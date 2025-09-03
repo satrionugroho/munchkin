@@ -29,7 +29,7 @@ config :munchkin, MunchkinWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :munchkin, Munchkin.Mailer, adapter: Swoosh.Adapters.Local
+# config :munchkin, MunchkinWeb.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,
@@ -70,7 +70,8 @@ config :munchkin, Munchkin.Repo,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
-config :munchkin, Munchkin.Mailer,
+config :munchkin, MunchkinWeb.Mailers,
+  adapter: Swoosh.Adapters.Local,
   sender_email: "noreply@application.com",
   sender_name: "Noreply"
 

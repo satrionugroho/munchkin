@@ -1,6 +1,6 @@
-defmodule Munchkin.Mailer do
+defmodule MunchkinWeb.Mailers do
   use Swoosh.Mailer, otp_app: :munchkin
-
+  
   def sender do
     config = Application.get_env(:munchkin, __MODULE__, [])
 

@@ -13,7 +13,7 @@ defmodule MunchkinWeb.FetchCurrentUser do
     case Munchkin.Cache.get(token) do
       {:ok, nil} -> get_from_database(token)
       {:ok, user} -> user
-        err -> err
+      err -> err
     end
     |> then(fn 
       {:error, message} -> unauthorized(conn, message)
@@ -26,7 +26,11 @@ defmodule MunchkinWeb.FetchCurrentUser do
   end
 
   defp unauthorized(conn, message) do
-    Plug.Conn.send_resp(conn, 401, message)
+    json_string = Jason.encode!(%{type: "error", message: message, data: []})
+
+    conn
+    |> Plug.Conn.put_resp_content_type("application/json")
+    |> Plug.Conn.send_resp(401, json_string)
     |> Plug.Conn.halt()
   end
 
@@ -35,7 +39,7 @@ defmodule MunchkinWeb.FetchCurrentUser do
       %Accounts.UserToken{} = user_token ->
         _ = Munchkin.Cache.put(token, user_token)
         user_token
-      _ -> {:error, "cannot validate token"}
+      _ -> {:error, "token is invalid or expired"}
     end
   end
 

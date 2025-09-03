@@ -12,4 +12,12 @@ defmodule MunchkinWeb.API.V1.UserJSON do
       }
     }
   end
+
+  def render("error.json", %{messages: messages}) do
+    %{
+      action: "update account",
+      data: nil,
+      messages: messages
+    }
+  end
 end

@@ -12,6 +12,8 @@ defmodule Munchkin.Accounts.User do
     field :verified_at, :naive_datetime
     field :sign_in_count, :integer, default: 0
     field :sign_in_attempt, :integer, default: 0
+    field :subcription_expired_at, :naive_datetime
+    field :tier, :integer, default: 0
 
     has_many :user_tokens, Munchkin.Accounts.UserToken
 
@@ -50,10 +52,12 @@ defmodule Munchkin.Accounts.User do
 
   defp cast_password(changeset) do
     case fetch_change(changeset, :password) do
-      {:ok, value} -> 
+      {:ok, value} ->
         hash = Argon2.hash_pwd_salt(value)
         put_change(changeset, :password_hash, hash)
-        _ -> changeset
+
+      _ ->
+        changeset
     end
   end
 
@@ -66,7 +70,9 @@ defmodule Munchkin.Accounts.User do
 
   defp get_increment_value(key, current_value, keyword, opts) do
     case Keyword.get(opts, :increment, false) do
-      true -> increment_value(current_value, keyword)
+      true ->
+        increment_value(current_value, keyword)
+
       _ ->
         case Keyword.keyword?(keyword) do
           true -> Keyword.get(keyword, key, current_value)
@@ -77,6 +83,7 @@ defmodule Munchkin.Accounts.User do
 
   defp assign_values(changeset, keyword, opts) do
     default = Keyword.get(opts, :default, 1)
+
     case Keyword.keyword?(keyword) do
       true -> Keyword.keys(keyword)
       _ -> keyword

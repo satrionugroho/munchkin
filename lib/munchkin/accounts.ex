@@ -159,8 +159,62 @@ defmodule Munchkin.Accounts do
   """
   def get_user_mfa_token(token) do
     now = DateTime.utc_now(:second)
-    query = from t in UserToken, preload: [:user], where: t.token == ^token and t.valid_until >= ^now and is_nil(t.used_at) and t.type == 5, limit: 1
+    query = from t in UserToken, preload: [:user], where: t.token == ^token and t.valid_until >= ^now and is_nil(t.used_at) and t.type == ^UserToken.two_factor_type(), limit: 1
     Repo.one(query)
+  end
+
+  @doc """
+  Create a single forgot password or nil
+
+  ## Examples
+
+    iex> create_user_forgot_password_token(user)
+    %UserToken{id: id}
+  """
+  def create_user_forgot_password_token(%User{} = user) do
+    user.user_tokens
+    |> Enum.filter(&Kernel.==(&1.type, UserToken.forgot_password_type()))
+    |> Enum.find(&Kernel.is_nil(&1.used_at))
+    |> case do
+      %UserToken{} = token -> {:ok, token}
+      _ ->
+        attrs = %{
+          user: user,
+          valid_until: NaiveDateTime.utc_now(:second) |> NaiveDateTime.shift(day: 7),
+          type: UserToken.forgot_password_type()
+        }
+        create_user_token(attrs)
+    end
+  end
+  def create_user_forgot_password_token(user_id) do
+    get_user!(user_id)
+    |> create_user_forgot_password_token()
+  end
+
+  @doc """
+  Get a single forgot password or nil
+
+  ## Examples
+
+    iex> reset_password_from_token(token, password)
+    %UserToken{id: id}
+  """
+  def reset_password_from_token(token, password) do
+    now = NaiveDateTime.utc_now(:second)
+    query = from t in UserToken, preload: [:user], where: t.token == ^token and t.type == ^UserToken.forgot_password_type() and is_nil(t.used_at) and t.valid_until >= ^now, limit: 1
+    case Repo.one(query) do
+      nil -> {:error, "token is expired or invalid"}
+      %UserToken{} = token -> do_reset_password(token, password)
+    end
+  end
+
+  defp do_reset_password(%{user: user} = token, password) do
+    Repo.transact(fn -> 
+      {:ok, updated_user} = update_user(user, %{password: password})
+      {:ok, token} = update_user_token(token, %{used_at: NaiveDateTime.utc_now(:second)})
+
+      {:ok, %{user: updated_user, token: token}}
+    end)
   end
 
   @doc """
@@ -179,6 +233,76 @@ defmodule Munchkin.Accounts do
     %UserToken{}
     |> UserToken.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Creates user access token
+
+  ## Examples
+
+      iex> create_user_access_token(%User{id: value})
+      {:ok, %UserToken{}}
+
+  """
+  def create_user_access_token(%User{} = user) do  
+    user.user_tokens
+    |> Enum.filter(fn token -> 
+      NaiveDateTime.after?(token.valid_until, NaiveDateTime.utc_now())
+      |> then(fn first -> 
+        Kernel.==(token.type, UserToken.access_token_type())
+        |> Kernel.and(first)
+      end)
+    end)
+    |> do_create_access_token_with_refresh(user)
+  end
+  def create_user_access_token(user_id) do
+    get_user!(user_id)
+    |> create_user_access_token()
+  end
+
+  defp do_create_access_token_with_refresh(tokens, user) do
+    token_ids = Enum.filter(tokens, &Kernel.is_nil(&1.used_at)) |> Enum.map(&(&1.id))
+    query = from t in UserToken, where: t.id in ^token_ids
+    updates = [set: [used_at: NaiveDateTime.utc_now(:second)]]
+    attrs = %{
+      user: user,
+      valid_until: NaiveDateTime.utc_now(:second) |> NaiveDateTime.shift(day: 7),
+      type: UserToken.access_token_type()
+    }
+
+    Repo.transact(fn ->
+      Repo.update_all(query, updates)
+      {:ok, access} = case create_user_token(attrs) do
+        {:ok, _access} = ret ->
+          Enum.map(tokens, &Munchkin.Cache.delete(&1.token))
+          ret
+        err -> err
+      end
+      refresh = should_generate_refresh_token?(user)
+
+
+      {:ok, %{access: access, refresh: refresh}}
+    end)
+  end
+
+  defp should_generate_refresh_token?(user) do
+    user.user_tokens
+    |> Enum.find(&Kernel.==(&1.type, UserToken.refresh_token_type()))
+    |> case do
+      %UserToken{valid_until: valid} = token -> [NaiveDateTime.before?(valid, NaiveDateTime.utc_now()), token]
+        _ -> [true, nil]
+    end
+    |> then(fn
+      [true, _] -> 
+        attrs = %{
+          user: user,
+          valid_until: NaiveDateTime.utc_now(:second) |> NaiveDateTime.shift(day: 7),
+          type: UserToken.refresh_token_type()
+        }
+        {:ok, token} = create_user_token(attrs)
+        token
+      [_, token] -> token
+    end)
   end
 
   @doc """

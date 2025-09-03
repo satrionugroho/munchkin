@@ -2,25 +2,27 @@ defmodule MunchkinWeb.API.V1.UserController do
   use MunchkinWeb, :controller
 
   alias Munchkin.Accounts
+  alias Munchkin.Accounts.UserToken
 
   def index(conn, _params) do
     current_user = get_current_user(conn)
     render(conn, :index, user: current_user)
   end
 
-  def update(conn, params) do
+  def create(conn, params) do
     with current_user <- get_current_user(conn),
-      ["Bearer " <> token] <- get_req_header(conn, "authorization"),
-      {:ok, updated_user} <- update_user(current_user, params) do
+            ["Bearer " <> token] <- get_req_header(conn, "authorization"),
+            {:ok, updated_user} <- update_user(current_user, params) do
       Munchkin.Cache.delete(token)
-      render(conn, :index, user: updated_user, message: gettext("user was updated sucessfully"))
+      render(conn, :index, user: updated_user, messages: [gettext("user was updated sucessfully")])
     else
+      {:error, msg} -> render(conn, :error, messages: [msg])
       _ ->
-      render(conn, :error, message: gettext("cannot update user"))
+          render(conn, :error, messages: [gettext("cannot update user")])
     end
   end
 
-  def update_user(user, %{"action" => "two_factor"} = _params) do
+  defp update_user(user, %{"action" => "two_factor"} = _params) do
     attrs = %{
       user: user,
       valid_until: DateTime.utc_now() |> DateTime.shift(minute: 60),
@@ -33,25 +35,25 @@ defmodule MunchkinWeb.API.V1.UserController do
     end
   end
 
-  def update_user(user, %{"action" => "validate_two_factor"} = params) do
+  defp update_user(user, %{"action" => "validate_two_factor"} = params) do
     user.user_tokens
-    |> Enum.filter(&Kernel.==(&1.type, Accounts.UserToken.two_factor_type()))
+    |> Enum.find(&Kernel.==(&1.type, Accounts.UserToken.two_factor_type()))
     |> case do
-      [token | _rest] -> validate_mfa_token(token, params)
-        _ -> {:error, gettext("token not found")}
+      %UserToken{} = token -> validate_mfa_token(token, params)
+      _ -> {:error, gettext("token not found")}
     end
   end
 
-  def update_user(user, %{"action" => "delete_two_factor"} = _params) do
+  defp update_user(user, %{"action" => "delete_two_factor"} = _params) do
     user.user_tokens
-    |> Enum.filter(&Kernel.==(&1.type, Accounts.UserToken.two_factor_type()))
+    |> Enum.find(&Kernel.==(&1.type, Accounts.UserToken.two_factor_type()))
     |> case do
-      [token | _rest] -> Accounts.delete_user_token(token)
-        _ -> {:error, gettext("token not found")}
+      %UserToken{} = token -> Accounts.delete_user_token(token)
+      _ -> {:error, gettext("token not found")}
     end
   end
 
-  def update_user(user, params) do
+  defp update_user(user, params) do
     Accounts.update_user(user, params)
   end
 
@@ -59,7 +61,11 @@ defmodule MunchkinWeb.API.V1.UserController do
     Base.url_decode64!(user_token.token)
     |> NimbleTOTP.valid?(code, period: 60)
     |> case do
-      false -> {:error, gettext("cannot verify the given code")}
+      false ->
+       
+
+        {:error, gettext("cannot verify the given code")}
+
       _ ->
         date = NaiveDateTime.utc_now() |> NaiveDateTime.shift(year: 1000)
 
@@ -67,8 +73,9 @@ defmodule MunchkinWeb.API.V1.UserController do
           {:ok, t} -> {:ok, Accounts.get_user!(t.user_id)}
           _ -> {:error, gettext("cannot update the user token")}
         end
+
     end
   end
-  defp validate_mfa_token(_token, _), do: {:error, gettext("code not found")}
 
+  defp validate_mfa_token(_token, _), do: {:error, gettext("code not found")}
 end

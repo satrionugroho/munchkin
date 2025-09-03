@@ -34,6 +34,9 @@ defmodule MunchkinWeb.Router do
     scope "/v1", V1 do
       post "/registrations", RegistrationController, :create
       post "/sessions", SessionController, :create
+
+      get "/forgot_password", SessionController, :forgot_password_request
+      post "/forgot_password", SessionController, :forgot_password
     end
   end
 

@@ -106,10 +106,45 @@ defmodule MunchkinWeb do
     end
   end
 
+  def mailer(opts) do
+    view = Keyword.get(opts, :view)
+    engine = Keyword.get(opts, :engine)
+
+    quote bind_quoted: [view: view, engine: engine] do
+      use Gettext, backend: MunchkinWeb.Gettext
+
+      import Swoosh.Email
+
+      def render_body(email, template, assigns \\ %{}) do
+        title = Map.get(assigns, :title, "")
+        message =
+          Phoenix.Template.render_to_string(unquote(view), to_string(template), "html", assigns)
+
+        rendered =
+          Phoenix.Template.render_to_string(unquote(view), "email", "html",
+            inner_content: message,
+            title: title
+          )
+
+        email
+        |> html_body(rendered)
+      end
+
+      def deliver(email), do: unquote(engine).deliver(email)
+
+      def sender, do: unquote(engine).sender()
+    end
+  end
+
   @doc """
   When used, dispatch to the appropriate controller/live_view/etc.
   """
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])
+  end
+
+  defmacro __using__(opts) do
+    {which, params} = Keyword.pop_first(opts, :type)
+    apply(__MODULE__, which, [params])
   end
 end
