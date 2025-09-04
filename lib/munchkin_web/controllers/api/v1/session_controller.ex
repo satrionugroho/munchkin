@@ -1,9 +1,24 @@
 defmodule MunchkinWeb.API.V1.SessionController do
   use MunchkinWeb, :controller
 
+  alias Munchkin.Repo
   alias Munchkin.Accounts
   alias Munchkin.Accounts.User
   alias Munchkin.Accounts.UserToken
+
+  def create(conn, %{"refresh_token" => raw}) when not is_nil(raw) do
+    with {:ok, token} <- Base.url_decode64(raw),
+         {:ok, user} <- Accounts.get_user_by_refresh_token(token),
+         {:ok, tokens} <- generate_new_token(user, token) do
+      render(conn, :create,
+        user: user,
+        tokens: tokens
+      )
+    else
+      {:error, message} ->
+        render(conn, :error, messages: [message])
+    end
+  end
 
   def create(conn, params) do
     with email <- Map.get(params, "email"),
@@ -13,7 +28,7 @@ defmodule MunchkinWeb.API.V1.SessionController do
          true <- Argon2.verify_pass(password, user.password_hash),
          {:ok, tokens} <- maybe_create_user_token(user, otp) do
       Munchkin.DelayedJob.delay(fn ->
-        Accounts.update_user(user, %{}, :success_login_changeset)
+        Accounts.update_user(user, %{}, :login_changeset)
       end)
 
       render(conn, :create,
@@ -22,7 +37,9 @@ defmodule MunchkinWeb.API.V1.SessionController do
         messages: [gettext("need to verfy the email")]
       )
     else
-      {:retry, user, messages} -> render(conn, :create, user: user, tokens: nil, messages: messages)
+      {:retry, user, messages} ->
+        render(conn, :retry, user: user, messages: messages)
+
       _ ->
         Munchkin.DelayedJob.delay(fn -> maybe_update_user(params) end)
 
@@ -34,8 +51,8 @@ defmodule MunchkinWeb.API.V1.SessionController do
     with email <- Map.get(params, "email"),
          {:ok, user} <- find_user_by_email(email),
          {:ok, token} <- Accounts.create_user_forgot_password_token(user) do
-
       Munchkin.DelayedJob.delay(fn -> send_forgot_password_email(user, token) end)
+
       render(conn, :forgot_password_request,
         messages: [gettext("an email was sent to given address if email exists")]
       )
@@ -47,7 +64,7 @@ defmodule MunchkinWeb.API.V1.SessionController do
     end
   end
 
-  def forgot_password(conn, params) do         
+  def forgot_password(conn, params) do
     with token <- Map.get(params, "token"),
          password <- Map.get(params, "password"),
          password_confirmation <- Map.get(params, "password_confirmation"),
@@ -75,7 +92,7 @@ defmodule MunchkinWeb.API.V1.SessionController do
 
       email ->
         case find_user_by_email(email) do
-          {:ok, user} -> Accounts.update_user(user, %{}, :failed_login_changeset)
+          {:ok, user} -> Accounts.update_user(user, %{}, :login_changeset)
           _ -> :ok
         end
     end
@@ -93,14 +110,15 @@ defmodule MunchkinWeb.API.V1.SessionController do
   end
 
   defp maybe_create_user_token(%User{verified_at: date} = user, otp) when date != nil do
-    user.user_tokens
-    |> Enum.find(&Kernel.==(&1.type, UserToken.two_factor_type()))
+    user.two_factor_tokens
+    |> Enum.find(&Kernel.is_nil(&1.used_at))
     |> case do
       %UserToken{} = token -> should_verify_the_otp(user, token, otp)
       _ -> should_create_user_token(user)
     end
   end
-  defp maybe_create_user_token(_, _), do: {:ok, nil}
+
+  defp maybe_create_user_token(_user, _otp), do: {:ok, nil}
 
   defp should_create_user_token(user) do
     case Accounts.create_user_access_token(user) do
@@ -110,15 +128,33 @@ defmodule MunchkinWeb.API.V1.SessionController do
   end
 
   defp should_verify_the_otp(user, token, otp) when not is_nil(otp) do
-    case NimbleTOTP.valid?(token.token, otp) do
+    NimbleTOTP.valid?(token.token, otp)
+    |> case do
       true -> should_create_user_token(user)
       _ -> {:error, gettext("cannot verify the otp token")}
     end
   end
-  defp should_verify_the_otp(user, _token, _otp), do: {:retry, user, [gettext("should enter the otp")]}
 
+  defp should_verify_the_otp(user, _token, _otp),
+    do: {:retry, user, [gettext("should enter the otp")]}
 
   defp send_forgot_password_email(user, token) do
     MunchkinWeb.Mailers.ForgotPasswordMailer.send_email(user, token)
+  end
+
+  defp generate_new_token(user, token) do
+    user.refresh_tokens
+    |> Enum.find(&Kernel.==(&1.token, token))
+    |> case do
+      %UserToken{} = token ->
+        Repo.transact(fn ->
+          Accounts.update_user_token(token, %{used_at: NaiveDateTime.utc_now(:second), user: user})
+
+          should_create_user_token(user)
+        end)
+
+      _ ->
+        {:error, "cannot find the refresh token"}
+    end
   end
 end

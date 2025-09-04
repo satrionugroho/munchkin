@@ -6,7 +6,7 @@ defmodule Munchkin.Accounts do
   import Ecto.Query, warn: false
   alias Munchkin.Repo
 
-  alias Munchkin.Accounts.{User, UserToken}
+  alias Munchkin.Accounts.{PartialQuery, User, UserToken}
 
   @doc """
   Returns the list of users.
@@ -35,8 +35,13 @@ defmodule Munchkin.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id) do 
-    query = from u in User, preload: [:user_tokens], where: u.id == ^id, limit: 1
+  def get_user!(id, relations \\ [:access_tokens, :two_factor_tokens]) do
+    query =
+      from u in User,
+        preload: ^PartialQuery.user_preloader(relations),
+        where: u.id == ^id,
+        limit: 1
+
     case Repo.one(query) do
       nil -> raise Ecto.NoResultsError, "cannot find user"
       user -> user
@@ -57,8 +62,73 @@ defmodule Munchkin.Accounts do
   """
   def get_user_by_email(email) when is_bitstring(email) do
     sanitized = String.downcase(email)
-    query = from u in User, preload: [:user_tokens], where: u.email == ^sanitized, limit: 1
+
+    query =
+      from u in User,
+        preload: ^PartialQuery.user_preloader(),
+        where: u.email == ^sanitized,
+        limit: 1
+
     Repo.one(query)
+  end
+
+  def get_user_by_access_token(token) when is_bitstring(token) do
+    with [expired_at, valid_token] <- decode_user_token(token),
+         query <- PartialQuery.active_token_query(UserToken.access_token_type(), valid_token),
+         %UserToken{} = token <- Repo.one(query),
+         {:ok, _user} = data <- verify_token_validity(token, expired_at) do
+      data
+    else
+      {:error, _} = err -> err
+      err -> err
+    end
+  end
+
+  defp decode_user_token(token) do
+    with {:ok, decoded_token} <- Base.url_decode64(token),
+         <<head::binary-size(4)>> <> valid_token <- decoded_token,
+         list_head <- :binary.bin_to_list(head),
+         rev_head <- :lists.reverse(list_head),
+         dt <- IO.iodata_to_binary(rev_head),
+         dt_bytes <- :binary.decode_unsigned(dt),
+         {:ok, expired_at} <- DateTime.from_unix(dt_bytes) do
+      [expired_at, valid_token]
+    else
+      {:error, _} = err -> err
+      err -> err
+    end
+  end
+
+  defp verify_token_validity(token, datetime) do
+    now = DateTime.utc_now()
+
+    case DateTime.after?(datetime, now) do
+      true -> {:ok, get_user!(token.user_id)}
+      _ -> {:error, "token is invalid"}
+    end
+  end
+
+  @doc """
+  Get user by refresh token
+
+  ## Examples
+
+      iex> get_user_by_refresh_token("token")
+      %User{}
+
+      iex> get_user_by_refresh_token!("not_valid_token")
+      nil
+  """
+  def get_user_by_refresh_token(token) do
+    query = PartialQuery.active_token_query(UserToken.refresh_token_type(), token)
+
+    case Repo.one(query) do
+      %UserToken{} = token ->
+        {:ok, get_user!(token.user_id, [:access_tokens, :two_factor_tokens, :refresh_tokens])}
+
+      _ ->
+        {:error, "cannot get user from given token"}
+    end
   end
 
   @doc """
@@ -91,9 +161,16 @@ defmodule Munchkin.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_user(%User{} = user, attrs, changeset_fun \\ :changeset) do
+  def update_user(user, attrs, changeset_fun \\ :changeset)
+
+  def update_user(%User{} = user, attrs, changeset_fun) do
     apply(User, changeset_fun, [user, attrs])
     |> Repo.update()
+  end
+
+  def update_user(user_id, attrs, changeset_fun) do
+    Repo.get(User, user_id)
+    |> update_user(attrs, changeset_fun)
   end
 
   @doc """
@@ -133,17 +210,34 @@ defmodule Munchkin.Accounts do
   ## Examples
 
       iex> get_user_token("token")
-      %UserToken{}
+      {:ok, %UserToken{}}
 
       iex> get_user_token("not valid token")
       ** (Ecto.NoResultsError)
 
   """
   def get_user_token(token) do
-    now = DateTime.utc_now(:second)
-    query = from t in UserToken, preload: [user: [:user_tokens]], where: t.token == ^token and t.valid_until >= ^now and is_nil(t.used_at), limit: 1
-    Repo.one(query)
+    with [_expired_at, valid_token] <- decode_user_token(token),
+         query <- PartialQuery.get_token_query(valid_token, with_limit: true),
+         %UserToken{} = token <- Repo.one(query) do
+      {:ok, token}
+    else
+      err -> err
+    end
   end
+
+  defp validate_token(%UserToken{type: token_type} = token, type) when token_type == type do
+    case DateTime.after?(token.valid_until, DateTime.utc_now(:second)) do
+      true -> Kernel.is_nil(token.used_at)
+      _ -> false
+    end
+    |> then(fn
+      true -> {:ok, token}
+      _ -> validate_token(nil, nil)
+    end)
+  end
+
+  defp validate_token(_, _), do: {:error, "cannot get user token"}
 
   @doc """
   Gets a single mfa token or nil
@@ -157,10 +251,11 @@ defmodule Munchkin.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user_mfa_token(token) do
-    now = DateTime.utc_now(:second)
-    query = from t in UserToken, preload: [:user], where: t.token == ^token and t.valid_until >= ^now and is_nil(t.used_at) and t.type == ^UserToken.two_factor_type(), limit: 1
-    Repo.one(query)
+  def get_user_mfa_token(token_string) do
+    case get_user_token(token_string) do
+      {:ok, token} -> validate_token(token, UserToken.two_factor_type())
+      _ -> {:error, "cannot get user token"}
+    end
   end
 
   @doc """
@@ -172,20 +267,25 @@ defmodule Munchkin.Accounts do
     %UserToken{id: id}
   """
   def create_user_forgot_password_token(%User{} = user) do
-    user.user_tokens
-    |> Enum.filter(&Kernel.==(&1.type, UserToken.forgot_password_type()))
+    user
+    |> Repo.preload([:forgot_password_tokens])
+    |> then(& &1.forgot_password_tokens)
     |> Enum.find(&Kernel.is_nil(&1.used_at))
     |> case do
-      %UserToken{} = token -> {:ok, token}
+      %UserToken{} = token ->
+        {:ok, token}
+
       _ ->
         attrs = %{
           user: user,
-          valid_until: NaiveDateTime.utc_now(:second) |> NaiveDateTime.shift(day: 7),
+          valid_until: DateTime.utc_now(:second) |> DateTime.shift(day: 7),
           type: UserToken.forgot_password_type()
         }
+
         create_user_token(attrs)
     end
   end
+
   def create_user_forgot_password_token(user_id) do
     get_user!(user_id)
     |> create_user_forgot_password_token()
@@ -200,18 +300,20 @@ defmodule Munchkin.Accounts do
     %UserToken{id: id}
   """
   def reset_password_from_token(token, password) do
-    now = NaiveDateTime.utc_now(:second)
-    query = from t in UserToken, preload: [:user], where: t.token == ^token and t.type == ^UserToken.forgot_password_type() and is_nil(t.used_at) and t.valid_until >= ^now, limit: 1
-    case Repo.one(query) do
+    case get_user_token(token) do
+      {:ok, token} -> validate_token(token, UserToken.forgot_password_type())
       nil -> {:error, "token is expired or invalid"}
-      %UserToken{} = token -> do_reset_password(token, password)
     end
+    |> then(fn
+      {:ok, token} -> do_reset_password(token, password)
+      err -> err
+    end)
   end
 
   defp do_reset_password(%{user: user} = token, password) do
-    Repo.transact(fn -> 
+    Repo.transact(fn ->
       {:ok, updated_user} = update_user(user, %{password: password})
-      {:ok, token} = update_user_token(token, %{used_at: NaiveDateTime.utc_now(:second)})
+      {:ok, token} = update_user_token(token, %{used_at: DateTime.utc_now(:second)})
 
       {:ok, %{user: updated_user, token: token}}
     end)
@@ -244,65 +346,102 @@ defmodule Munchkin.Accounts do
       {:ok, %UserToken{}}
 
   """
-  def create_user_access_token(%User{} = user) do  
-    user.user_tokens
-    |> Enum.filter(fn token -> 
-      NaiveDateTime.after?(token.valid_until, NaiveDateTime.utc_now())
-      |> then(fn first -> 
-        Kernel.==(token.type, UserToken.access_token_type())
-        |> Kernel.and(first)
-      end)
+  def create_user_access_token(%User{} = user) do
+    user
+    |> Repo.preload([:access_tokens])
+    |> Map.get(:access_tokens)
+    |> Enum.sort(fn a, b ->
+      DateTime.after?(a.valid_until, b.valid_until)
     end)
     |> do_create_access_token_with_refresh(user)
   end
+
   def create_user_access_token(user_id) do
     get_user!(user_id)
     |> create_user_access_token()
   end
 
   defp do_create_access_token_with_refresh(tokens, user) do
-    token_ids = Enum.filter(tokens, &Kernel.is_nil(&1.used_at)) |> Enum.map(&(&1.id))
+    token_ids = Enum.filter(tokens, &Kernel.is_nil(&1.used_at)) |> Enum.map(& &1.id)
     query = from t in UserToken, where: t.id in ^token_ids
-    updates = [set: [used_at: NaiveDateTime.utc_now(:second)]]
+
+    [_first | delete_tokens] =
+      case Enum.chunk_every(tokens, 2) do
+        [] -> [nil]
+        rst -> rst
+      end
+
+    updates = [set: [used_at: DateTime.utc_now(:second)]]
+
     attrs = %{
       user: user,
-      valid_until: NaiveDateTime.utc_now(:second) |> NaiveDateTime.shift(day: 7),
+      valid_until: DateTime.utc_now(:second) |> DateTime.shift(day: 7),
       type: UserToken.access_token_type()
     }
 
     Repo.transact(fn ->
       Repo.update_all(query, updates)
-      {:ok, access} = case create_user_token(attrs) do
-        {:ok, _access} = ret ->
-          Enum.map(tokens, &Munchkin.Cache.delete(&1.token))
-          ret
-        err -> err
-      end
-      refresh = should_generate_refresh_token?(user)
 
+      List.flatten(delete_tokens)
+      |> Enum.map(& &1.id)
+      |> case do
+        [] -> :ok
+        lst -> Repo.delete_all(from t in UserToken, where: t.id in ^lst)
+      end
+
+      {:ok, access} =
+        case create_user_token(attrs) do
+          {:ok, _access} = ret ->
+            Enum.map(tokens, &Munchkin.Cache.delete(&1.token))
+            ret
+
+          err ->
+            err
+        end
+
+      refresh = should_generate_refresh_token?(user)
 
       {:ok, %{access: access, refresh: refresh}}
     end)
   end
 
   defp should_generate_refresh_token?(user) do
-    user.user_tokens
-    |> Enum.find(&Kernel.==(&1.type, UserToken.refresh_token_type()))
+    user
+    |> Repo.preload([:refresh_tokens], force: true)
+    |> Map.get(:refresh_tokens, [])
+    |> tap(fn tokens -> filter_unused_refresh_tokens(tokens) end)
+    |> Enum.find(&Kernel.is_nil(&1.used_at))
     |> case do
-      %UserToken{valid_until: valid} = token -> [NaiveDateTime.before?(valid, NaiveDateTime.utc_now()), token]
-        _ -> [true, nil]
-    end
-    |> then(fn
-      [true, _] -> 
+      %UserToken{} = token ->
+        token
+
+      _ ->
         attrs = %{
           user: user,
-          valid_until: NaiveDateTime.utc_now(:second) |> NaiveDateTime.shift(day: 7),
+          valid_until: DateTime.utc_now(:second) |> DateTime.shift(day: 7),
           type: UserToken.refresh_token_type()
         }
+
         {:ok, token} = create_user_token(attrs)
         token
-      [_, token] -> token
-    end)
+    end
+  end
+
+  defp filter_unused_refresh_tokens(tokens) do
+    Enum.reject(tokens, &Kernel.is_nil(&1.used_at))
+    |> Enum.sort(fn a, b -> DateTime.after?(a, b) end)
+    |> Enum.chunk_every(2)
+    |> case do
+      [] ->
+        :ok
+
+      [_first | []] ->
+        :ok
+
+      [_first | tokens] ->
+        ids = List.flatten(tokens) |> Enum.map(& &1.id)
+        Repo.delete_all(from t in UserToken, where: t.id == ^ids)
+    end
   end
 
   @doc """

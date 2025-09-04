@@ -29,13 +29,19 @@ defmodule MunchkinWeb.Mailers.EmailVerificationMailer do
     |> to({fullname, user.email})
     |> from(sender())
     |> subject("Account Verifications")
-    |> render_body(:welcome, %{fullname: fullname, token_url: compose_url(user_token.token), title: gettext("Welcome onboard")})
+    |> render_body(:welcome, %{
+      fullname: fullname,
+      token_url: compose_url(user_token),
+      title: gettext("Welcome onboard")
+    })
     |> deliver()
   end
 
   defp compose_url(token) do
+    valid_token = MunchkinWeb.Utils.decode_token(token)
+
     MunchkinWeb.Endpoint.url()
     |> Kernel.<>("/accounts/verification")
-    |> Kernel.<>("?token=#{token}")
+    |> Kernel.<>("?token=#{valid_token}")
   end
 end

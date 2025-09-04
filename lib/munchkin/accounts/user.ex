@@ -9,13 +9,17 @@ defmodule Munchkin.Accounts.User do
     field :profile_url, :string
     field :password, :string, virtual: true
     field :password_hash, :string
-    field :verified_at, :naive_datetime
-    field :sign_in_count, :integer, default: 0
+    field :verified_at, :utc_datetime
     field :sign_in_attempt, :integer, default: 0
-    field :subcription_expired_at, :naive_datetime
+    field :subscription_expired_at, :utc_datetime
     field :tier, :integer, default: 0
 
-    has_many :user_tokens, Munchkin.Accounts.UserToken
+    has_one :email_verification_token, Munchkin.Accounts.UserToken, where: [type: 1]
+    has_many :access_tokens, Munchkin.Accounts.UserToken, where: [type: 2]
+    has_many :refresh_tokens, Munchkin.Accounts.UserToken, where: [type: 3]
+    has_many :forgot_password_tokens, Munchkin.Accounts.UserToken, where: [type: 4]
+    has_many :two_factor_tokens, Munchkin.Accounts.UserToken, where: [type: 5]
+    has_many :subcriptions_tokens, Munchkin.Accounts.UserToken, where: [type: 6]
 
     timestamps(type: :utc_datetime)
   end
@@ -30,14 +34,7 @@ defmodule Munchkin.Accounts.User do
   end
 
   @doc false
-  def success_login_changeset(user, attrs) do
-    user
-    |> cast(attrs, [])
-    |> assign_values([:sign_in_count, :sign_in_attempt], increment: true, increment_by: 1)
-  end
-
-  @doc false
-  def failed_login_changeset(user, attrs) do
+  def login_changeset(user, attrs) do
     user
     |> cast(attrs, [])
     |> assign_values([:sign_in_attempt], increment: true, increment_by: 1)
@@ -47,7 +44,7 @@ defmodule Munchkin.Accounts.User do
   def email_verified_changeset(user, attrs) do
     user
     |> cast(attrs, [])
-    |> assign_values([:verified_at], default: NaiveDateTime.utc_now(:second))
+    |> assign_values([:verified_at], default: DateTime.utc_now(:second))
   end
 
   defp cast_password(changeset) do

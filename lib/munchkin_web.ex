@@ -117,6 +117,7 @@ defmodule MunchkinWeb do
 
       def render_body(email, template, assigns \\ %{}) do
         title = Map.get(assigns, :title, "")
+
         message =
           Phoenix.Template.render_to_string(unquote(view), to_string(template), "html", assigns)
 

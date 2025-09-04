@@ -22,8 +22,18 @@ POST {{BASE_URL}}/sessions HTTP/1.1
 Content-Type: application/json
 
 {
-  "email": "satrio.nu27@gmail.com",
+  "email": "{{user_email}}",
   "password": "{{user_password}}"
+}
+
+
+### SESSION_FROM_REFRESH
+
+POST {{BASE_URL}}/sessions HTTP/1.1
+Content-Type: application/json
+
+{
+  "refresh_token": "{{CREATE_SESSION.response.body.$.data.tokens.refresh}}"
 }
 
 
@@ -38,3 +48,34 @@ Content-Type: application/json
 GET {{BASE_URL}}/accounts HTTP/1.1
 Authorization: Bearer {{CREATE_SESSION.response.body.$.data.tokens.access}}
 Content-Type: application/json
+
+
+### Two factor request
+
+POST {{BASE_URL}}/accounts?action=two_factor HTTP/1.1
+Authorization: Bearer {{CREATE_SESSION.response.body.$.data.tokens.access}}
+Content-Type: application/json
+
+
+### Two factor validate
+
+POST {{BASE_URL}}/accounts HTTP/1.1
+Authorization: Bearer {{CREATE_SESSION.response.body.$.data.tokens.access}}
+Content-Type: application/json
+
+{
+  "action": "validate_two_factor",
+  "code": "212306"
+}
+
+
+### Delete two factor
+
+POST {{BASE_URL}}/accounts HTTP/1.1
+Authorization: Bearer {{CREATE_SESSION.response.body.$.data.tokens.access}}
+Content-Type: application/json
+
+{
+  "action": "delete_two_factor",
+  "id": "11"
+}

@@ -1,0 +1,15 @@
+<Layouts.flash_group flash={@flash} />
+
+<div>
+  <p>
+    Hello there,
+  </p>
+  <p>
+    You have encounter this error
+    <ol>
+      <li :for={msg <- @messages}>
+        {msg}
+      </li>
+    </ol>
+  </p>
+</div>

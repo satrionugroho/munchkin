@@ -75,6 +75,8 @@ config :munchkin, MunchkinWeb.Mailers,
   sender_email: "noreply@application.com",
   sender_name: "Noreply"
 
+config :munchkin, Munchkin, name: "app"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

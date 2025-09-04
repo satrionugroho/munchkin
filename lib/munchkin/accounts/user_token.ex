@@ -3,9 +3,9 @@ defmodule Munchkin.Accounts.UserToken do
   import Ecto.Changeset
 
   schema "user_tokens" do
-    field :token, :string
-    field :valid_until, :naive_datetime
-    field :used_at, :naive_datetime
+    field :token, :binary
+    field :valid_until, :utc_datetime
+    field :used_at, :utc_datetime
     field :type, :integer
 
     belongs_to :user, Munchkin.Accounts.User
@@ -23,8 +23,12 @@ defmodule Munchkin.Accounts.UserToken do
     |> create_token()
   end
 
-  defp assign_user(changeset, user) when is_nil(user),
-    do: add_error(changeset, :user, "cannot be nil")
+  defp assign_user(changeset, user) when is_nil(user) do
+    case get_field(changeset, :user_id) do
+      nil -> add_error(changeset, :user_id, "user cannot be nil")
+      _ch -> changeset
+    end
+  end
 
   defp assign_user(changeset, user) do
     case get_field(changeset, :user_id) do
@@ -40,7 +44,7 @@ defmodule Munchkin.Accounts.UserToken do
   defp create_token(changeset) do
     case get_field(changeset, :token) do
       nil ->
-        type = get_field(changeset, :type)
+        type = get_field(changeset, :type) |> to_string()
         put_change(changeset, :token, generated_token(type))
 
       _ ->
@@ -48,30 +52,26 @@ defmodule Munchkin.Accounts.UserToken do
     end
   end
 
-  defp generated_token("5") do
-    NimbleTOTP.secret(20)
-    |> Base.url_encode64()
-  end
+  defp generated_token("5"), do: NimbleTOTP.secret(32)
 
   defp generated_token(type) do
-    len = Map.get(variants(), to_string(type))
+    len = Map.get(variants(), type)
 
     :rand.bytes(len)
-    |> Base.url_encode64()
   end
 
   defp variants do
     %{
       # email verification
-      "1" => 32,
+      "1" => 48,
       # access token
-      "2" => 48,
+      "2" => 32,
       # refresh token
       "3" => 64,
       # forgot password
-      "4" => 32,
+      "4" => 48,
       # subscription
-      "6" => 32,
+      "6" => 48
     }
   end
 

@@ -3,7 +3,7 @@ defmodule Munchkin.Repo.Migrations.CreateUserTokens do
 
   def change do
     create table(:user_tokens) do
-      add :token, :string
+      add :token, :binary
       add :valid_until, :utc_datetime
       add :used_at, :utc_datetime
       add :type, :integer

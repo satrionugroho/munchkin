@@ -16,8 +16,9 @@ defmodule MunchkinWeb.Mailers.ForgotPasswordMailer do
   end
 
   defp compose_url(token) do
-    MunchkinWeb.Endpoint.url()
-    |> Kernel.<>("/forgot-password?token=#{token}")
-  end
+    valid_token = Base.url_encode64(token.token)
 
+    MunchkinWeb.Endpoint.url()
+    |> Kernel.<>("/forgot-password?token=#{valid_token}")
+  end
 end

@@ -9,9 +9,8 @@ defmodule Munchkin.Repo.Migrations.CreateUsers do
       add :email, :string
       add :password_hash, :string
       add :verified_at, :utc_datetime
-      add :sign_in_count, :integer
       add :sign_in_attempt, :integer
-      add :subcription_expired_at, :utc_datetime
+      add :subscription_expired_at, :utc_datetime
       add :tier, :integer, default: 0
 
       timestamps(type: :utc_datetime)
