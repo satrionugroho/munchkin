@@ -6,6 +6,7 @@ defmodule MunchkinWeb.API.V1.RegistrationJSON do
         email: user.email,
         name: "#{user.firstname} #{user.lastname}" |> String.trim()
       },
+      messages: [],
       action: "register"
     }
   end
@@ -14,7 +15,7 @@ defmodule MunchkinWeb.API.V1.RegistrationJSON do
     %{
       data: nil,
       action: "register",
-      message: messages
+      messages: messages
     }
   end
 end

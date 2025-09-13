@@ -3,6 +3,8 @@ defmodule MunchkinWeb.API.V1.UserTokenJSON do
     MunchkinWeb.Utils.decode_token(token)
   end
 
+  def token_data(str), do: str
+
   def session_tokens(%{access: access, refresh: refresh}) do
     %{
       access: token_data(access),

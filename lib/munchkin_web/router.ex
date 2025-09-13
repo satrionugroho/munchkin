@@ -45,6 +45,7 @@ defmodule MunchkinWeb.Router do
 
     scope "/v1", V1 do
       resources "/accounts", UserController, only: [:index, :create]
+      get "/accounts/two_factors", UserController, :two_factors
     end
   end
 

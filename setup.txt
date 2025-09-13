@@ -1,0 +1,1 @@
+otpauth://totp/app:satrio.nu28@gmail.com?secret=B33HPOBNKUCWNPQ5WPPCTIVYS5L7ZYBSD4SAAVNVTM527XE2DW4Q&issuer=app

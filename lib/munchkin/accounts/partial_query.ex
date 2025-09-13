@@ -41,4 +41,14 @@ defmodule Munchkin.Accounts.PartialQuery do
       _ -> from t in UserToken, where: t.token == ^token
     end
   end
+
+  def delete_unused_2fa_token(user_id) do
+    type = UserToken.two_factor_type()
+    one_day = DateTime.utc_now(:second) |> DateTime.shift(day: 1)
+
+    from t in UserToken,
+      where:
+        t.type == ^type and is_nil(t.used_at) and t.user_id == ^user_id and
+          t.valid_until < ^one_day
+  end
 end

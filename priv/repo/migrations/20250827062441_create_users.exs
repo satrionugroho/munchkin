@@ -7,6 +7,7 @@ defmodule Munchkin.Repo.Migrations.CreateUsers do
       add :lastname, :string
       add :profile_url, :string
       add :email, :string
+      add :email_source, :string
       add :password_hash, :string
       add :verified_at, :utc_datetime
       add :sign_in_attempt, :integer

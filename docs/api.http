@@ -1,6 +1,8 @@
 @BASE_URL = http://localhost:4000/api/v1
-@user_email = satrio.nu28@gmail.com
-@user_password = KudaMakanKalengKacang
+@user_email = satrio.nu22@gmail.com
+@user_password = satrio1234S
+
+# // @user_password = KudaMakanKalengKacang
 
 
 ### Register a user
@@ -65,7 +67,7 @@ Content-Type: application/json
 
 {
   "action": "validate_two_factor",
-  "code": "212306"
+  "code": "641874"
 }
 
 

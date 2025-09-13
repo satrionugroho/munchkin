@@ -69,7 +69,9 @@ defmodule Munchkin.MixProject do
       {:argon2_elixir, "~> 4.1.3"},
       {:nebulex, "~> 3.0.0-rc.1"},
       {:nebulex_local, "~> 3.0.0-rc.1"},
-      {:nimble_totp, "~> 1.0.0"}
+      {:nimble_totp, "~> 1.0.0"},
+      {:elixir_auth_google, "~> 1.6.9"},
+      {:cors_plug, "~> 3.0"}
     ]
   end
 

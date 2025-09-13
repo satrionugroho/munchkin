@@ -5,6 +5,7 @@ defmodule MunchkinWeb.API.V1.SessionJSON do
         user: MunchkinWeb.API.V1.UserJSON.user_data(user),
         tokens: MunchkinWeb.API.V1.UserTokenJSON.session_tokens(tokens)
       },
+      messages: [],
       action: "login"
     }
   end
@@ -16,7 +17,7 @@ defmodule MunchkinWeb.API.V1.SessionJSON do
         tokens: nil
       },
       action: "login",
-      message: messages
+      messages: messages
     }
   end
 
@@ -27,7 +28,7 @@ defmodule MunchkinWeb.API.V1.SessionJSON do
         tokens: nil
       },
       action: "login",
-      message: messages
+      messages: messages
     }
   end
 
@@ -36,6 +37,7 @@ defmodule MunchkinWeb.API.V1.SessionJSON do
       data: %{
         user: MunchkinWeb.API.V1.UserJSON.user_data(user, two_factor_enabled?: false)
       },
+      messages: [],
       action: "forgot password"
     }
   end
@@ -60,7 +62,7 @@ defmodule MunchkinWeb.API.V1.SessionJSON do
     %{
       data: nil,
       action: "login",
-      message: messages
+      messages: messages
     }
   end
 end

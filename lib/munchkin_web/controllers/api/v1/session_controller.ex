@@ -16,7 +16,25 @@ defmodule MunchkinWeb.API.V1.SessionController do
       )
     else
       {:error, message} ->
-        render(conn, :error, messages: [message])
+        put_status(conn, 403)
+        |> render(:error, messages: [message])
+    end
+  end
+
+  def create(conn, %{"type" => "google_auth"} = params) do
+    with raw when not is_nil(raw) <- Map.get(params, "token"),
+         encoded <- URI.decode(raw),
+         {:ok, token} <- Base.decode64(encoded),
+         {:ok, user} <- Accounts.find_or_create_user(token),
+         {:ok, tokens} <- maybe_create_user_token(user, nil) do
+      Munchkin.DelayedJob.delay(fn ->
+        Accounts.update_user(user, %{}, :login_changeset)
+      end)
+
+      render(conn, :create,
+        user: user,
+        tokens: tokens
+      )
     end
   end
 
@@ -38,12 +56,14 @@ defmodule MunchkinWeb.API.V1.SessionController do
       )
     else
       {:retry, user, messages} ->
-        render(conn, :retry, user: user, messages: messages)
+        put_status(conn, 200)
+        |> render(:retry, user: user, messages: messages)
 
       _ ->
         Munchkin.DelayedJob.delay(fn -> maybe_update_user(params) end)
 
-        render(conn, :error, messages: [gettext("Email or Password missmatch")])
+        put_status(conn, 403)
+        |> render(:error, messages: [gettext("Email or Password missmatch")])
     end
   end
 

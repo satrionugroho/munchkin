@@ -6,6 +6,7 @@ defmodule Munchkin.Accounts.User do
     field :firstname, :string
     field :lastname, :string
     field :email, :string
+    field :email_source, :string
     field :profile_url, :string
     field :password, :string, virtual: true
     field :password_hash, :string
@@ -27,9 +28,10 @@ defmodule Munchkin.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:firstname, :lastname, :email, :password])
-    |> validate_required([:firstname, :lastname, :email, :password])
-    |> cast_password()
+    |> cast(attrs, [:firstname, :lastname, :email, :password, :email_source])
+    |> validate_required([:firstname, :lastname, :email, :email_source])
+    |> should_mark_email_valid?()
+    |> should_cast_password?()
     |> unique_constraint(:email)
   end
 
@@ -45,6 +47,39 @@ defmodule Munchkin.Accounts.User do
     user
     |> cast(attrs, [])
     |> assign_values([:verified_at], default: DateTime.utc_now(:second))
+  end
+
+  defp should_mark_email_valid?(changeset) do
+    case get_field(changeset, :email_source) do
+      "google" -> should_change_verify(changeset)
+      _ -> changeset
+    end
+  end
+
+  defp should_change_verify(changeset) do
+    case get_field(changeset, :verified_at) do
+      nil -> assign_values(changeset, [:verified_at], default: DateTime.utc_now(:second))
+      _ -> changeset
+    end
+  end
+
+  defp should_cast_password?(changeset) do
+    case get_field(changeset, :email_source) do
+      "google" ->
+        add_password_error(changeset)
+
+      _ ->
+        changeset
+        |> validate_required([:password])
+        |> cast_password()
+    end
+  end
+
+  defp add_password_error(changeset) do
+    case get_field(changeset, :password) do
+      nil -> changeset
+      _ -> add_error(changeset, :password, "cannot add password on OAUTH account")
+    end
   end
 
   defp cast_password(changeset) do

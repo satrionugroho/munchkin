@@ -149,6 +149,29 @@ defmodule Munchkin.Accounts do
     |> Repo.insert()
   end
 
+  def find_or_create_user(token) do
+    with {:ok, auth_user} <- ElixirAuthGoogle.get_user_profile(token),
+         {:ok, _user} = data <- find_or_create_user_google(auth_user) do
+      data
+    end
+  end
+
+  defp find_or_create_user_google(%{email: email} = auth_user) do
+    case get_user_by_email(email) do
+      %User{} = user ->
+        {:ok, user}
+
+      _ ->
+        %{
+          firstname: Map.get(auth_user, :given_name),
+          lastname: Map.get(auth_user, :family_name),
+          email: email,
+          email_source: "google"
+        }
+        |> create_user()
+    end
+  end
+
   @doc """
   Updates a user.
 
