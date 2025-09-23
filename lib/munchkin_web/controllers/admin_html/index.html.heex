@@ -1,0 +1,46 @@
+<Layouts.flash_group flash={@flash} />
+
+<section class="w-full flex justify-center">
+  <div class="w-1/2 mt-4 bg-transparent">
+    <div class="mb-6 flex w-full justify-between">
+      <h1 class="text-lg font-bold">ADMINS</h1>
+      <.link class="btn btn-primary" href={~p"/admins/new"}>
+        <.icon name="hero-plus" class="size-5" />
+        <span>Add Admin</span>
+      </.link>
+    </div>
+    <form>
+      <div class="mt-6 w-full flex justify-between items-center">
+        <div>
+          <.input
+            type="select"
+            label="Entries per page"
+            name="per"
+            value={@limit}
+            options={
+              Enum.reduce(1..5, Keyword.new(), fn k, acc ->
+                Keyword.put(acc, String.to_atom(to_string(k * 10)), to_string(k * 10))
+              end)
+            }
+          />
+        </div>
+        <div class="flex items-center">
+          <.input
+            name="q"
+            type="text"
+            placeholder="Enter a user email"
+            autocomplete="off"
+            value={@search_term}
+          />
+          <.button type="submit" class="btn btn-info ml-2">Search</.button>
+          <.link href={~p"/admins"} class="btn btn-error ml-2">Clear</.link>
+        </div>
+      </div>
+      <.table id="admins" rows={@admins}>
+        <:col :let={user} label="ID">{user.id}</:col>
+        <:col :let={user} label="Name">{user.fullname}</:col>
+        <:col :let={user} label="Email">{user.email}</:col>
+      </.table>
+    </form>
+  </div>
+</section>

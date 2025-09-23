@@ -1,6 +1,8 @@
 defmodule MunchkinWeb.API.V1.SessionController do
   use MunchkinWeb, :controller
 
+  alias Munchkin.Subscription
+  alias Munchkin.DelayedJob
   alias Munchkin.Repo
   alias Munchkin.Accounts
   alias Munchkin.Accounts.User
@@ -25,7 +27,8 @@ defmodule MunchkinWeb.API.V1.SessionController do
     with raw when not is_nil(raw) <- Map.get(params, "token"),
          encoded <- URI.decode(raw),
          {:ok, token} <- Base.decode64(encoded),
-         {:ok, user} <- Accounts.find_or_create_user(token),
+         {:ok, raw_user} <- Accounts.find_or_create_user(token),
+         %Accounts.User{} = user <- Accounts.get_user(raw_user.id),
          {:ok, tokens} <- maybe_create_user_token(user, nil) do
       Munchkin.DelayedJob.delay(fn ->
         Accounts.update_user(user, %{}, :login_changeset)
@@ -176,5 +179,47 @@ defmodule MunchkinWeb.API.V1.SessionController do
       _ ->
         {:error, "cannot find the refresh token"}
     end
+  end
+
+  def verify_email(conn, params) do
+    with raw when is_bitstring(raw) <- Map.get(params, "token"),
+         {:ok, token} <- Accounts.get_user_token(raw),
+         {:ok, true} <- verify_user_token(token),
+         %User{} = user <- Accounts.get_user(token.user_id) do
+      DelayedJob.delay(fn -> execute_delayed_job(token) end)
+      render(conn, :verify_email, user: user)
+    else
+      {:error, msg} when is_bitstring(msg) ->
+        render(conn, :error, messages: [msg])
+
+      {:error, msg} ->
+        render(conn, :error, messages: msg)
+
+      {:ok, false} ->
+        render(conn, :error, messages: [gettext("Token is already used")])
+
+      err ->
+        IO.inspect(err)
+        render(conn, :error, messages: [gettext("error while reading the token")])
+    end
+  end
+
+  defp verify_user_token(%{used_at: date, type: token_type} = _token) do
+    case token_type == UserToken.email_verification_type() do
+      true -> {:ok, is_nil(date)}
+      _ -> {:error, "token is not valid"}
+    end
+  end
+
+  defp execute_delayed_job(user_token) do
+    Repo.transact(fn ->
+      Accounts.update_user(user_token.user_id, %{}, :email_verified_changeset)
+      Accounts.update_user_token(user_token, %{used_at: DateTime.utc_now(:second)})
+
+      Subscription.create_subscription(%{
+        user_id: user_token.user_id,
+        product_id: Subscription.free_tier!().id
+      })
+    end)
   end
 end

@@ -1,0 +1,7 @@
+<div class="flex items-center mt-2">
+  <.icon :if={@tier.free} name="hero-user" class="size-5" />
+  <.icon :if={@tier.key == "basic"} name="hero-user-plus" class="size-5" />
+  <.icon :if={@tier.key == "premium"} name="hero-academic-cap" class="size-5" />
+  <.icon :if={@tier.key == "institutional"} name="hero-building-office-2" class="size-5" />
+  <span class="ml-1">{gettext("%{name} Plan", %{name: Map.get(@tier, :name)})}</span>
+</div>

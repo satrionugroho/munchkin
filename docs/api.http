@@ -1,8 +1,14 @@
 @BASE_URL = http://localhost:4000/api/v1
-@user_email = satrio.nu22@gmail.com
+@user_email = another.email@gmail.com
 @user_password = satrio1234S
 
 # // @user_password = KudaMakanKalengKacang
+
+
+### List products
+
+GET {{BASE_URL}}/products HTTP/1.1
+Content-Type: application/json
 
 
 ### Register a user

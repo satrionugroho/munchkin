@@ -1,0 +1,13 @@
+<.card title={gettext("Account Detail")}>
+  <.list>
+    <:item title="Fullname">{@user.firstname} {@user.lastname}</:item>
+    <:item title="Email">{@user.email}</:item>
+    <:item title="Tier"><.user_tier tier={@tier} /></:item>
+    <:item title="Source">
+      <span :if={@user.email_source == "google"}>
+        {gettext("Linked account from Google")}
+      </span>
+      <span :if={@user.email_source != "google"}>{gettext("Email")}</span>
+    </:item>
+  </.list>
+</.card>

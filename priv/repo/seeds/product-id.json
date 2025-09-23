@@ -1,0 +1,107 @@
+{
+  "tiers": [
+    {
+      "tier": 1,
+      "name": "Dasar",
+      "description": "Tingkat gratis ini dirancang untuk investor biasa dan pelajar yang ingin mendapatkan pemahaman dasar tentang pasar. Ini menyediakan platform yang sederhana dan mudah digunakan untuk melacak sejumlah kecil saham dan mengakses data fundamental.",
+      "features": [
+        "Data Keuangan Dasar: Harga saham waktu nyata (dengan sedikit penundaan), profil perusahaan, metrik keuangan utama (rasio P/E, kapitalisasi pasar, imbal hasil dividen).",
+        "Pembuatan Bagan Sederhana: Bagan interaktif dasar dengan pilihan indikator terbatas (misalnya, Rata-rata Pergerakan, RSI).",
+        "Daftar Pantauan: Buat dan kelola satu daftar pantauan dengan jumlah saham yang terbatas.",
+        "Berita & Utama: Akses ke berita utama real-time dari outlet keuangan besar."
+      ],
+      "limitations": [
+        "Akses Tertunda: Data tertunda (15-20 menit).",
+        "Alat Terbatas: Hanya alat dan indikator bagan dasar.",
+        "Kustomisasi Terbatas: Tidak ada penyaringan khusus atau penyaringan lanjutan.",
+        "Iklan: Mungkin termasuk iklan dan ajakan untuk meningkatkan layanan.",
+        "Tidak Ada Ekspor: Tidak ada kemampuan untuk mengekspor data.",
+        "Daftar Pantauan Terbatas: Hanya satu daftar pantauan dengan maksimal 10-15 saham."
+      ],
+      "price": 0,
+      "key": "basic",
+      "subtitle": "Investor Pemula",
+      "button_text": "Coba sekarang",
+      "is_free": true,
+      "currency": "IDR"
+    },
+    {
+      "tier": 2,
+      "name": "Amatir",
+      "description": "Tingkat Dasar ini untuk investor individu yang secara aktif mengelola portofolio mereka sendiri. Ini menyediakan data yang lebih mendalam dan beragam alat analisis teknis dan fundamental untuk membantu pengambilan keputusan yang tepat.",
+      "features": [
+        "Data Waktu Nyata: Akses ke harga saham real-time dan data intraday.",
+        "Pembuatan Bagan Lanjutan: Beragam jenis bagan yang lebih luas (misalnya, kandil, batang) dan perpustakaan indikator teknis yang lebih luas (misalnya, MACD, Retracemen Fibonacci, Bollinger Bands).",
+        "Analisis Fundamental: Akses ke laporan keuangan terperinci (neraca, laporan laba rugi, laporan arus kas) dan rasio keuangan.",
+        "Penyaring Saham Dasar: Penyaring yang kuat dengan sejumlah filter sedang (misalnya, harga, volume, rasio P/E, ROE, kapitalisasi pasar).",
+        "Daftar Pantauan Ganda: Buat dan kelola beberapa daftar pantauan.",
+        "Peringatan: Atur peringatan harga dasar."
+      ],
+      "limitations": [
+        "Data Historis Terbatas: Akses ke data historis untuk periode waktu terbatas (misalnya, 5-10 tahun).",
+        "Tidak Ada Alat Lanjutan: Tidak ada kemampuan backtesting atau alat analisis kuantitatif yang kompleks.",
+        "Tidak Ada Akses API: Data tidak dapat diekspor melalui API.",
+        "Dukungan Pelanggan: Dukungan pelanggan standar, biasanya melalui email."
+      ],
+      "price": 100000,
+      "subtitle": "Investor Menengah",
+      "button_text": "Jangan lewatkan kesempatan",
+      "key": "amateur",
+      "is_free": false,
+      "currency": "IDR"
+    },
+    {
+      "tier": 3,
+      "name": "Premium",
+      "description": "Tingkat Premium ini untuk pedagang dan investor serius dan aktif yang membutuhkan data komprehensif dan analitik canggih untuk mendapatkan keunggulan kompetitif. Ini mencakup rangkaian lengkap alat dan fitur tingkat profesional.",
+      "features": [
+        "Semua Fitur Tingkat Dasar, ditambah:",
+        "Data Historis Ekstensif: Akses ke riwayat data saham lengkap (misalnya, 20+ tahun).",
+        "Penyaringan Lanjutan: Penyaring saham yang sangat dapat disesuaikan dengan ratusan filter, termasuk bidang teknis, fundamental, dan kustom.",
+        "Mesin Backtesting: Uji dan optimalkan strategi perdagangan pada data historis.",
+        "Perdagangan Algoritmik: Alat untuk membuat, menguji, dan menerapkan strategi perdagangan otomatis (hanya perdagangan kertas).",
+        "Penelitian Mendalam: Akses ke analisis ahli, rekomendasi saham yang dikurasi, dan portofolio model.",
+        "Analisis Berita & Sentimen: Agregasi berita real-time dengan analisis sentimen untuk mengukur suasana pasar.",
+        "Ekspor Data: Ekspor data ke CSV atau format lain untuk analisis offline.",
+        "Dukungan Prioritas: Dukungan email dan obrolan langsung prioritas."
+      ],
+      "limitations": [
+        "Tidak Ada Perdagangan Langsung: Tidak ada integrasi pialang langsung untuk perdagangan langsung.",
+        "Akses API Terbatas: Akses API mungkin terbatas pada sejumlah panggilan per hari.",
+        "Tidak Ada Fitur Institusional: Tidak termasuk fitur yang dirancang untuk penggunaan institusional skala besar, seperti kolaborasi multi-pengguna atau umpan data tingkat perusahaan."
+      ],
+      "price": 200000,
+      "subtitle": "Investor Profesional",
+      "key": "premium",
+      "button_text": "Dapatkan Sekarang",
+      "is_popular": true,
+      "is_free": false,
+      "currency": "IDR"
+    },
+    {
+      "tier": 4,
+      "name": "Institusi",
+      "description": "Tingkat Institusional adalah solusi tingkat perusahaan untuk profesional keuangan, dana lindung nilai, dan perusahaan manajemen aset. Ini menyediakan alat dan umpan data yang komprehensif dan sangat skalabel untuk penelitian kompleks dan operasi skala besar.",
+      "features": [
+        "Semua Fitur Tingkat Premium, ditambah:",
+        "Akses API Penuh: Panggilan API tanpa batas dan umpan data tingkat perusahaan.",
+        "Umpan Data Waktu Nyata: Umpan data langsung, latensi ultra-rendah dari semua bursa utama.",
+        "Analisis Kuantitatif Lanjutan: Akses ke model kuantitatif kepemilikan dan alat pembelajaran mesin.",
+        "Multi-Pengguna & Kolaborasi: Alat untuk kolaborasi tim, penelitian bersama, dan manajemen pengguna.",
+        "Kustomisasi: Kemampuan untuk membangun dasbor, laporan, dan mengintegrasikan platform ke dalam sistem yang ada.",
+        "Dukungan Khusus: Manajer akun khusus dan dukungan teknis 24/7."
+      ],
+      "limitations": [
+        "Biaya: Model penetapan harga kustom, biaya tinggi.",
+        "Kompleksitas: Platform ini dirancang untuk pengguna profesional dan membutuhkan keahlian teknis.",
+        "Tidak Ada Harga Publik: Harga tidak dipublikasikan dan didasarkan pada penawaran kustom untuk setiap klien."
+      ],
+      "subtitle": "Khusus Institusi",
+      "price": 0,
+      "key": "institutional",
+      "button_text": "Hubungi Kami",
+      "is_free": false,
+      "currency": "IDR"
+    }
+  ]
+}

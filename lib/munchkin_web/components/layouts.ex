@@ -151,4 +151,49 @@ defmodule MunchkinWeb.Layouts do
     </div>
     """
   end
+
+  def sidebar_item(assigns) do
+    ~H"""
+    <li>
+      <.link href={@href} class="py-4 px-5" data-id="sidebar-items">
+        <.icon :if={Map.get(assigns, :icon)} name={@icon} class="size-5" />
+        <span>{@title}</span>
+      </.link>
+    </li>
+    """
+  end
+
+  attr :id, :string, required: true
+  attr :title, :string
+  attr :subtitle, :string
+  attr :close_button, :boolean, default: true
+  attr :button_title, :string, required: true
+  attr :button_class, :string, default: "btn btn-primary"
+  attr :width, :string, default: "w-11/12"
+
+  slot :inner_block
+
+  def modal(assigns) do
+    ~H"""
+    <div id={"#{@id}_container"}>
+      <button class={@button_class} onclick={"#{@id}.showModal()"}>{@button_title}</button>
+      <dialog id={@id} class="modal">
+        <div class={"modal-box #{@width} max-w-5xl"}>
+          <div>
+            <div :if={Map.get(assigns, :title)} class="mb-2">
+              <h1 class="text-lg font-bold">{@title}</h1>
+              <span :if={Map.get(assigns, :subtitle)} class="text-md italic">{@subtitle}</span>
+            </div>
+            <form :if={@close_button} method="dialog" class="absolute right-2 top-2">
+              <button class="btn btn-sm btn-circle btn-ghost">
+                <.icon name="hero-x-mark" />
+              </button>
+            </form>
+          </div>
+          <div class="w-full">{render_slot(@inner_block)}</div>
+        </div>
+      </dialog>
+    </div>
+    """
+  end
 end

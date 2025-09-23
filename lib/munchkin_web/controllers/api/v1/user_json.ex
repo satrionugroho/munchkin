@@ -70,13 +70,17 @@ defmodule MunchkinWeb.API.V1.UserJSON do
   end
 
   def user_data(%Munchkin.Accounts.User{} = user, opts \\ []) do
+    last_subscription =
+      Enum.sort_by(user.subscriptions, & &1.inserted_at, {:desc, DateTime}) |> List.first()
+
     %{
       id: user.id,
       email: user.email,
       name: fullname(user),
-      tier: user.tier,
       method: user.email_source,
-      last_active: List.last(user.access_tokens) |> Map.get(:inserted_at)
+      last_active: get_last_active(user.access_tokens),
+      active_subscription:
+        MunchkinWeb.API.V1.SubscriptionJSON.subscription_data(last_subscription)
     }
     |> with_two_fa?(user, Keyword.get(opts, :two_factor_enabled?, true))
   end
@@ -101,4 +105,11 @@ defmodule MunchkinWeb.API.V1.UserJSON do
   end
 
   defp with_two_fa?(data, _user, _), do: data
+
+  defp get_last_active(tokens) do
+    case List.last(tokens) do
+      nil -> nil
+      data -> Map.get(data, :inserted_at)
+    end
+  end
 end

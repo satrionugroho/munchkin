@@ -1,0 +1,107 @@
+{
+  "tiers": [
+    {
+      "tier": 1,
+      "name": "Basic",
+      "description": "The Free tier is designed for casual investors and students who want to get a basic understanding of the market. It provides a simple, easy-to-use platform to track a small number of stocks and access fundamental data.",
+      "features": [
+        "Basic Financial Data: Real-time stock quotes (with some delay), company profiles, key financial metrics (P/E ratio, market cap, dividend yield).",
+        "Simple Charting: Basic interactive charts with a limited selection of indicators (e.g., Moving Averages, RSI).",
+        "Watchlists: Create and manage a single watchlist with a limited number of stocks.",
+        "News & Headlines: Access to real-time news headlines from major financial outlets."
+      ],
+      "limitations": [
+        "Delayed Access: Delayed data (15-20 minutes).",
+        "Limited Tools: Only basic charting tools and indicators.",
+        "Limited Customization: No custom screening or advanced filtering.",
+        "Ads: May include advertisements and upgrade prompts.",
+        "No Export: No ability to export data.",
+        "Limited Watchlists: Only one watchlist with a maximum of 10-15 stocks."
+      ],
+      "price": 0,
+      "key": "basic",
+      "subtitle": "Newbie Investors",
+      "button_text": "Try it now",
+      "is_free": true,
+      "currency": "IDR"
+    },
+    {
+      "tier": 2,
+      "name": "Amateur",
+      "description": "The Basic tier is for individual investors who are actively managing their own portfolios. It provides more in-depth data and a wider range of technical and fundamental analysis tools to help with informed decision-making.",
+      "features": [
+        "Real-time Data: Access to real-time stock prices and intraday data.",
+        "Advanced Charting: A wider variety of chart types (e.g., candlestick, bar) and a more extensive library of technical indicators (e.g., MACD, Fibonacci Retracements, Bollinger Bands).",
+        "Fundamental Analysis: Access to detailed financial statements (balance sheets, income statements, cash flow statements) and financial ratios.",
+        "Basic Stock Screener: A powerful screener with a moderate number of filters (e.g., price, volume, P/E ratio, ROE, market cap).",
+        "Multiple Watchlists: Create and manage multiple watchlists.",
+        "Alerts: Set up basic price alerts."
+      ],
+      "limitations": [
+        "Limited Historical Data: Access to historical data for a limited time period (e.g., 5-10 years).",
+        "No Advanced Tools: No backtesting capabilities or complex quantitative analysis tools.",
+        "No API Access: Data cannot be exported via API.",
+        "Customer Support: Standard customer support, typically via email."
+      ],
+      "price": 100000,
+      "button_text": "Don't miss the chance",
+      "key": "amateur",
+      "subtitle": "Medium Investors",
+      "is_free": false,
+      "currency": "IDR"
+    },
+    {
+      "tier": 3,
+      "name": "Premium",
+      "description": "The Premium tier is for serious, active traders and investors who need comprehensive data and advanced analytics to gain a competitive edge. It includes a full suite of professional-grade tools and features.",
+      "features": [
+        "All Basic Tier Features, plus:",
+        "Extensive Historical Data: Access to a full history of stock data (e.g., 20+ years).",
+        "Advanced Screening: A highly customizable stock screener with hundreds of filters, including technical, fundamental, and custom fields.",
+        "Backtesting Engine: Test and optimize trading strategies on historical data.",
+        "Algorithmic Trading: Tools to create, test, and deploy automated trading strategies (paper trading only).",
+        "In-depth Research: Access to expert analysis, curated stock recommendations, and model portfolios.",
+        "News & Sentiment Analysis: Real-time news aggregation with sentiment analysis to gauge market mood.",
+        "Data Export: Export data to CSV or other formats for offline analysis.",
+        "Priority Support: Priority email and live chat support."
+      ],
+      "limitations": [
+        "No Direct Trading: No direct brokerage integration for live trading.",
+        "Limited API Access: API access may be limited to a certain number of calls per day.",
+        "No Institutional Features: Does not include features designed for large-scale institutional use, such as multi-user collaboration or enterprise-level data feeds."
+      ],
+      "price": 200000,
+      "key": "premium",
+      "subtitle": "Professional Investors",
+      "button_text": "Get it Now",
+      "is_popular": true,
+      "is_free": false,
+      "currency": "IDR"
+    },
+    {
+      "tier": 4,
+      "name": "Institutional",
+      "description": "The Institutional tier is an enterprise-level solution for financial professionals, hedge funds, and asset management firms. It provides comprehensive, highly scalable tools and data feeds for complex research and large-scale operations.",
+      "features": [
+        "All Premium Tier Features, plus:",
+        "Full API Access: Unlimited API calls and enterprise-level data feeds.",
+        "Real-time Data Feeds: Direct, ultra-low-latency data feeds from all major exchanges.",
+        "Advanced Quantitative Analysis: Access to proprietary quantitative models and machine learning tools.",
+        "Multi-User & Collaboration: Tools for team collaboration, shared research, and user management.",
+        "Customization: The ability to build custom dashboards, reports, and integrate the platform into existing systems.",
+        "Dedicated Support: A dedicated account manager and 24/7 technical support."
+      ],
+      "limitations": [
+        "Cost: High-cost, custom pricing model.",
+        "Complexity: The platform is designed for professional users and requires technical expertise.",
+        "No Public Pricing: Pricing is not public and is based on custom quotes for each client."
+      ],
+      "price": 0,
+      "subtitle": "Institution Only",
+      "key": "institutional",
+      "button_text": "Contact Us",
+      "is_free": false,
+      "currency": "IDR"
+    }
+  ]
+}

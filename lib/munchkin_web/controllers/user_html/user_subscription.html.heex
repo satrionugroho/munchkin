@@ -1,0 +1,38 @@
+<.card
+  title={gettext("Subscription History")}
+  subtitle={gettext("We show only a few subscriptions")}
+>
+  <:header_action>
+    <Layouts.modal
+      title={gettext("Change tier")}
+      button_title={gettext("Change Tier")}
+      id="change_tier"
+    >
+      <.change_tier_form
+        form={@form}
+        user={@user}
+        tier={@tier}
+        id="change_tier"
+      />
+    </Layouts.modal>
+  </:header_action>
+  <div :if={@user.subscriptions == []} class="w-full items-center text-center">
+    <p class="italic">{gettext("User have no payment history")}</p>
+  </div>
+  <div :if={@user.subscriptions != []}>
+    <.table id="subscription" rows={@user.subscriptions}>
+      <:col :let={data} label="ID">
+        <.link href={"/users/#{@user.id}/payments/#{data.id}"} class="link">
+          {String.slice(data.id, 0, 6)}...
+        </.link>
+      </:col>
+      <:col :let={data} label="Ref">{String.slice(data.idempotency_id, 0, 6)}...</:col>
+      <:col :let={data} label="Initial Date">
+        {Calendar.strftime(data.inserted_at, @date_format)}
+      </:col>
+      <:col :let={data} label="Description">
+        {gettext("Subscribe for %{name}", %{name: data.product.name})}
+      </:col>
+    </.table>
+  </div>
+</.card>

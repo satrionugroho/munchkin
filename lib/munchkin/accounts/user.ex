@@ -13,7 +13,6 @@ defmodule Munchkin.Accounts.User do
     field :verified_at, :utc_datetime
     field :sign_in_attempt, :integer, default: 0
     field :subscription_expired_at, :utc_datetime
-    field :tier, :integer, default: 0
 
     has_one :email_verification_token, Munchkin.Accounts.UserToken, where: [type: 1]
     has_many :access_tokens, Munchkin.Accounts.UserToken, where: [type: 2]
@@ -21,6 +20,11 @@ defmodule Munchkin.Accounts.User do
     has_many :forgot_password_tokens, Munchkin.Accounts.UserToken, where: [type: 4]
     has_many :two_factor_tokens, Munchkin.Accounts.UserToken, where: [type: 5]
     has_many :subcriptions_tokens, Munchkin.Accounts.UserToken, where: [type: 6]
+
+    has_many :subscriptions, Munchkin.Subscription.Plan
+    has_many :integrations, Munchkin.Accounts.Integration
+
+    has_one :tier, through: [:subscriptions, :product]
 
     timestamps(type: :utc_datetime)
   end
@@ -32,6 +36,7 @@ defmodule Munchkin.Accounts.User do
     |> validate_required([:firstname, :lastname, :email, :email_source])
     |> should_mark_email_valid?()
     |> should_cast_password?()
+    |> downcase_emaiL()
     |> unique_constraint(:email)
   end
 
@@ -128,5 +133,12 @@ defmodule Munchkin.Accounts.User do
         _ -> put_change(acc, key, value)
       end
     end)
+  end
+
+  defp downcase_emaiL(changeset) do
+    case get_change(changeset, :email) do
+      email -> put_change(changeset, :email, String.downcase(email))
+      _ -> changeset
+    end
   end
 end

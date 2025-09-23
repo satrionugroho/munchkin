@@ -10,6 +10,16 @@ defmodule MunchkinWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :admin_browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, html: {MunchkinWeb.Layouts, :admin}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+    plug MunchkinWeb.FetchCurrentUser, type: :cookies
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -22,9 +32,21 @@ defmodule MunchkinWeb.Router do
   scope "/", MunchkinWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    resources "/signin", SessionController, only: [:index, :create]
 
     get "/accounts/verification", EmailVerificationController, :index
+  end
+
+  scope "/", MunchkinWeb do
+    pipe_through :admin_browser
+
+    get "/", PageController, :home
+
+    resources "/users", UserController do
+      resources "/payments", PaymentController, only: [:show]
+    end
+
+    resources "/admins", AdminController, only: [:index, :new, :create]
   end
 
   # Other scopes may use custom stacks.
@@ -34,9 +56,12 @@ defmodule MunchkinWeb.Router do
     scope "/v1", V1 do
       post "/registrations", RegistrationController, :create
       post "/sessions", SessionController, :create
+      post "/verify_email", SessionController, :verify_email
 
       get "/forgot_password", SessionController, :forgot_password_request
       post "/forgot_password", SessionController, :forgot_password
+
+      get "/products", ProductController, :index
     end
   end
 

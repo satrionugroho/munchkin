@@ -58,6 +58,16 @@ defmodule MunchkinWeb.API.V1.SessionJSON do
     }
   end
 
+  def render("verify_email.json", %{user: user}) do
+    %{
+      data: %{
+        user: MunchkinWeb.API.V1.UserJSON.user_data(user, two_factor_enabled?: false)
+      },
+      messages: ["user account is verified"],
+      action: "verify email"
+    }
+  end
+
   def render("error.json", %{messages: messages}) do
     %{
       data: nil,

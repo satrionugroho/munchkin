@@ -45,4 +45,20 @@ defmodule Munchkin.AccountsFixtures do
 
     user_token
   end
+
+  @doc """
+  Generate a admin.
+  """
+  def admin_fixture(attrs \\ %{}) do
+    {:ok, admin} =
+      attrs
+      |> Enum.into(%{
+        email: "some email",
+        fullname: "some fullname",
+        password_hash: "some password_hash"
+      })
+      |> Munchkin.Accounts.create_admin()
+
+    admin
+  end
 end

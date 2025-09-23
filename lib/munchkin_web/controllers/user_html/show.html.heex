@@ -1,0 +1,16 @@
+<Layouts.flash_group flash={@flash} />
+
+<section class="w-full flex justify-center">
+  <div class="w-1/2 mt-4 bg-transparent overflow-x-auto">
+    <div class="mb-6 flex w-full justify-between">
+      <h1 class="text-lg font-bold">
+        <.link class="" href={~p"/users"}>
+          <.icon name="hero-arrow-left" class="size-5" />
+        </.link>
+        <span class="ml-1">{gettext("Detail User")}</span>
+      </h1>
+    </div>
+    <.user_detail user={@user} tier={@tier} />
+    <.user_subscription user={@user} form={@form} tier={@tier} date_format={@date_format} />
+  </div>
+</section>

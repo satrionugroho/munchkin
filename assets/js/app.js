@@ -24,12 +24,24 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import {hooks as colocatedHooks} from "phoenix-colocated/munchkin"
 import topbar from "../vendor/topbar"
+import numeral from "../vendor/numeral.min"
+
+const CounterFormatter = {
+  mounted() {
+    const num = this.el.innerText
+    const val = parseInt(num)
+    this.el.innerText = numeral(val).format('0a')
+  }
+}
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: {
+    ...colocatedHooks,
+    CounterFormatter
+  },
 })
 
 // Show progress bar on live navigation and form submits
@@ -80,4 +92,3 @@ if (process.env.NODE_ENV === "development") {
     window.liveReloader = reloader
   })
 }
-

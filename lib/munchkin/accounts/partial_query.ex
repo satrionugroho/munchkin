@@ -13,7 +13,7 @@ defmodule Munchkin.Accounts.PartialQuery do
 
   def refresh_tokens_query, do: token_query(UserToken.refresh_token_type())
 
-  def user_preloader(types \\ [:access_tokens, :two_factor_tokens]) do
+  def user_preloader(types \\ [:access_tokens, :two_factor_tokens, :subscriptions]) do
     Enum.reduce(types, [], fn key, acc ->
       fun = String.to_existing_atom("#{key}_query")
       query = apply(__MODULE__, fun, [])
@@ -50,5 +50,24 @@ defmodule Munchkin.Accounts.PartialQuery do
       where:
         t.type == ^type and is_nil(t.used_at) and t.user_id == ^user_id and
           t.valid_until < ^one_day
+  end
+
+  def subscriptions_query do
+    from s in Munchkin.Subscription.Plan,
+      preload: ^[product: tier_extended_query()],
+      preload: :payments,
+      limit: 5,
+      order_by: [desc: s.inserted_at]
+  end
+
+  def tier_extended_query() do
+    query = from(p in Munchkin.Subscription.Product, limit: 1)
+
+    query
+    |> select([c], %{c | free: c.name == "Free", key: fragment("lower(?)", c.key)})
+  end
+
+  def integrations_query do
+    from(i in Munchkin.Accounts.Integration)
   end
 end

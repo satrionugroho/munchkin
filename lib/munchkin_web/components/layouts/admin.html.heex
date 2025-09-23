@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title default="Munchkin" suffix=" · Phoenix Framework">
+      {assigns[:page_title]}
+    </.live_title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
+    </script>
+    <script>
+      (() => {
+        const setTheme = (theme) => {
+          if (theme === "system") {
+            localStorage.removeItem("phx:theme");
+            document.documentElement.removeAttribute("data-theme");
+          } else {
+            localStorage.setItem("phx:theme", theme);
+            document.documentElement.setAttribute("data-theme", theme);
+          }
+        };
+        if (!document.documentElement.hasAttribute("data-theme")) {
+          setTheme(localStorage.getItem("phx:theme") || "system");
+        }
+        window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
+        window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const sidebars = document.querySelectorAll("a[data-id='sidebar-items']")
+        const { pathname } = document.location
+        const splitted = pathname.split('/').filter(f => f != '')
+          if (splitted.length == 0) {
+            sidebars.forEach(f => f.pathname == '/' && f.classList.add("bg-primary"))
+          } else if (splitted.length > 0) {
+            const adjustedPathname = `/${splitted[0]}`
+            sidebars.forEach(f => f.pathname == adjustedPathname && f.classList.add("bg-primary"))
+        }
+      })
+      })();
+    </script>
+  </head>
+  <body class="bg-base-300 w-full h-screen">
+    <div class="drawer drawer-open">
+      <input id="mainDrawer" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content flex flex-col justify-between">
+        <main class="w-full flex flex-start px-4 py-6 bg-base-300">
+          {@inner_content}
+        </main>
+
+        <footer class="footer sm:footer-horizontal footer-center bg-base-300 text-base-content pb-6 pt-8">
+          <aside>
+            <p>Copyright © 2025 - All right reserved by ACME Industries Ltd</p>
+          </aside>
+        </footer>
+      </div>
+      <div class="drawer-side">
+        <ul class="menu bg-base-200 rounded-box w-56 min-h-full">
+          <li>
+            <h1 class="p-4 cursor-default font-bold text-lg">
+              Dashboard
+            </h1>
+          </li>
+          <Layouts.sidebar_item href="/" title={gettext("Overview")} icon="hero-home" />
+          <Layouts.sidebar_item href="/users" title={gettext("Users")} icon="hero-users" />
+          <Layouts.sidebar_item href="/admins" title={gettext("Admins")} icon="hero-user-group" />
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

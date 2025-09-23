@@ -6,7 +6,7 @@ defmodule Munchkin.Accounts do
   import Ecto.Query, warn: false
   alias Munchkin.Repo
 
-  alias Munchkin.Accounts.{PartialQuery, User, UserToken}
+  alias Munchkin.Accounts.{Admin, Integration, PartialQuery, User, UserToken}
 
   @doc """
   Returns the list of users.
@@ -17,8 +17,47 @@ defmodule Munchkin.Accounts do
       [%User{}, ...]
 
   """
-  def list_users do
-    Repo.all(User)
+  def list_users(opts \\ []) do
+    page = Keyword.get(opts, :page, 1)
+    limit = Keyword.get(opts, :per, 10)
+    offset = (page - 1) * limit
+
+    base =
+      case Keyword.get(opts, :q) do
+        data when data in [nil, ""] ->
+          from(a in User)
+
+        str ->
+          email = "%#{str}%"
+
+          from a in User,
+            where:
+              ilike(a.email, ^email) or ilike(a.firstname, ^email) or ilike(a.lastname, ^email)
+      end
+
+    product_query =
+      select(Munchkin.Subscription.Product, [c], %{
+        c
+        | free: c.name == "Free",
+          key: fragment("lower(?)", c.name)
+      })
+
+    subscription_query =
+      from(p in Munchkin.Subscription.Plan,
+        preload: [product: ^product_query],
+        limit: 1,
+        order_by: [desc: p.inserted_at]
+      )
+
+    query =
+      from b in base,
+        preload: [subscriptions: ^subscription_query],
+        limit: ^limit,
+        offset: ^offset,
+        order_by: [desc: :id]
+
+    query
+    |> Repo.all()
   end
 
   @doc """
@@ -35,16 +74,31 @@ defmodule Munchkin.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id, relations \\ [:access_tokens, :two_factor_tokens]) do
+  def get_user!(id, relations \\ [:access_tokens, :two_factor_tokens, :subscriptions]) do
+    case get_user(id, relations) do
+      %User{} = user -> user
+      _ -> raise Ecto.NoResultsError, "cannot find user"
+    end
+  end
+
+  def get_user(id, relations \\ [:access_tokens, :two_factor_tokens, :subscriptions])
+
+  def get_user(id, relations) when is_number(id) do
     query =
       from u in User,
         preload: ^PartialQuery.user_preloader(relations),
         where: u.id == ^id,
         limit: 1
 
-    case Repo.one(query) do
-      nil -> raise Ecto.NoResultsError, "cannot find user"
-      user -> user
+    Repo.one(query)
+  end
+
+  def get_user(id, relations) do
+    try do
+      String.to_integer(id)
+      |> get_user(relations)
+    rescue
+      _ -> nil
     end
   end
 
@@ -103,8 +157,11 @@ defmodule Munchkin.Accounts do
     now = DateTime.utc_now()
 
     case DateTime.after?(datetime, now) do
-      true -> {:ok, get_user!(token.user_id)}
-      _ -> {:error, "token is invalid"}
+      true ->
+        {:ok, get_user!(token.user_id, [:access_tokens, :two_factor_tokens, :subscriptions])}
+
+      _ ->
+        {:error, "token is invalid"}
     end
   end
 
@@ -162,13 +219,23 @@ defmodule Munchkin.Accounts do
         {:ok, user}
 
       _ ->
-        %{
-          firstname: Map.get(auth_user, :given_name),
-          lastname: Map.get(auth_user, :family_name),
-          email: email,
-          email_source: "google"
-        }
-        |> create_user()
+        Repo.transact(fn ->
+          {:ok, user} =
+            %{
+              firstname: Map.get(auth_user, :given_name),
+              lastname: Map.get(auth_user, :family_name),
+              email: email,
+              email_source: "google"
+            }
+            |> create_user()
+
+          Munchkin.Subscription.create_subscription(%{
+            user_id: user.id,
+            product_id: Munchkin.Subscription.free_tier!().id
+          })
+
+          {:ok, user}
+        end)
     end
   end
 
@@ -499,5 +566,142 @@ defmodule Munchkin.Accounts do
   """
   def delete_user_token(%UserToken{} = user_token) do
     Repo.delete(user_token)
+  end
+
+  @doc """
+  Returns the list of admins.
+
+  ## Examples
+
+      iex> list_admins()
+      [%Admin{}, ...]
+
+  """
+  def list_admins(opts \\ []) do
+    page = Keyword.get(opts, :page, 1)
+    limit = Keyword.get(opts, :per, 10)
+    offset = (page - 1) * limit
+
+    base =
+      case Keyword.get(opts, :q) do
+        data when data in [nil, ""] ->
+          from(a in Admin)
+
+        str ->
+          email = "%#{str}%"
+          from a in Admin, where: ilike(a.email, ^email)
+      end
+
+    query = from b in base, limit: ^limit, offset: ^offset
+
+    Repo.all(query)
+  end
+
+  @doc """
+  Gets a single admin.
+
+  Raises `Ecto.NoResultsError` if the Admin does not exist.
+
+  ## Examples
+
+      iex> get_admin!(123)
+      %Admin{}
+
+      iex> get_admin!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_admin!(id), do: Repo.get!(Admin, id)
+
+  def get_admin_by_email(raw) do
+    email = String.downcase(raw)
+    query = from a in Admin, where: a.email == ^email, limit: 1
+    Repo.one(query)
+  end
+
+  def admin_session(params) do
+    with email when is_bitstring(email) <- Map.get(params, "email"),
+         password when is_bitstring(password) <- Map.get(params, "password"),
+         %Admin{} = admin <- get_admin_by_email(email),
+         true <- Argon2.verify_pass(password, admin.password_hash) do
+      {:ok, admin}
+    else
+      _ -> {:error, ["email or password combination is invalid"]}
+    end
+  end
+
+  @doc """
+  Creates a admin.
+
+  ## Examples
+
+      iex> create_admin(%{field: value})
+      {:ok, %Admin{}}
+
+      iex> create_admin(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_admin(attrs) do
+    %Admin{}
+    |> Admin.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a admin.
+
+  ## Examples
+
+      iex> update_admin(admin, %{field: new_value})
+      {:ok, %Admin{}}
+
+      iex> update_admin(admin, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_admin(%Admin{} = admin, attrs) do
+    admin
+    |> Admin.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a admin.
+
+  ## Examples
+
+      iex> delete_admin(admin)
+      {:ok, %Admin{}}
+
+      iex> delete_admin(admin)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_admin(%Admin{} = admin) do
+    Repo.delete(admin)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking admin changes.
+
+  ## Examples
+
+      iex> change_admin(admin)
+      %Ecto.Changeset{data: %Admin{}}
+
+  """
+  def change_admin(%Admin{} = admin, attrs \\ %{}) do
+    Admin.changeset(admin, attrs)
+  end
+
+  def create_integration(%User{} = user, params) do
+    attrs =
+      Enum.reduce(params, %{}, fn {key, val}, acc -> Map.put(acc, to_string(key), val) end)
+      |> Map.put("user", user)
+
+    %Integration{}
+    |> Integration.changeset(attrs)
+    |> Repo.insert()
   end
 end

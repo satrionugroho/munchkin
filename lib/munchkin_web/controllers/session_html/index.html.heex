@@ -1,0 +1,45 @@
+<Layouts.flash_group flash={@flash} />
+
+<.form for={@form} class="w-full flex justify-center items-center h-screen">
+  <div class="card bg-base-200 w-1/3 shadow-sm">
+    <div class="card-body">
+      <h2 class="card-title">{gettext("Sign In")}</h2>
+      <div :if={@errors != []} role="alert" class="alert alert-error">
+        <.icon name="hero-x-circle" class="size-6" />
+        <ul class="list bg-error text-error-content">
+          <li class="tracking-wide text-error-content opacity-80 mb-2">
+            {gettext("We have encountered an errors when logging in")}
+          </li>
+          <li :for={item <- @errors} class="capitalize text-sm">
+            {item}
+          </li>
+        </ul>
+      </div>
+
+      <input
+        type="hidden"
+        value={Plug.CSRFProtection.get_csrf_token_for("/signin")}
+        name="_csrf_token"
+      />
+      <.input
+        name="email"
+        type="email"
+        field={@form[:email]}
+        autocomplete="off"
+        label="Email"
+        placeholder="you@domain.com"
+      />
+      <.input
+        name="password"
+        type="password"
+        field={@form[:password]}
+        autocomplete="off"
+        label="Email"
+        placeholder="..."
+      />
+      <div class="card-actions justify-end">
+        <.button variant="primary">Sign In</.button>
+      </div>
+    </div>
+  </div>
+</.form>

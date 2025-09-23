@@ -90,11 +90,18 @@ defmodule MunchkinWeb.CoreComponents do
   """
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
   attr :class, :string
-  attr :variant, :string, values: ~w(primary)
+  attr :variant, :string, values: ~w(primary info error warning plain)
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
-    variants = %{"primary" => "btn-primary", nil => "btn-primary btn-soft"}
+    variants = %{
+      "primary" => "btn-primary",
+      "plain" => "btn-outline",
+      "info" => "btn-info",
+      "error" => "btn-error",
+      "warning" => "btn-warning",
+      nil => "btn-primary btn-soft"
+    }
 
     assigns =
       assign_new(assigns, :class, fn ->
@@ -185,7 +192,7 @@ defmodule MunchkinWeb.CoreComponents do
       end)
 
     ~H"""
-    <div class="fieldset mb-2">
+    <fieldset class="fieldset mb-2">
       <label>
         <input type="hidden" name={@name} value="false" disabled={@rest[:disabled]} />
         <span class="label">
@@ -201,28 +208,26 @@ defmodule MunchkinWeb.CoreComponents do
         </span>
       </label>
       <.error :for={msg <- @errors}>{msg}</.error>
-    </div>
+    </fieldset>
     """
   end
 
   def input(%{type: "select"} = assigns) do
     ~H"""
-    <div class="fieldset mb-2">
-      <label>
-        <span :if={@label} class="label mb-1">{@label}</span>
-        <select
-          id={@id}
-          name={@name}
-          class={[@class || "w-full select", @errors != [] && (@error_class || "select-error")]}
-          multiple={@multiple}
-          {@rest}
-        >
-          <option :if={@prompt} value="">{@prompt}</option>
-          {Phoenix.HTML.Form.options_for_select(@options, @value)}
-        </select>
-      </label>
+    <fieldset class="fieldset mb-2">
+      <legend class="fieldset-legend">{@label}</legend>
+      <select
+        id={@id}
+        name={@name}
+        class={[@class || "w-full select", @errors != [] && (@error_class || "select-error")]}
+        multiple={@multiple}
+        {@rest}
+      >
+        <option :if={@prompt} value="">{@prompt}</option>
+        {Phoenix.HTML.Form.options_for_select(@options, @value)}
+      </select>
       <.error :for={msg <- @errors}>{msg}</.error>
-    </div>
+    </fieldset>
     """
   end
 
@@ -249,23 +254,21 @@ defmodule MunchkinWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div class="fieldset mb-2">
-      <label>
-        <span :if={@label} class="label mb-1">{@label}</span>
-        <input
-          type={@type}
-          name={@name}
-          id={@id}
-          value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-          class={[
-            @class || "w-full input",
-            @errors != [] && (@error_class || "input-error")
-          ]}
-          {@rest}
-        />
-      </label>
+    <fieldset class="fieldset mb-2">
+      <legend :if={@label} class="fieldset-legend">{@label}</legend>
+      <input
+        type={@type}
+        name={@name}
+        id={@id}
+        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+        class={[
+          @class || "w-full input",
+          @errors != [] && (@error_class || "input-error")
+        ]}
+        {@rest}
+      />
       <.error :for={msg <- @errors}>{msg}</.error>
-    </div>
+    </fieldset>
     """
   end
 
@@ -382,7 +385,7 @@ defmodule MunchkinWeb.CoreComponents do
   def list(assigns) do
     ~H"""
     <ul class="list">
-      <li :for={item <- @item} class="list-row">
+      <li :for={item <- @item} class="p-3 border-t first:border-t-0 border-base-content/20">
         <div class="list-col-grow">
           <div class="font-bold">{item.title}</div>
           <div>{render_slot(item)}</div>
@@ -468,5 +471,47 @@ defmodule MunchkinWeb.CoreComponents do
   """
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
+  end
+
+  attr :title, :string
+  attr :subtitle, :string
+  attr :image, :string
+
+  slot :inner_block,
+    required: true,
+    doc: "the optional inner block that renders the flash message"
+
+  slot :action
+  slot :header_action
+
+  def card(assigns) do
+    ~H"""
+    <div class="card bg-base-200 w-full shadow-sm mt-4 first:mt-0">
+      <figure :if={Map.get(assigns, :image)}>
+        <img src={@image} />
+      </figure>
+      <div class="card-body">
+        <div class="flex items-center justify-between border-b border-base-content/60 pb-4">
+          <div>
+            <h2 :if={Map.get(assigns, :title)} class="card-title">{@title}</h2>
+            <span :if={Map.get(assigns, :subtitle)} class="text-sm italic">{@subtitle}</span>
+          </div>
+          <div :if={@header_action != []}>
+            <%= for action <- @header_action do %>
+              {render_slot(action)}
+            <% end %>
+          </div>
+        </div>
+        <div class="mt-2">
+          {render_slot(@inner_block)}
+        </div>
+        <div :if={@action != []} class="card-actions justify-end">
+          <%= for action <- @action do %>
+            {render_slot(action)}
+          <% end %>
+        </div>
+      </div>
+    </div>
+    """
   end
 end

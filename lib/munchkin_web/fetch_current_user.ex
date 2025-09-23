@@ -1,11 +1,44 @@
 defmodule MunchkinWeb.FetchCurrentUser do
-  alias Munchkin.Accounts
-  def init(_), do: :ok
+  use Gettext, backend: MunchkinWeb.Gettext
 
-  def call(conn, _) do
+  alias Munchkin.Accounts
+
+  @user_session_key "_current_admin"
+
+  def init(opts \\ []), do: opts
+
+  def put_admin(conn, %Accounts.Admin{email: email} = _admin) when not is_nil(email) do
+    hash = Base.url_encode64(email)
+    Plug.Conn.put_session(conn, @user_session_key, hash)
+  end
+
+  def put_admin(conn, _), do: conn
+
+  def get_admin(conn) do
+    case Plug.Conn.get_session(conn, @user_session_key) do
+      nil -> {:error, gettext("admin not logged in")}
+      hash -> {:ok, hash}
+    end
+  end
+
+  def call(conn, params) do
+    case Keyword.get(params, :type) do
+      :cookies -> html_auth(conn)
+      _ -> api_auth(conn)
+    end
+  end
+
+  defp html_auth(conn) do
+    case get_admin(conn) do
+      {:ok, hash} -> validate_hash(conn, hash)
+      _ -> redirected(conn)
+    end
+  end
+
+  defp api_auth(conn) do
     case Plug.Conn.get_req_header(conn, "authorization") do
       ["Bearer " <> token] -> validate_token(conn, token)
-      _ -> unauthorized(conn, "must have a token")
+      _ -> unauthorized(conn, gettext("must have a token"))
     end
   end
 
@@ -23,8 +56,15 @@ defmodule MunchkinWeb.FetchCurrentUser do
         unauthorized(conn, message)
 
       _ ->
-        unauthorized(conn, "cannot verify the given token")
+        unauthorized(conn, gettext("cannot verify the given token"))
     end)
+  end
+
+  defp validate_hash(conn, hash) do
+    case Base.url_decode64(hash) do
+      {:ok, email} -> get_admin_data(conn, email)
+      _ -> redirected(conn)
+    end
   end
 
   defp unauthorized(conn, message) do
@@ -44,8 +84,38 @@ defmodule MunchkinWeb.FetchCurrentUser do
         data
 
       _ ->
-        {:error, "token is invalid or expired"}
+        {:error, gettext("token is invalid or expired")}
     end
+  end
+
+  defp get_admin_data(conn, email) do
+    case Munchkin.Cache.get("email:#{email}") do
+      {:ok, nil} -> get_admin_from_database(email)
+      {:ok, _admin} = data -> data
+      err -> err
+    end
+    |> then(fn
+      {:ok, admin} -> Plug.Conn.assign(conn, :current_user, admin)
+      _ -> redirected(conn)
+    end)
+  end
+
+  defp get_admin_from_database(email) do
+    case Accounts.get_admin_by_email(email) do
+      %Accounts.Admin{} = admin ->
+        _ = Munchkin.Cache.put("email:#{email}", admin)
+        {:ok, admin}
+
+      _ ->
+        {:error, "Admin not found"}
+    end
+  end
+
+  defp redirected(conn) do
+    conn
+    |> Phoenix.Controller.put_flash(:error, gettext("Restricted Area!. Need authenticate."))
+    |> Phoenix.Controller.redirect(to: "/signin")
+    |> Plug.Conn.halt()
   end
 
   def get_current_user(conn) do

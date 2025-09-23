@@ -1,0 +1,58 @@
+<.form for={@form} method="PUT" action={~p"/users/#{@user.id}"}>
+  <div role="alert" class="alert alert-info">
+    <.icon name="hero-information-circle" class="size-6" />
+    <div class="flex flex-col">
+      <span>{gettext("You are on the %{name} tier", %{name: @tier.name})}</span>
+      <span class="font-bold">{gettext("This form means to force into specific tier")}</span>
+    </div>
+  </div>
+
+  <div class="mt-6 flex flex-col w-full items-center">
+    <div class="w-1/2">
+      <.input
+        type="select"
+        label={gettext("Desired tier")}
+        name="tier"
+        value={@tier.id}
+        options={
+          Enum.reduce(Munchkin.Subscription.list_products(), Keyword.new(), fn %{id: t, name: n},
+                                                                               acc ->
+            Keyword.put(acc, String.to_atom(n), t)
+          end)
+        }
+      />
+
+      <.input
+        type="select"
+        label={gettext("Payment method")}
+        prompt={gettext("Choose one of the payment method")}
+        field={@form[:payment_method]}
+        options={
+          Enum.reduce(Munchkin.PaymentMethod.data(), Keyword.new(), fn %{id: t, name: n}, acc ->
+            Keyword.put(acc, String.to_atom(n), t)
+          end)
+        }
+      />
+
+      <.input
+        type="date"
+        label={gettext("Tier validity")}
+        field={@form[:valid_until]}
+        value={Date.utc_today()}
+      />
+
+      <.input
+        type="text"
+        label={gettext("Remarks")}
+        field={@form[:valid_until]}
+        placeholder={gettext("Ex: User wants to test")}
+      />
+    </div>
+    <div class="w-full flex justify-end space-x-2">
+      <.button type="submit" variant="primary">{gettext("Submit")}</.button>
+      <button type="reset" class="btn btn-outline" onClick={"#{@id}.close()"}>
+        {gettext("Cancel")}
+      </button>
+    </div>
+  </div>
+</.form>
