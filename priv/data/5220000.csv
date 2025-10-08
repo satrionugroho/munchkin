@@ -1,0 +1,86 @@
+key,value,formula,multiplier
+cash_equivalents,Cash and cash equivalents,,1
+restricted_funds,Restricted funds,,1
+deposits_clearing_and_settlement,Deposits to clearing and settlement guarantee institution,,1
+guarantee_institution_receivables,Receivables from clearing and settlement guarantee institution,,1
+receivables_from_customers,Receivables from customers,"third_party_receivables_from_customers,related_receivables_from_customers",1
+third_party_receivables_from_customers,Receivables from customers third parties,,1
+related_receivables_from_customers,Receivables from customers related parties,,1
+receivables_from_brokers,Receivables from brokers,,1
+margin_receivables,Margin receivables,,1
+receivables_from_im,Receivables from investment manager,,1
+receivables_from_uas,Receivables from underwriting and advisory services,,1
+other_receivables,Other receivables,,1
+marketable_securities,Marketable securities,,1
+securities_agreements,Securities purchased under agreement to resale,,1
+derivative_financial_assets,Derivative financial assets,,1
+accrued_income,Accrued income,,1
+prepaid_taxes,Prepaid taxes,,1
+prepaid_expenses,Prepaid expenses,,1
+guarantees,Guarantees,,1
+advances,Advances,,1
+investment_in_idx,Investments in shares of indonesia stock exchange,,1
+claims_for_tax_refund,Claims for tax refund,,1
+accounted_equity,Investments accounted for using equity method,,1
+investment_ventures_associates,Investments in joint ventures and associates,"investment_ventures,investment_associates",1
+investment_ventures,Investments in joint ventures,,1
+investment_associates,Investments in associates,,1
+deferred_tax_assets,Deferred tax assets,,1
+post_employment_benefits,Post-employment benefit assets,,1
+goodwill,Goodwill,,1
+intangible_assets_oth_goodwill,Intangible assets other than goodwill,,1
+investment_properties,Investment properties,,1
+tax_amnesty_assets,Tax amnesty assets,,1
+ppe,"Property, plant, and equipment",,1
+right_of_use_assets,Right of use assets,,1
+other_assets,Other assets,,1
+total_assets,Total assets,"cash_equivalents,restricted_funds,deposits_clearing_and_settlement,guarantee_institution_receivables,receivables_from_customers,receivables_from_brokers,margin_receivables,receivables_from_im,receivables_from_uas,other_receivables,marketable_securities,securities_agreements,derivative_financial_assets,accrued_income,prepaid_taxes,prepaid_expenses,guarantees,advances,investment_in_idx,claims_for_tax_refund,accounted_equity,investment_ventures_associates,deferred_tax_assets,post_employment_benefits,goodwill,intangible_assets_oth_goodwill,investment_properties,tax_amnesty_assets,ppe,right_of_use_assets,other_assets",1
+notes_payable,Notes payable,,1
+medium_notes,Medium term notes,,1
+bonds_payable,Bonds payable,,1
+sukuk,Sukuk,,1
+subordinated_bonds,Subordinated bonds,,1
+bank_loans,Bank loans,,1
+non_bank_loans,Non-bank financial insitutions loan,,1
+payables_and_settlements_guarantee,Payables to clearing and settlement guarantee institution,,1
+payable_to_customers,Payables to customers,"third_party_payable_to_customers,related_payable_to_customers",1
+third_party_payable_to_customers,Payables to customers third parties,,1
+related_payable_to_customers,Payables to customers related parties,,1
+payable_to_im,Payables to investment managers,,1
+payable_to_securities,Payables to securities company,,1
+dividends_payable,Dividends payable,,1
+margin_payable,Margin payables,,1
+accrued_expenses,Accrued expenses,,1
+taxes_payable,Taxes payable,,1
+deferred_tax_liabilities,Deferred tax liabilities,,1
+contract_liabilities,Contract liabilities,,1
+due_to_related_party,Due to related parties,,1
+subordinated_loans,Subordinated loans,,1
+post_employment_obligations,Post-employment benefit obligations,,1
+tax_amnesty_liabilities,Tax amnesty liabilities,,1
+other_liabilities,Other liabilities,,1
+total_liabilities,Total liabilities,"notes_payable,medium_notes,bonds_payable,sukuk,subordinated_bonds,bank_loans,non_bank_loans,payables_and_settlements_guarantee,payable_to_customers,payable_to_im,payable_to_securities,dividends_payable,margin_payable,accrued_expenses,taxes_payable,deferred_tax_liabilities,contract_liabilities,due_to_related_party,subordinated_loans,post_employment_obligations,tax_amnesty_liabilities,other_liabilities",1
+stocks,Common stocks,,1
+preferred_stocks,Preferred stocks,,1
+additional_paid_in_capital,Additional paid-in capital,,1
+treasury_stocks,Treasury stocks,,-1
+advances_in_capital_stocks,Advances in capital stock,,1
+stock_options,Stock options,,1
+translation_adjustment,Translation adjustment,,1
+revalutaion_reserves,Revaluation reserves,,1
+translation_reserves,Reserve of exchange differences on translation,,1
+equity_reserves,Reserve of gains (losses) from investments in equity instruments,,1
+share_based_reserves,Reserve of share-based payments,,1
+cashflow_reserves,Reserve of cash flow hedges,,1
+defined_benefit_reserves,Reserve of remeasurements of defined benefit plans,,1
+other_reserves,Other reserves,,1
+equity_subsidiary_differences,Difference Due to Changes of Equity in Subsidiary/Associates,,1
+other_equity_components,Other components of equity,,1
+retained_earnings,Retained earnings (deficit),"appropriated_earnings,unappropriated_earnings",1
+appropriated_earnings,Appropriated retained earnings,,1
+unappropriated_earnings,Unappropriated retained earnings,,1
+total_equity_to_owners,Total equity attributable to equity owners of parent entity,"stocks,preferred_stocks,additional_paid_in_capital,treasury_stocks,advances_in_capital_stocks,stock_options,translation_adjustment,revalutaion_reserves,translation_reserves,equity_reserves,share_based_reserves,cashflow_reserves,defined_benefit_reserves,other_reserves,equity_subsidiary_differences,other_equity_components,retained_earnings",1
+proforma_equity,Proforma equity,,1
+non_controlling_interest,Non-controlling interests,,1
+total_equity,Total equity,"total_equity_to_owners,proforma_equity,non_controlling_interest",1
+total_liabilities_and_equity,Total liabilities and equity,"total_equity,total_liabilities",1

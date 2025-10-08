@@ -1,14 +1,23 @@
 defmodule Munchkin.Utils.Relations do
   def cast_relations(changeset, relations, attrs) do
+    params = mapper(attrs)
+
     Enum.reduce(relations, changeset, fn {key, value}, acc ->
-      cast_relation(acc, key, value, attrs)
+      cast_relation(acc, key, value, params)
     end)
   end
 
   defp cast_relation(changeset, key, module, attrs) do
     case Ecto.Changeset.get_field(changeset, key) do
       %mod{} when mod == module -> changeset
-      _ -> get_relation_from_attributes(changeset, key, module, attrs)
+      _ -> get_relation_within_attributes(changeset, key, module, attrs)
+    end
+  end
+
+  defp get_relation_within_attributes(changeset, key, module, attrs) do
+    case Map.get(attrs, to_string(key)) do
+      nil -> get_relation_from_attributes(changeset, key, module, attrs)
+      data -> Ecto.Changeset.put_change(changeset, key, data)
     end
   end
 
@@ -66,4 +75,16 @@ defmodule Munchkin.Utils.Relations do
   end
 
   defp to_safe_atom(atom), do: atom
+
+  defp mapper(map) when is_map(map) do
+    Enum.reduce(map, %{}, fn {key, value}, acc ->
+      case is_struct(value) do
+        true -> Map.put(acc, to_string(key), value)
+        _ -> Map.put(acc, to_string(key), mapper(value))
+      end
+    end)
+  end
+
+  defp mapper([_f | _l] = list), do: Enum.map(list, &mapper/1)
+  defp mapper(data), do: data
 end

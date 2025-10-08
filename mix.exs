@@ -21,9 +21,12 @@ defmodule Munchkin.MixProject do
   def application do
     [
       mod: {Munchkin.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: extra_applications(Mix.env())
     ]
   end
+
+  defp extra_applications(:prod), do: [:logger]
+  defp extra_applications(_), do: [:logger, :wx, :observer, :runtime_tools]
 
   def cli do
     [
@@ -47,7 +50,7 @@ defmodule Munchkin.MixProject do
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 1.1.0"},
-      {:lazy_html, ">= 0.1.0", only: :test},
+      {:lazy_html, ">= 0.1.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
@@ -71,7 +74,10 @@ defmodule Munchkin.MixProject do
       {:nebulex_local, "~> 3.0.0-rc.1"},
       {:nimble_totp, "~> 1.0.0"},
       {:elixir_auth_google, "~> 1.6.9"},
-      {:cors_plug, "~> 3.0"}
+      {:cors_plug, "~> 3.0"},
+      {:pythonx, "~> 0.4.0"},
+      {:xlsxir, "~> 1.6.4"},
+      {:nimble_csv, "~> 1.3.0"}
     ]
   end
 

@@ -1,0 +1,95 @@
+{
+  "revenue": [
+    "sales_and_revenue",
+    "4322000:interest",
+    "4322000:revenue_as_mudharib",
+    "4322000:insurance_income",
+    "4322000:securities_income",
+    "4322000:third_party_syirkah_funds",
+    "5311000:brokerage_income",
+    "5311000:underwriting_income",
+    "5311000:transactions_income",
+    "5311000:dividends_income",
+    "5311000:gains_in_securities",
+    "5311000:realised_gains",
+    "4322000:5311000:financing_income",
+    "6312000:insurance_premiums",
+    "6312000:unearned_premiums",
+    "6312000:comisson_income",
+    "6312000:other_underwriting_income",
+    "8322000:interest_finance_income",
+    "8322000:guarantee_income",
+    "8322000:murabahah_income",
+    "8322000:revenue_sharing_income"
+  ],
+  "cogs": [
+    "cost_sales_revenue",
+    "4322000:interest",
+    "4322000:interest_expenses",
+    "5311000:transactions_income",
+    "5311000:advisory_income",
+    "5311000:underwriting_income",
+    "6312000:reinsurance_premiums",
+    "6312000:retrocession_premiums",
+    "6312000:8322000:claim_expenses",
+    "8322000:policyholder_liability"
+  ],
+  "gross_profit": [
+    "total_gross_profit",
+    "4322000:interest",
+    "4322000:interest_expenses",
+    "4322000:financing_income",
+    "4322000:securities_income",
+    "4322000:other_operating_income",
+    "5311000:brokerage_income",
+    "5311000:underwriting_income",
+    "5311000:transactions_income",
+    "5311000:administration_income",
+    "5311000:inv_management_income",
+    "5311000:advisory_income",
+    "5311000:dividends_income",
+    "5311000:financing_income",
+    "6312000:insurance_premiums",
+    "6312000:unearned_premiums",
+    "6312000:commission_income",
+    "6312000:other_underwriting_income",
+    "6312000:reinsurance_claims",
+    "6312000:retrocession_claims",
+    "8322000:interest_finance_income",
+    "8322000:guarantee_income",
+    "8322000:murabahah_income",
+    "8322000:revenue_sharing_income",
+    "8322000:ijarah_income",
+    "8322000:financing_income",
+    "8322000:insurance_income"
+  ],
+  "sales_marketing": [
+    "selling_expenses",
+    "6312000:8322000:commission_expenses"
+  ],
+  "research_development": "",
+  "general_administrative": "general_adm_exp",
+  "opex": [
+    "selling_expenses",
+    "general_adm_exp",
+    "insurance_expenses",
+    "1311000:2311000:33110000:5311000:other_expenses",
+    "5311000:final_tax_expenses"
+  ],
+  "operating_income": [
+    "1311000:2311000:3311000:5311000:6312000:total_profit_before_tax",
+    "4322000:total_operating_income_expense"
+  ],
+  "other_operating_income": [
+    "other_income",
+    "total_other_operating_income",
+    "8322000:other_gains"
+  ],
+  "income_before_tax": "total_comprehensive_income_after_tax",
+  "income_tax_expense": [
+    "tax_benefit"
+  ],
+  "net_income": "total_profit",
+  "non_controlling_interest": "pnl_to_nci",
+  "net_income_to_shareholders": "pnl_to_parent"
+}

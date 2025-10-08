@@ -1,0 +1,131 @@
+{
+  "net_income": [
+    "cash_receipts",
+    "4510000:cashflow_before_operating_assets_and_liab",
+    "5510000:net_cash_assets_and_liabilities",
+    "6510000:insurance_premiums",
+    "6510000:reinsurance_claims",
+    "6510000:commission_receipts",
+    "6510000:retrocession_claims",
+    "6510000:repayment_deposits"
+  ],
+  "stock_based_expense": [
+    "proceeds_investments",
+    "proceeds_securities",
+    "5510000:payments_to_brokerage",
+    "5510000:payments_to_clearing",
+    "5510000:payments_to_marketable_securities",
+    "6510000:retrocession_payments"
+  ],
+  "operating_income": [
+    "1510000:2510000:3510000:investment_income",
+    "6510000:commission_payments",
+    "6510000:marketing_expenses",
+    "6510000:reinsurance_payments",
+    "6510000:insurance_payments",
+    "dividends_received",
+    "interests_received"
+  ],
+  "operating_expense": [
+    "1510000:2510000:3510000:interest_payments",
+    "5510000:payments_to_sales",
+    "8510000:interests_loan",
+    "interests_paid",
+    "dividends_from_opex"
+  ],
+  "depreciation_and_amortization": [
+    "cash_payments",
+    "excise_payable",
+    "corporate_income_taxes",
+    "decreased_operation",
+    "4510000:other_operating_expenses",
+    "4510000:decrease_in_operating_assets",
+    "5510000:cash_payments_for_cogs"
+  ],
+  "other_non_cash_items": [
+    "refunded_income_taxes",
+    "increased_liabilities",
+    "other_flows",
+    "4510000:increased_in_liabilities",
+    "4510000:increased_other_liabilities"
+  ],
+  "net_cash_operating_activities": "total_netcash_opex",
+  "capex": [
+    "acquisition_ppe",
+    "acquisition_intangible_assets",
+    "acquisition_land",
+    "acquisition_toll_road",
+    "acquisition_rnd",
+    "acquisition_mining",
+    "acquisition_oil",
+    "acquisition_plantation",
+    "acquisition_investments",
+    "acquisition_plasma_plantation",
+    "acquisition_timber_plantation",
+    "acquisition_livestocks",
+    "placement_cost",
+    "ppe_advances",
+    "deferred_charges",
+    "assets_payments"
+  ],
+  "investing_income": [
+    "dividends_received_from_investing",
+    "interests_received_from_investing",
+    "4510000:proceeds_sales_interests",
+    "4510000:proceeds_interests"
+  ],
+  "investing_expense": [
+    "interests_paid_from_investing",
+    "payments_interests",
+    "4510000:payments_acquisition_interests"
+  ],
+  "other_investing_activities": [
+    "withdrawal_short_term",
+    "withdrawal_assets",
+    "withdrawal_income",
+    "withdrawal_investing",
+    "withdrawal_bonds",
+    "withdrawal_cost_investment",
+    "proceeds_assets",
+    "contracts_payments",
+    "contracts_receipts",
+    "related_to_receivable",
+    "income_tax_from_investing",
+    "other_flows_from_investing",
+    "disposal_non_finance",
+    "4510000:disposal_property_equipment",
+    "4510000:disposal_intangible_assets",
+    "6510000:proceeds_disposal_ppe",
+    "6510000:sales_investments",
+    "6510000:investment_income",
+    "8510000:disposal_investment"
+  ],
+  "net_cash_from_investing": "total_netcash_from_investing",
+  "financing_income": [
+    "interests_paid_from_investing",
+    "interests_received_from_investing",
+    "8510000:notes_payable",
+    "8510000:bank_loans",
+    "8510000:lease_liabilities",
+    "8510000:medium_notes"
+  ],
+  "financing_expense": [
+    "dividends_paid",
+    "4510000:increase_non_controlling_interest",
+    "8510000:notes_payable_payments",
+    "8510000:non_bank_loan",
+    "8510000:liease_liabilities_payments",
+    "8510000:medium_notes_payments"
+  ],
+  "other_financing_activities": [
+    "other_flows_from_financing",
+    "income_tax_from_financing",
+    "8510000:subordinated_loans",
+    "8510000:other_borrowings"
+  ],
+  "net_cash_from_financing": "total_netcash_from_financing",
+  "exchange_rate": "effect_exchange_rate",
+  "change_in_cash": "total_netcash",
+  "cash_in_beginning_period": "cash_and_cash_equivalent",
+  "cash_in_end_period": "cashflows"
+}

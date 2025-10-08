@@ -1,0 +1,121 @@
+key,value,formula,multiplier
+cashflow_before_operating_assets_and_liab,Cash flows before changes in operating assets and liabilities,"investment_income,interest_payments,interest_from_banks_and_time_deposits,revenue_as_mudharib,payments_of_syirkah_funds,insurance_premiums,reinsurance_claims,commission_receipts,retrocession_claims,ujrah_receipts,clearing_and_guarantee_receipts,customers_receipts,clearing_and_guarantee_withdrawal,other_transactions_income,off_written_assets,deferred_acquisition_cost,bank_and_administration_charges,salaries_cash_payments,corporate_income_tax,gna_cash_payments,foreign_currency_pnl,refunds_of_income_tax,other_operating_expenses,non_operating_income_receipts,repayment_deposits,other_flows",1
+investment_income,"Interest, investment income, fees and commissions received",,1
+interest_payments,Payments Of Interest And Bonus Fees And Commissions,,-1
+interest_from_banks_and_time_deposits,Interest from banks and time deposits,,1
+revenue_as_mudharib,Revenue receipts from fund management as mudharib,,1
+payments_of_syirkah_funds,Payments of temporary syirkah funds,,-1
+insurance_premiums,Receipts from insurance premiums,,1
+reinsurance_claims,Receipts from reinsurance claims,,1
+commission_receipts,Receipts (payments) of commission,,1
+retrocession_claims,Receipts from retrocession claims,,1
+ujrah_receipts,Receipts of ujrah,,1
+clearing_and_guarantee_receipts,Receipts from (payments to) clearing and guarantee institution,,1
+customers_receipts,Receipts from (payments to) customers,,1
+clearing_and_guarantee_withdrawal,Withdrawal (placement) of deposits to clearing and guarantee institution,,1
+other_transactions_income,Income from other operating transactions,,1
+off_written_assets,Recoveries of written off assets,,1
+deferred_acquisition_cost,Payments for deferred acquisition costs,,-1
+bank_and_administration_charges,Payments of finance costs and bank administration charges,,-1
+salaries_cash_payments,Payments for salaries and allowances,,-1
+corporate_income_tax,Payments for corporate income tax,,-1
+gna_cash_payments,Payments for general and administrative expense,,-1
+foreign_currency_pnl,Foreign currency gains (losses),,1
+refunds_of_income_tax,Refunds (payments) of income tax,,1
+other_operating_expenses,Payments for other operating expenses,,-1
+non_operating_income_receipts,Receipts from non-operating income,,1
+repayment_deposits,Repayment (placement) of refundable deposits,,1
+other_flows,Other cash inflows (outflows) from operating activities,,1
+decrease_in_sharia,Decrease (increase) in sharia financing and receivables,"decrease_in_murabahah,decrease_in_istishna,decrease_in_ijarah,decrease_in_qardh,decrease_in_mudharabah_financing,decrease_in_musyarakah,decrease_in_ijarah_assets",1
+decrease_in_murabahah,Decrease (increase) in murabahah receivables,,1
+decrease_in_istishna,Decrease (increase) in istishna receivables,,1
+decrease_in_ijarah,Decrease (increase) in ijarah receivables,,1
+decrease_in_qardh,Decrease (increase) in qardh funds,,1
+decrease_in_mudharabah_financing,Decrease (increase) in mudharabah financing,,1
+decrease_in_musyarakah,Decrease (increase) in musyarakah financing,,1
+decrease_in_ijarah_assets,Decrease (increase) in ijarah assets,,1
+decrease_in_placements,Decrease (increase) in placements with other banks and Bank Indonesia,,1
+decrease_in_marketable_securities,Decrease (increase) in marketable securities,,1
+decrease_in_securities_resale,Decrease (increase) in securities purchased under resale agreements,,1
+decrease_in_policyholder,Decrease (increase) in investment of policyholder in unit-linked contracts,,1
+decrease_in_bills,Decrease (increase) in bills and other receivables,,1
+decrease_in_acceptance_receivables,Decrease (increase) in acceptance receivables,,1
+decrease_in_loans,Decrease (increase) in loans,,1
+decrease_in_consumer_financing,Decrease (increase) in consumer financing receivables,,1
+decrease_in_lease_investments,Decrease (increase) in lease investments,,1
+decrease_in_factoring,Decrease (increase) in factoring,,1
+decrease_in_other_receivables,Decrease (increase) in other receivables,,1
+decrease_in_foreclosed_assets,Decrease (increase) in foreclosed assets,,1
+decrease_in_derivative_receivables,Decrease (increase) in derivative receivables,,1
+decrease_in_reinsurance_assets,Decrease (increase) in reinsurance assets,,1
+decrease_in_other_assets,Decrease (increase) in other assets,,1
+decrease_in_operating_assets,Decrease (increase) in operating assets,"decrease_in_sharia,decrease_in_placements,decrease_in_marketable_securities,decrease_in_securities_resale,decrease_in_policyholder,decrease_in_bills,decrease_in_acceptance_receivables,decrease_in_loans,decrease_in_consumer_financing,decrease_in_lease_investments,decrease_in_factoring,decrease_in_other_receivables,decrease_in_foreclosed_assets,decrease_in_derivative_receivables,decrease_in_reinsurance_assets,decrease_in_other_assets",1
+increase_in_obligations,Increase (decrease) in obligations due immediately,,1
+increase_in_customers_savings,Increase (decrease) in current accounts and customers savings,,1
+increase_in_time_deposits,Increase (decrease) in customers time deposits,,1
+increase_in_demand_deposits,Increase (decrease) in customers wadiah demand deposits,,1
+increase_in_wadiah_savings,Increase (decrease) in customers wadiah saving deposits,,1
+increase_in_wakalah_deposits,Increase (decrease) in customers wakalah deposits,,1
+increase_in_bank_deposits,Increase (decrease) in other banks saving deposits,,1
+increase_in_current_accounts,Increase (decrease) in mudharabah current account,,1
+increase_in_saving_deposits,Increase (decrease) in mudharabah savings deposits,,1
+increase_in_repurchase_agreements,Increase (decrease) in securities sold under repurchase agreement,,1
+increase_in_acceptance_payables,Increase (decrease) in acceptance payables,,1
+increase_in_policyholder,Increase (decrease) in liabilities to policyholder on unit-linked contracts,,1
+increase_in_derivative_payables,Increase (decrease) in derivative payables,,1
+increase_in_syirkah_funds,Increase (decrease) in temporary syirkah funds,,1
+increase_in_other_liabilities,Increase (decrease) in other liabilities,,1
+increase_in_liabilities,Increase (decrease) in operating liabilities,"increase_in_obligations,increase_in_customers_savings,increase_in_time_deposits,increase_in_demand_deposits,increase_in_wadiah_savings,increase_in_bank_deposits,increase_in_current_accounts,increase_in_saving_deposits,increase_in_repurchase_agreements,increase_in_acceptance_payables,increase_in_policyholder,increase_in_derivative_payables,increase_in_syirkah_funds,increase_in_other_liabilities",1
+total_netcash_opex,Total net cash flows received from (used in) operating activities,"increase_in_liabilities,decrease_in_operating_assets,cashflow_before_operating_assets_and_liab",1
+proceeds_investments,Proceeds from equity investments classified as amortized cost and fair value through other comprehensive income,,1
+withdrawal_bonds,Withdrawal (placement) of bonds and (or) sukuk,,1
+dividends_received_from_investing,Dividends received from investing activities,,1
+disposal_investment_properties,Proceeds from disposal (acquisition) of investment properties,,1
+disposal_property_equipment,Proceeds from disposal (acquisition) of property and equipment,,1
+disposal_intangible_assets,Proceeds from disposal (acquisition) of intangible assets other than goodwill,,1
+withdrawal_income,Withdrawal (placement) of financial assets fair value through other comprehensive income,,1
+placement_cost,Placement of financial assets amotized cost investments,,-1
+withdrawal_cost_investment,Withdrawal of financial assets amortized cost investments,,1
+receipts_for_policy_loans,Receipts from (payments for) policy loans,,1
+payments_acquisition,Payments for acquisition of subsidiaries,,-1
+sales_of_subsidiaries,Proceeds from sales of subsidiaries,,1
+payments_interests,Payments for acquisition of additional interests in subsidiaries,,-1
+placement_marketable_securities,Withdrawal (placement) of marketable securities,,1
+proceeds_interests,Proceeds from sales of interests in subsidiaries without loss of control from investing activities,,1
+payments_acquisition_interests,Payments for acquisition of interests in associates,,-1
+proceeds_sales_interests,Proceeds from sales of interests in associates,,1
+other_flows_from_investing,Other cash inflows (outflows) from investing activities,,1
+total_netcash_from_investing,Total net cash flows received from (used in) investing activities,"proceeds_investments,withdrawal_bonds,dividends_received_from_investing,disposal_investment_properties,disposal_property_equipment,disposal_intangible_assets,withdrawal_income,placement_cost,withdrawal_cost_investment,receipts_for_policy_loans,payments_acquisition,sales_of_subsidiaries,payments_interests,placement_marketable_securities,proceeds_interests,payments_acquisition_interests,other_flows_from_investing",1
+increase_in_securities_issued,Increase (decrease) in securities issued,,1
+issuance_of_sukuk,Issuance of mudharabah sukuk,,1
+placement_mudharabah_investments,Placement of certificate of mudharabah investments,,-1
+issuance_mudharabah_cost,Issuance cost of mudharabah sukuk,,-1
+proceeds_from_borrowing,Proceeds from borrowings,,1
+payments_from_borrowing,Payments for borrowings,,-1
+subordinated_loans,Proceeds from subordinated loans,,1
+subordinated_loans_payments,Payments of subordinated loans,,-1
+payments_from_interests,Payments of interests from borrowings,,-1
+proceeds_from_bonds,Proceeds from bonds issuance,,1
+bonds_payable_payments,Payments of bonds payable,,-1
+insurance_costs,Payments of bonds issuance costs,,-1
+subordinated_bonds,Subordinated bonds issued,,1
+subordinated_bonds_payments,Payments of subordinated bonds,,-1
+subordinated_bonds_costs,Subordinated bonds issuance costs,,-1
+medium_notes,Proceeds from medium term notes,,1
+medium_notes_payments,Payments of medium term notes,,-1
+proceeds_from_new_stocks,Proceeds from issuance of new stocks,,1
+stock_issuance_payments,Payments of stock issuance costs,,-1
+proceeds_from_capital,Proceeds from capital contributions,,1
+increase_non_controlling_interest,Proceed from increase of non-controlling interest,,1
+treasury_sales,Sales (purchase) of treasury stocks,,1
+stock_options,Proceeds from employee stock options program,,1
+settlement_derivative_transactions,Settlement (placement) of derivative transactions,,1
+dividends_paid,Dividends paid from financing activities,,-1
+other_flows_from_financing,Other cash inflows (outflows) from financing activities,,1
+total_netcash_from_financing,Total net cash flows received from (used in) financing activities,"increase_in_securities_issued,issuance_of_sukuk,placement_mudharabah_investments,issuance_mudharabah_cost,proceeds_from_borrowing,payments_from_borrowing,subordinated_loans,subordinated_loans_payments,payments_from_interests,proceeds_from_bonds,bonds_payable_payments,insurance_costs,subordinated_bonds,subordinated_bonds_payments,subordinated_bonds_costs,medium_notes,medium_notes_payments,proceeds_from_new_stocks,stock_issuance_payments,proceeds_from_capital,increase_non_controlling_interest,treasury_sales,stock_options,settlement_derivative_transactions,dividends_paid,other_flows_from_financing",1
+total_netcash,Total net increase (decrease) in cash and cash equivalents,"total_netcash_opex,total_netcash_from_investing,total_netcash_from_financing",1
+cash_and_cash_equivalent,"Cash and cash equivalents cash flows, beginning of the period",,1
+effect_exchange_rate,Effect of exchange rate changes on cash and cash equivalents,,1
+deconsolidated_cash_and_cash,Cash and cash equivalent of deconsolidated subsidiaries,,1
+other_cash_and_cash,Other increase (decrease) in cash and cash equivalents,,1
+cashflows,"Cash and cash equivalents cash flows, end of the period","total_netcash,cash_and_cash_equivalent,effect_exchange_rate,deconsolidated_cash_and_cash,other_cash_and_cash",1

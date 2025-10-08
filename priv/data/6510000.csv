@@ -1,0 +1,56 @@
+key,value,formula,multiplier
+insurance_premiums,Receipts from insurance premiums,,1
+reinsurance_claims,Receipts from reinsurance claims,,1
+commission_receipts,Receipts from commission,,1
+retrocession_claims,Receipts from retrocession claims,,1
+commission_payments,Payments of commission,,-1
+reinsurance_payments,Payments for reinsurance premiums,,-1
+insurance_payments,Payments for insurance claims and benefits,,-1
+retrocession_payments,Payments for retrocession premiums,,-1
+underwriting_payments,Payments for other underwriting expenses,,-1
+gna_cash_payments,Payments for general and administrative expense,,-1
+marketing_expenses,Payments for marketing expenses,,-1
+salaries_cash_payments,Payments for salaries and allowances,,-1
+corporate_income_tax,Payments for corporate income tax,,-1
+interests_received,Interests received from operating activities,,1
+interests_paid,Interests paid from operating activities,,-1
+refunded_income_taxes,Income taxes refunded (paid) from operating activities,,1
+repayment_deposits,Repayment (placement) of refundable deposits,,1
+other_flows,Other cash inflows (outflows) from operating activities,,1
+total_netcash_opex,Total net cash flows received from (used in) operating activities,"insurance_premiums,reinsurance_claims,commission_receipts,retrocession_claims,commission_payments,reinsurance_payments,insurance_payments,retrocession_payments,underwriting_payments,gna_cash_payments,marketing_expenses,salaries_cash_payments,corporate_income_tax,interests_received,interests_paid,refunded_income_taxes,repayment_deposits,other_flows",1
+investment_income,Receipts of investment income,,1
+sales_investments,Proceeds from sales of investments,,1
+proceeds_disposal_ppe,Proceeds from disposal of property and equipment,,1
+acquisition_ppe,Payments for acquisition of property and equipment,,-1
+disposal_investments,Proceeds from disposal of investment properties,,1
+acquisition_investments,Payments for acquisition of investment properties,,-1
+proceeds_intangible_assets,Proceeds from disposal of intangible assets,,1
+withdrawal_income,Withdrawal (placement) of financial assets fair value through other comprehensive income,,1
+placement_cost,Placement of financial assets amotized cost investments,,-1
+withdrawal_cost_investment,Withdrawal of financial assets amortized cost investments,,1
+acquisition_intangible_assets,Payments for acquisition of intangible assets,,-1
+disposal_non_finance,Proceeds from disposal of other non-financial assets,,1
+acquisition_non_finance,Payments for acquisition of other non-financial assets,,-1
+receipts_for_policy_loans,Receipts from (payments for) policy loans,,1
+dividends_received_from_investing,Dividends received from investing activities,,1
+interests_received_from_investing,Interests received from investing activities,,1
+interests_paid_from_investing,Interests paid from investing activities,,-1
+income_tax_from_investing,Income taxes refunded (paid) from investing activities,,1
+other_flows_from_investing,Other cash inflows (outflows) from investing activities,,1
+total_netcash_from_investing,Total net cash flows received from (used in) investing activities,"investment_income,sales_investments,proceeds_disposal_ppe,acquisition_ppe,disposal_investments,acquisition_investments,proceeds_intangible_assets,withdrawal_income,placement_cost,withdrawal_cost_investment,acquisition_intangible_assets,disposal_non_finance,acquisition_non_finance,receipts_for_policy_loans,dividends_received_from_investing,interests_received_from_investing,interests_paid_from_investing,income_tax_from_investing,other_flows_from_investing",1
+dividends_paid,Dividends paid from financing activities,,-1
+insurance_stocks,Proceeds from issuance of common stocks,,1
+insurance_preferred_stocks,Proceeds from issuance of preferred stocks,,1
+increase_non_controlling_interest,Proceed from increase of non-controlling interest,,1
+stock_issuance_payments,Payments of stock issuance costs,,-1
+interests_received_from_financing,Interests received from financing activities,,1
+interests_paid_from_financing,Interests paid from financing activities,,-1
+income_tax_from_financing,Income taxes refunded (paid) from financing activities,,1
+other_flows_from_financing,Other cash inflows (outflows) from financing activities,,1
+total_netcash_from_financing,Total net cash flows received from (used in) financing activities,"dividends_paid,insurance_stocks,insurance_preferred_stocks,increase_non_controlling_interest,stock_issuance_payments,interests_received_from_financing,income_tax_from_financing,other_flows_from_financing",1
+total_netcash,Total net increase (decrease) in cash and cash equivalents,"total_netcash_opex,total_netcash_from_financing,total_netcash_from_investing",1
+cash_and_cash_equivalent,"Cash and cash equivalents cash flows, beginning of the period",,1
+effect_exchange_rate,Effect of exchange rate changes on cash and cash equivalents,,1
+deconsolidated_cash_and_cash,Cash and cash equivalent of deconsolidated subsidiaries,,1
+other_cash_and_cash,Other increase (decrease) in cash and cash equivalents,,1
+cashflows,"Cash and cash equivalents cash flows, end of the period","total_netcash,cash_and_cash_equivalent,effect_exchange_rate,deconsolidated_cash_and_cash,other_cash_and_cash",1

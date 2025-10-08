@@ -1,0 +1,16 @@
+net_income
+stock_based_expense
+depreciation_and_amortization
+other_non_cash_items
+net_cash_operating_activities
+cashflow_from_investing
+capex
+other_investing_activities
+net_cash_from_investing
+cashflow_from_financing
+dividends_paid
+other_financing_activities
+net_cash_from_financing
+change_in_cash
+cash_in_beginning_period
+cash_in_end_period

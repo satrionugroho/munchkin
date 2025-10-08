@@ -1,0 +1,89 @@
+key,value,formula,multiplier
+cash_equivalents,Cash and cash equivalents,,1
+investments_income,Investment income receivables,,1
+premium_receivables,Premium receivables,,1
+reinsurance_receivables,Reinsurance receivables,,1
+coinsurance_receivables,Coinsurance receivables,,1
+retrocession_receivables,Retrocession receivables,,1
+other_receivables,Other receivables,,1
+reinsurance_assets,Reinsurance assets,,1
+total_investments,Investments,"investments_time_deposits,investments_mutual_funds,investments_other_comp_income,investments_amortized,investments_in_shares,other_investments",1
+investments_time_deposits,Investments in time deposits,,1
+investments_mutual_funds,Investments on securities and mutual funds at fair value through profit or loss,,1
+investments_other_comp_income,Investments on fair value through other comprehensive income securities,,1
+investments_amortized,Investments on amortized cost securities,,1
+investments_in_shares,Investments in shares,,1
+other_investments,Other investments,,1
+investments_policyholder,Investments of policyholder in unit-linked contracts,,1
+prepaid_expenses,Prepaid expenses,,1
+guarantees,Guarantees,,1
+prepaid_taxes,Prepaid taxes,,1
+assets_for_sale,Non-current assets or disposal groups classified as held-for-sale,,1
+assets_for_owners,Non-current assets or disposal groups classified as held-for-distribution to owners,,1
+deferred_tax_assets,Deferred tax assets,,1
+retrocession_assets,Retrocession assets,,1
+deferred_acquisition_costs,Deferred acquisition costs,,1
+goodwill,Goodwill,,1
+intangible_assets_oth_goodwill,Intangible assets other than goodwill,,1
+investment_properties,Investment properties,,1
+ppe,"Property, plant, and equipment",,1
+right_of_use_assets,Right of use assets,,1
+post_employment_benefits,Post-employment benefit assets,,1
+tax_amnesty_assets,Tax amnesty assets,,1
+other_assets,Other assets,,1
+total_assets,Total assets,"cash_equivalents,investments_income,premium_receivables,reinsurance_receivables,coinsurance_receivables,retrocession_receivables,other_receivables,retrocession_assets,total_investments,investments_policyholder,prepaid_expenses,guarantees,prepaid_taxes,assets_for_sale,assets_for_owners,deferred_tax_assets,retrocession_assets,deferred_acquisition_costs,goodwill,intangible_assets_oth_goodwill,investment_properties,ppe,right_of_use_assets,post_employment_benefits,tax_amnesty_assets,other_assets",1
+coinsurance_liabilities,Coinsurance liabilities,,1
+reinsurance_payables,Reinsurance payables,,1
+commission_payables,Commission payables,,1
+claim_payables,Claim payables,,1
+retrocession_payables,Retrocession payables,,1
+bonds_payable,Bonds payable,,1
+sukuk,Sukuk,,1
+dividends_payable,Dividends payable,,1
+taxes_payable,Taxes payable,,1
+zakat_fund,Zakat fund,,1
+accrued_expenses,Accrued expenses,,1
+premium_deposits,Premium deposits,,1
+contract_liabilities,Contract liabilities,,1
+ujrah_liabilites,Ujrah liabilities,,1
+non_current_asset_liabilities,Liabilities directly associated with non-current assets or disposal groups classified as held-for-sale or as held-for-distribution to owners,,1
+liabilities_policyholder,Liabilities to policyholder in unit-linked contracts,,1
+insurance_contract_liabilities,Insurance contract liabilities,"insurance_unearned,insurance_liability,insurance_policy,provision_adecuacy,insurance_on_income",1
+insurance_unearned,Insurance liabilities on unearned premium,,1
+insurance_liability,Insurance liabilities on estimated claims liability,,1
+insurance_policy,Insurance liabilities for future policy benefits,,1
+provision_adecuacy,Provisions for losses arising resulting from liability adequacy test,,1
+insurance_on_income,Insurance liabilities on deferred premium income,,1
+deferred_tax_liabilities,Deferred tax liabilities,,1
+post_employment_obligations,Post-employment benefit obligations,,1
+tax_amnesty_liabilities,Tax amnesty liabilities,,1
+other_liabilities,Other liabilities,,1
+total_liabilities,Total liabilities,"coinsurance_liabilities,reinsurance_payables,commission_payables,claim_payables,retrocession_assets,bonds_payable,sukuk,dividends_payable,taxes_payable,zakat_fund,accrued_expenses,premium_deposits,contract_liabilities,ujrah_liabilites,non_current_asset_liabilities,liabilities_policyholder,insurance_contract_liabilities,deferred_tax_liabilities,post_employment_obligations,tax_amnesty_liabilities,other_liabilities",1
+accumulated_tabarru_funds,Accumulated tabarru's funds,,1
+mudharabah_funds,Mudharabah temporary syirkah funds,,1
+total_syirkah_funds,Total temporary syirkah funds,"accumulated_tabarru_funds,mudharabah_funds",1
+stocks,Common stocks,,1
+preferred_stocks,Preferred stocks,,1
+additional_paid_in_capital,Additional paid-in capital,,1
+treasury_stocks,Treasury stocks,,-1
+advances_in_capital_stocks,Advances in capital stock,,1
+stock_options,Stock options,,1
+translation_adjustment,Translation adjustment,,1
+revalutaion_reserves,Revaluation reserves,,1
+translation_reserves,Reserve of exchange differences on translation,,1
+income_reserves,Reserve for changes in fair value of fair value through other comprehensive income financial assets,,1
+equity_reserves,Reserve of gains (losses) from investments in equity instruments,,1
+share_based_reserves,Reserve of share-based payments,,1
+cashflow_reserves,Reserve of cash flow hedges,,1
+defined_benefit_reserves,Reserve of remeasurements of defined benefit plans,,1
+other_reserves,Other reserves,,1
+equity_subsidiary_differences,Difference Due to Changes of Equity in Subsidiary/Associates,,1
+other_equity_components,Other components of equity,,1
+retained_earnings,Retained earnings (deficit),"appropriated_earnings,unappropriated_earnings",1
+appropriated_earnings,Appropriated retained earnings,,1
+unappropriated_earnings,Unappropriated retained earnings,,1
+total_equity_to_owners,Total equity attributable to equity owners of parent entity,"stocks,preferred_stocks,additional_paid_in_capital,treasury_stocks,advances_in_capital_stocks,stock_options,translation_adjustment,revalutaion_reserves,translation_reserves,income_reserves,equity_reserves,share_based_reserves,cashflow_reserves,defined_benefit_reserves,other_reserves,equity_subsidiary_differences,other_equity_components,retained_earnings",1
+proforma_equity,Proforma equity,,1
+non_controlling_interest,Non-controlling interests,,1
+total_equity,Total equity,"total_equity_to_owners,proforma_equity,non_controlling_interest",1
+total_liabilities_and_equity,"Total liabilities, tabarru funds and equity","total_liabilities,total_syirkah_funds,total_equity",0

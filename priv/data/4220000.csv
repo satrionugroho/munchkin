@@ -1,0 +1,229 @@
+key,value,formula,multiplier
+cash,Cash,,1
+restricted_funds,Restricted funds,,1
+current_bi_accounts,Current accounts with Bank Indonesia,,1
+current_other_bank_accounts,Current accounts with other banks,"third_party_current_accounts,related_current_accounts,other_bank_impairment_losses",1
+third_party_current_accounts,Current accounts with other banks third parties,,1
+related_current_accounts,Current accounts with other banks related parties,,1
+other_bank_impairment_losses,Allowance for impairment losses for current accounts with other bank,,-1
+other_bank_placements,Placements with Bank Indonesia and other banks,"third_party_placements,related_placements,placements_impairment_losses",1
+third_party_placements,Placements with Bank Indonesia and other banks third parties,,1
+related_placements,Placements with Bank Indonesia and other banks related parties,,1
+placements_impairment_losses,Allowance for impairment losses for placements with other banks,,-1
+insurance_receivables,Insurance receivables,"third_party_insurance_receivables,related_insurance_receivables,insurance_receivables_impairment_losses",1
+third_party_insurance_receivables,Insurance receivables third parties,,1
+related_insurance_receivables,Insurance receivables related parties,,1
+insurance_receivables_impairment_losses,Allowance for impairment losses for insurance receivables,,-1
+deferred_acquisition_costs,Deferred acquisition costs,,1
+deposits_clearing_and_settlement,Deposits to clearing and settlement guarantee institution,,1
+marketable_securities,Marketable securities,"third_party_marketable_securities,related_marketable_securities,marketable_securities_impairment_losses",1
+third_party_marketable_securities,Marketable securities third parties,,1
+related_marketable_securities,Marketable securities related parties,,1
+marketable_securities_impairment_losses,Allowance for impairment losses for marketable securities,,-1
+investments_policyholder,Investments of policyholder in unit-linked contracts,,1
+securities_agreements,Securities purchased under agreement to resale,,1
+bills_and_other_receivables,Bills and other receivables,"third_party_bills_and_other_receivables,related_bills_and_other_receivables,bills_and_other_receivables_impairment_losses",1
+third_party_bills_and_other_receivables,Bills and other receivables third parties,,1
+related_bills_and_other_receivables,Bills and other receivables related parties,,1
+bills_and_other_receivables_impairment_losses,Allowance for impairment losses for bills and other receivables,,-1
+acceptance_receivables,Acceptance receivables,"third_party_acceptance_receivables,related_acceptance_receivables,acceptance_receivables_impairment_losses",1
+third_party_acceptance_receivables,Acceptance receivables third parties,,1
+related_acceptance_receivables,Acceptance receivables related parties,,1
+acceptance_receivables_impairment_losses,Allowance for impairment losses for acceptance receivables,,-1
+derivative_receivables,Derivative receivables,"third_party_derivative_receivables,related_derivative_receivables",1
+third_party_derivative_receivables,Derivative receivables third parties,,1
+related_derivative_receivables,Derivative receivables related parties,,1
+loans,Loans,"third_party_loans,related_loans,loans_impairment_losses",1
+third_party_loans,Loans third parties,,1
+related_loans,Loans related parties,,1
+loans_impairment_losses,Allowance for impairment losses for loans,,-1
+guarantee_institution_receivables,Receivables from clearing and settlement guarantee institution,,1
+receivables_from_customers,Receivables from customers,"third_party_receivables_from_customers,related_receivables_from_customers,receivables_from_customers_impairment_losses",1
+third_party_receivables_from_customers,Receivables from customers third parties,,1
+related_receivables_from_customers,Receivables from customers related parties,,1
+receivables_from_customers_impairment_losses,Allowance for impairment losses for receivables from customers,,-1
+murabahah_receivables,Murabahah receivables,"third_party_murabahah_receivables,related_murabahah_receivables,murabahah_receivables_impairment_losses",1
+third_party_murabahah_receivables,Murabahah receivables third parties,,1
+related_murabahah_receivables,Murabahah receivables related parties,,1
+murabahah_receivables_impairment_losses,Allowance for impairment losses for murabahah receivables,,-1
+istishna_receivables,Istishna receivables,"third_party_istishna_receivables,related_istishna_receivables,istishna_receivables_impairment_losses",1
+third_party_istishna_receivables,Istishna receivables third parties,,1
+related_istishna_receivables,Istishna receivables related parties,,1
+istishna_receivables_impairment_losses,Allowance for impairment losses for istishna receivables,,-1
+ijarah_receivables,Ijarah receivables,"third_party_ijarah_receivables,related_ijarah_receivables,ijarah_receivables_impairment_losses",1
+third_party_ijarah_receivables,Ijarah receivables third parties,,1
+related_ijarah_receivables,Ijarah receivables related parties,,1
+ijarah_receivables_impairment_losses,Allowance for impairment losses for ijarah receivables,,-1
+consumer_financing_receivables,Consumer financing receivables,"third_party_consumer_financing_receivables,related_consumer_financing_receivables,consumer_financing_receivables_impairment_losses",1
+third_party_consumer_financing_receivables,Consumer financing receivables third parties,,1
+related_consumer_financing_receivables,Consumer financing receivables related parties,,1
+consumer_financing_receivables_impairment_losses,Allowance for impairment losses for consumer financing receivables,,-1
+qardh_funds,Qardh funds,"third_party_qardh_funds,related_qardh_funds,qardh_funds_impairment_losses",1
+third_party_qardh_funds,Qardh funds third parties,,1
+related_qardh_funds,Qardh funds related parties,,1
+qardh_funds_impairment_losses,Allowance for impairment losses for qardh funds,,-1
+mudharabah_financing,Mudharabah financing,"third_party_mudharabah_financing,related_mudharabah_financing,mudharabah_financing_impairment_losses",1
+third_party_mudharabah_financing,Mudharabah financing third parties,,1
+related_mudharabah_financing,Mudharabah financing related parties,,1
+mudharabah_financing_impairment_losses,Allowance for impairment losses for mudharabah financing,,-1
+musyarakah_financing,Musyarakah financing,"third_party_musyarakah_financing,related_musyarakah_financing,musyarakah_financing_impairment_losses",1
+third_party_musyarakah_financing,Musyarakah financing third parties,,1
+related_musyarakah_financing,Musyarakah financing related parties,,1
+musyarakah_financing_impairment_losses,Allowance for impairment losses for musyarakah financing,,-1
+lease_investments,Lease investments,"third_party_lease_investments,related_lease_investments,residual_lease_investments,deferred_lease_investments,guarantee_lease_investments,lease_investments_impairment_losses",1
+third_party_lease_investments,Lease investments third parties,,1
+related_lease_investments,Lease investments related parties,,1
+residual_lease_investments,Lease investments guaranteed residual value,,1
+deferred_lease_investments,Lease investments deferred financing income,,1
+guarantee_lease_investments,Lease investments guarantee deposits,,1
+lease_investments_impairment_losses,Allowance for impairment losses for lease investments,,-1
+factoring_receivables,Factoring receivables,"third_party_factoring_receivables,related_factoring_receivables,deferred_factoring_receivables",1
+third_party_factoring_receivables,Factoring receivables third parties,,1
+related_factoring_receivables,Factoring receivables related parties,,1
+deferred_factoring_receivables,Factoring receivables on deferred factoring income,,1
+factoring_receivables_impairment_losses,Allowance for impairment losses for factoring receivables,,-1
+other_receivables,Other receivables,"third_party_other_receivables,related_other_receivables,other_receivables_impairment_losses",1
+third_party_other_receivables,Other receivables third parties,,1
+related_other_receivables,Other receivables related parties,,1
+other_receivables_impairment_losses,Allowance for impairment losses for other receivables,,-1
+other_financial_assets,Other financial assets,,1
+goverment_bonds,Government bonds,,1
+assets_for_sale,Non-current assets or disposal groups classified as held-for-sale,,1
+assets_for_owners,Non-current assets or disposal groups classified as held-for-distribution to owners,,1
+advances,Advances,,1
+prepaid_expenses,Prepaid expenses,,1
+guarantees,Guarantees,,1
+prepaid_taxes,Prepaid taxes,,1
+claims_for_tax_refund,Claims for tax refund,,1
+deferred_tax_assets,Deferred tax assets,,1
+accounted_equity,Investments accounted for using equity method,,1
+investment_ventures_associates,Investments in joint ventures and associates,"investment_ventures,investment_associates",1
+investment_ventures,Investments in joint ventures,,1
+investment_associates,Investments in associates,,1
+reinsurance_assets,Reinsurance assets,,1
+post_employment_benefits,Post-employment benefit assets,,1
+goodwill,Goodwill,,1
+intangible_assets_oth_goodwill,Intangible assets other than goodwill,,1
+investment_properties,Investment properties,,1
+ijarah_assets,Ijarah assets,,1
+ppe,"Property, plant, and equipment",,1
+right_of_use_assets,Right of use assets,,1
+tax_amnesty_assets,Tax amnesty assets,,1
+foreclosed_assets,Foreclosed assets,,1
+other_assets,Other assets,,1
+total_assets,Total assets,"cash,restricted_funds,current_bi_accounts,current_other_bank_accounts,other_bank_placements,insurance_receivables,marketable_securities,investments_policyholder,securities_agreements,deferred_acquisition_costs,deposits_clearing_and_settlement,acceptance_receivables,derivative_receivables,loans,guarantee_institution_receivables,receivables_from_customers,murabahah_receivables,istishna_receivables,ijarah_receivables,consumer_financing_receivables,qardh_funds,mudharabah_financing,musyarakah_financing,lease_investments,factoring_receivables,other_receivables,other_financial_assets,goverment_bonds,assets_for_sale,assets_for_owners,advances,prepaid_expenses,guarantees,prepaid_taxes,claims_for_tax_refund,deferred_tax_assets,accounted_equity,investment_ventures_associates,reinsurance_assets,post_employment_benefits,goodwill,intangible_assets_oth_goodwill,investment_properties,ijarah_assets,ppe,right_of_use_assets,tax_amnesty_assets,foreclosed_assets,other_assets",1
+immediately_obligations,Obligations due immediately,,1
+undistributed_profit,Undistributed profit sharing,,1
+sharia_deposits,Sharia deposits,,1
+current_accounts,Current accounts,"third_party_current_accounts,related_current_accounts",1
+third_party_current_accounts,Current accounts third parties,,1
+related_current_accounts,Current accounts related parties,,1
+wadiah_deposits,Wadiah demand deposits,"third_party_wadiah_deposits,related_wadiah_deposits",1
+third_party_wadiah_deposits,Wadiah demand deposits third parties,,1
+related_wadiah_deposits,Wadiah demand deposits related parties,,1
+savings,Savings,"third_party_savings,related_savings",1
+third_party_savings,Savings third parties,,1
+related_savings,Savings related parties,,1
+wadiah_savings,Wadiah savings,"third_party_wadiah_savings,related_wadiah_savings",1
+third_party_wadiah_savings,Wadiah savings third parties,,1
+related_wadiah_savings,Wadiah savings related parties,,1
+time_deposits,Time deposits,"third_party_time_deposits,related_time_deposits",1
+third_party_time_deposits,Time deposits third parties,,1
+related_time_deposits,Time deposits related parties,,1
+wakalah_deposits,Wakalah deposits,"third_party_wakalah_deposits,related_wakalah_deposits",1
+third_party_wakalah_deposits,Wakalah deposits third parties,,1
+related_wakalah_deposits,Wakalah deposits related parties,,1
+customer_deposits,Customers deposits,"current_accounts,wadiah_deposits,savings,wadiah_savings,time_deposits,wakalah_deposits",1
+other_bank_deposits,Other banks deposits,"third_party_other_bank_deposits,related_other_bank_deposits",1
+third_party_other_bank_deposits,Other banks deposits related parties,,1
+related_other_bank_deposits,Other banks deposits third parties,,1
+securities_repurchase_agreement,Securities sold with repurchase agreement,,1
+derivative_payables,Derivative payables,"third_party_derivative_payables,related_derivative_payables",1
+third_party_derivative_payables,Derivative payables third parties,,1
+related_derivative_payables,Derivative payables related parties,,1
+insurance_payables,Insurance payables,,1
+coinsurance_liabilities,Coinsurance liabilities,,1
+liabilities_policyholder,Liabilities to policyholder in unit-linked contracts,,1
+interest_payables,Interest payables,,1
+acceptance_liablities,Acceptance liabilities,"third_party_acceptance_liablities,related_acceptance_liablities",1
+third_party_acceptance_liablities,Acceptance liabilities related parties,,1
+related_acceptance_liablities,Acceptance liabilities third parties,,1
+accounts_payable,Accounts payable,,1
+advances_and_installments,Advances and installments,,1
+dividends_payable,Dividends payable,,1
+dealer_payables,Dealer payables,,1
+borrowings,Borrowings,"third_party_borrowings,related_borrowings,borrowings_settlements",1
+third_party_borrowings,Borrowings third parties,,1
+related_borrowings,Borrowings related parties,,1
+borrowings_settlements,Borrowings payables to clearing and settlement guarantee institution,,1
+securities_issued,Securities issued,"bonds_payable,sukuk,subordinated_bonds,medium_notes,other_securities_issued",1
+bonds_payable,Bonds payable,,1
+sukuk,Sukuk,,1
+subordinated_bonds,Subordinated bonds,,1
+medium_notes,Medium term notes,,1
+other_securities_issued,Others securities issued,,1
+insurance_contract_liabilities,Insurance contract liabilities,,1
+securities_company_payables,Securities company payables,,1
+provisions,Provisions,,1
+contract_liabilities,Contract liabilities,,1
+deferred_income,Deferred income,,1
+finance_lease_liablities,Finance lease liabilities,,1
+estimated_commitments_losses,Estimated losses on commitments and contingencies,,1
+accrued_expenses,Accrued expenses,,1
+taxes_payable,Taxes payable,,1
+deferred_tax_liabilities,Deferred tax liabilities,,1
+tax_amnesty_liabilities,Tax amnesty liabilities,,1
+other_liabilities,Other liabilities,,1
+post_employment_obligations,Post-employment benefit obligations,,1
+subordinated_loans,Subordinated loans,"third_party_subordinated_loans,related_subordinated_loans",1
+third_party_subordinated_loans,Subordinated loans third parties,,1
+related_subordinated_loans,Subordinated loans related parties,,1
+total_liabilities,Total liabilities,"immediately_obligations,undistributed_profit,sharia_deposits,customer_deposits,other_bank_deposits,securities_repurchase_agreement,derivative_payables,insurance_payables,coinsurance_liabilities,liabilities_policyholder,interest_payables,acceptance_liablities,accounts_payable,advances_and_installments,dividends_payable,dealer_payables,borrowings,securities_issued,insurance_contract_liabilities,securities_company_payables,provisions,contract_liabilities,deferred_income,finance_lease_liablities,estimated_commitments_losses,accrued_expenses,taxes_payable,deferred_tax_liabilities,tax_amnesty_liabilities,other_liabilities,post_employment_obligations,subordinated_loans",1
+mudharabah_account,Mudharabah current account,"third_party_mudharabah_account,related_mudharabah_account",1
+third_party_mudharabah_account,Mudharabah current account third parties,,1
+related_mudharabah_account,Mudharabah current account related parties,,1
+mudharabah_saving,Mudharabah saving deposits,"third_party_mudharabah_saving,related_mudharabah_account",1
+third_party_mudharabah_saving,Mudharabah saving deposits third parties,,1
+related_mudharabah_saving,Mudharabah saving deposits related parties,,1
+mudharabah_time_deposits,Mudharabah time deposits,"third_party_mudharabah_time_deposits,related_mudharabah_time_deposits",1
+third_party_mudharabah_time_deposits,Mudharabah time deposits third parties,,1
+related_mudharabah_time_deposits,Mudharabah time deposits related parties,,1
+non_banks,Non-banks,"mudharabah_account,mudharabah_saving,mudharabah_time_deposits",1
+bank,Bank,"mudharabah_bank_account,mudharabah_bank_saving_deposits,mudharabah_bank_time_deposits",1
+mudharabah_bank_account,Mudharabah current account,,1
+mudharabah_bank_saving_deposits,Mudharabah saving deposits (ummat),,1
+mudharabah_bank_time_deposits,Mudharabah time deposits,,1
+bank_securities_issued,Bank securities issued,"interbank_mudharabah_investments,mudharabah_sukuk,subordinated_mudharabah_sukuk",1
+interbank_mudharabah_investments,Interbank mudharabah investments,,1
+mudharabah_sukuk,Mudharabah sukuk,,1
+subordinated_mudharabah_sukuk,Subordinated mudharabah sukuk,,1
+total_syirkah_funds,Total temporary syirkah funds,"non_banks,bank,bank_securities_issued",1
+total_accoumulated_tabarru_funds,Total accumulated tabarru's funds,,1
+stocks,Common stocks,,1
+preferred_stocks,Preferred stocks,,1
+additional_paid_in_capital,Additional paid-in capital,,1
+treasury_stocks,Treasury stocks,,-1
+advances_in_capital_stocks,Advances in capital stock,,1
+stock_options,Stock options,,1
+translation_adjustment,Translation adjustment,,1
+revalutaion_reserves,Revaluation reserves,,1
+translation_reserves,Reserve of exchange differences on translation,,1
+income_reserves,Reserve for changes in fair value of fair value through other comprehensive income financial assets,,1
+equity_reserves,Reserve of gains (losses) from investments in equity instruments,,1
+share_based_reserves,Reserve of share-based payments,,1
+cashflow_reserves,Reserve of cash flow hedges,,1
+defined_benefit_reserves,Reserve of remeasurements of defined benefit plans,,1
+other_reserves,Other reserves,,1
+equity_subsidiary_differences,Difference Due to Changes of Equity in Subsidiary/Associates,,1
+other_equity_components,Other components of equity,,1
+retained_earnings,Retained earnings (deficit),"appropriated_earnings,unappropriated_earnings",1
+appropriated_earnings,Appropriated retained earnings,"general_and_legal_reserves,specific_reserves",1
+general_and_legal_reserves,General and legal reserves,,1
+specific_reserves,Specific reserves,,1
+unappropriated_earnings,Unappropriated retained earnings,,1
+total_equity_to_owners,Total equity attributable to equity owners of parent entity,"stocks,preferred_stocks,additional_paid_in_capital,treasury_stocks,translation_adjustment,revalutaion_reserves,translation_reserves,income_reserves,equity_reserves,share_based_reserves,cashflow_reserves,defined_benefit_reserves,other_reserves,equity_subsidiary_differences,other_equity_components,retained_earnings",1
+proforma_equity,Proforma equity,,1
+non_controlling_interest,Non-controlling interests,,1
+total_equity,Total equity,"total_equity_to_owners,proforma_equity,non_controlling_interest",1
+total_liabilities_and_equity,"Total liabilities, temporary syirkah funds and equity","total_equity,total_syirkah_funds,total_accoumulated_tabarru_funds,total_liabilities",1
+

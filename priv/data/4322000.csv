@@ -1,0 +1,114 @@
+key,value,formula,multiplier
+interest,Interest income,,1
+interest_expenses,Interest expenses,,1
+revenue_as_mudharib,Revenue from fund management as mudharib,,1
+third_party_syirkah_funds,Third parties share on return of temporary syirkah funds,,1
+insurance_income,Insurance income,"insurance_premiums,reinsurance_income,retrocession_premiums,unearned_premiums,premium_to_reinsurance,net_investment_income,ujrah_received,other_insurance_income",1
+insurance_premiums,Revenue from insurance premiums,,1
+reinsurance_income,Reinsurance premiums,,-1
+retrocession_premiums,Retrocession premiums,,-1
+unearned_premiums,Decrease (increase) in unearned premiums,,1
+premium_to_reinsurance,Decrease (increase) in premium income ceded to reinsurancer,,-1
+commision_insurance_income,Insurance commission income,,1
+net_investment_income,Net investment income,,1
+ujrah_received,Ujrah received,,1
+other_insurance_income,Other insurance income,,1
+insurance_expenses,Insurance expenses,"claim_expenses,retrocession_claims,claims_liability,policy_liability,adequacy_liability,reinsurers_liability,policyholder_liability,insurance_commision,ujrah_paid,acquisition_insurance_contracts,other_insurance_expenses",1
+claim_expenses,Claim expenses,,-1
+reinsurance_claims,Reinsurance claims,,1
+retrocession_claims,Retrocession claims,,1
+claims_liability,Increase (decrease) in estimated claims liability,,-1
+policy_liability,Increase (decrease) in liability for future policy benefit,,-1
+adequacy_liability,Increase (decrease) in provision for losses arising from liability adequacy test,,-1
+reinsurers_liability,Increase (decrease) in insurance liabilities ceded to reinsurers,,1
+policyholder_liability,Increase (decrease) in liabilities to policyholder in unit-linked contracts,,-1
+insurance_commision,Insurance commission expenses,,-1
+ujrah_paid,Ujrah paid,,-1
+acquisition_insurance_contracts,,Acquisition costs of insurance contracts,,-1
+other_insurance_expenses,Other insurance expenses,,-1
+financing_income,Financing income,"customer_revenue,finance_revenue,operating_revenue,factoring_revenue",1
+customer_revenue,Revenue from consumer financing,,1
+finance_revenue,Revenue from finance lease,,1
+operating_revenue,Revenue from operating lease,,1
+factoring_revenue,Revenue from factoring,,1
+securities_income,Securities income,"underwriting_selling_fees,transactions_financing,management_service,advisory_service,realised_gains,gains_in_securities",1
+underwriting_selling_fees,Revenue from underwriting activities and selling fees,,1
+transactions_financing,Revenue from financing transactions,,1
+administration_services,Revenue from securities administration service,,1
+management_service,Revenue from investment management services,,1
+advisory_service,Revenue from financial advisory services,,1
+realised_gains,Realised gains (losses) on trading of marketable securities,,1
+gains_in_securities,Gains (losses) on changes in fair value of marketable securities,,1
+total_other_operating_income,Total Other operating income,"investment_income,provisions_and_commissions,trading_revenue,dividends_income,derivative_realised_gains,written_off_revenue,gains_in_exchange,disposal_ppe,disposal_foreclosed_assets,other_operating_income",1
+investment_income,Investments income,,1
+provisions_and_commissions,Provisions and commissions income from transactions other than loan,,1
+trading_revenue,Revenue from trading transactions,,1
+dividends_income,Dividends income,,-1
+derivative_realised_gains,Realised gains (losses) from derivative instruments,,1
+written_off_revenue,Revenue from recovery of written-off assets,,1
+gains_in_exchange,Gains (losses) on changes in foreign exchange rates,,1
+disposal_ppe,Gains (losses) on disposal of property and equipment,,1
+disposal_foreclosed_assets,Gains (losses) on disposal of foreclosed assets,,1
+other_operating_income,Other operating income,,1
+impairment_recovery_loss,Recovery of impairment loss,"impairment_recovery_financial_assets,impairment_recovery_finance_lease,impairment_recovery_consumer_receivables,impairment_recovery_non_finance_assets,impairment_recovery_repossessed_collaterals,impairment_recovery_commitments_contigency",1
+impairment_recovery_financial_assets,Recovery of impairment loss of financial assets,,1
+impairment_recovery_finance_lease,Recovery of impairment loss of financial assets finance lease,,1
+impairment_recovery_consumer_receivables,Recovery of impairment loss of financial assets consumer financing receivables,,1
+impairment_recovery_non_finance_assets,Recovery of impairment loss of non-financial assets,,1
+impairment_recovery_repossessed_collaterals,Recovery of impairment loss of non-financial assets repossessed collaterals,,1
+impairment_recovery_commitments_contigency,Recovery of estimated loss of commitments and contingency,,1
+allowances_for_impairment,Allowances for impairment losses,"earnings_allowances_for_impairment,non_earnings_allowances_for_impairment",1
+earnings_allowances_for_impairment,Allowances for impairment losses on earnings assets,,-1
+non_earnings_allowances_for_impairment,Allowances for impairment losses on non-earnings assets,,-1
+reversal_commitments_and_contigencies,Reversal (expense) of estimated losses on commitments and contingencies,,1
+total_other_opex,Total Other operating expenses,"general_adm_exp,selling_expenses,rent_maintenance_improvement,other_fees_commissions",1
+general_adm_exp,General and administrative expenses,,-1
+selling_expenses,Selling expenses,,-1
+rent_maintenance_improvement,"Rent, maintenance and improvement expenses",,-1
+other_fees_commissions,Other fees and commissions expenses,,-1
+other_operating_expenses,Other operating expenses,,-1
+total_operating_income_expense,Total profit from operation,"interest,interest_expenses,revenue_as_mudharib,third_party_syirkah_funds,insurance_income,insurance_expenses,financing_income,securities_income,total_other_operating_income,impairment_recovery_loss,allowances_for_impairment,total_other_opex",1
+non_operating_income_expense,Non-operating income and expense,"non_operating_income,non_operating_expense,pnl_associates_equity,pnl_joint_ventures",1
+non_operating_income,Non-operating income,,1
+non_operating_expense,Non-operating expenses,,-1
+pnl_associates_equity,Share of profit (loss) of associates accounted for using equity method,,1
+pnl_joint_ventures,Share of profit (loss) of joint ventures accounted for using equity method,,1
+total_profit_before_tax,Total profit (loss) before tax,"total_operating_income_expense,non_operating_income_expense",1
+tax_benefit,Tax benefit (expenses),,1
+total_profit_operations,Total profit (loss) from continuing operations,"total_profit_before_tax,tax_benefit",1
+pnl_discountinued_operations,Profit (loss) from discontinued operations,,1
+total_profit,Total profit (loss),"total_profit_operations,pnl_discountinued_operations",1
+other_comprehensive_on_revaluation_ppe,"Other comprehensive income for gains (losses) on revaluation of property and equipment, before tax",,1
+other_income_to_obligation,"Other comprehensive income for remeasurement of defined benefit obligation, before tax",,1
+other_income_not_to_pnl,"Other adjustments to other comprehensive income that will not be reclassified to profit or loss, before tax",,1
+total_other_income,"Total other comprehensive income that will not be reclassified to profit or loss, before tax","other_comprehensive_on_revaluation_ppe,other_income_to_obligation,other_income_not_to_pnl",1
+gains_diff_translation,"Gains (losses) on exchange differences on translation, before tax",,1
+reclassification_adjustment,"Reclassification adjustments on exchange differences on translation, before tax",,-1
+unrealized_income,"Unrealised gains (losses) on changes in fair value through other comprehensive income, before tax",,1
+reclassified_adjustment,"Reclassification adjustments on fair value through other comprehensive income financial assets, before tax",,-1
+gains_on_cashflow,"Gains (losses) on cash flow hedges, before tax",,1
+reclassification_on_cashflow,"Reclassification adjustments on cash flow hedges, before tax",,-1
+carrying_amount,"Carrying amount of non-financial asset (liability) whose acquisition or incurrence was hedged on highly probable forecast transaction, adjusted from equity, before tax",,1
+gains_on_investments,"Gains (losses) on hedges of net investments in foreign operations, before tax",,1
+reclassification_foreign_ops,"Reclassification adjustments on hedges of net investments in foreign operations, before tax",,-1
+share_on_equity,"Share of other comprehensive income of associates accounted for using equity method, before tax",,1
+share_on_joint_ventures,"Share of other comprehensive income of joint ventures accounted for using equity method, before tax",,1
+other_adjustment_pnl,"Other adjustments to other comprehensive income that may be reclassified to profit or loss, before tax",,1
+total_other_income_to_pnl,"Total other comprehensive income that may be reclassified to profit or loss, before tax","gains_diff_translation,reclassified_adjustment,gains_on_cashflow,reclassification_on_cashflow,carrying_amount,gains_on_investments,reclassification_foreign_ops,share_on_equity,share_on_joint_ventures,other_adjustment_pnl",1
+total_comprehensive_income_before_tax,"Total other comprehensive income, before tax","total_other_income,total_other_income_to_pnl",1
+tax_on_comprehensive_income,Tax on other comprehensive income,,-1
+total_comprehensive_income_after_tax,"Total other comprehensive income, after tax","total_comprehensive_income_before_tax,-tax_on_comprehensive_income",1
+total_comprehensive_income,Total comprehensive income,"total_comprehensive_income_after_tax,total_profit",1
+pnl_attibutable,Profit (loss) attributable to,"pnl_to_parent,pnl_to_nci",1
+pnl_to_parent,Profit (loss) attributable to parent entity,,1
+pnl_to_nci,Profit (loss) attributable to non-controlling interests,,1
+comprehensive_income,Comprehensive income attributable to,"comprehensive_income_to_parent,comprehensive_income_to_nci",1
+comprehensive_income_to_parent,Comprehensive income attributable to parent entity,,1
+comprehensive_income_to_nci,Comprehensive income attributable to non-controlling interests,,1
+eps,Earnings (loss) per share,"basic_earnings,diluted_earnings",1
+basic_earnings,Basic earnings per share attributable to equity owners of the parent entity,"basic_earnings_ops,basic_earnings_discontinued_ops",1
+basic_earnings_ops,Basic earnings (loss) per share from continuing operations,,1
+basic_earnings_discontinued_ops,Basic earnings (loss) per share from discontinued operations,,1
+diluted_earnings,Diluted earnings (loss) per share,"diluted_earnings_ops,diluted_earnings_discontinued_ops",1
+diluted_earnings_ops,Diluted earnings (loss) per share from continuing operations,,1
+diluted_earnings_discontinued_ops,Diluted earnings (loss) per share from discontinued operations,,1

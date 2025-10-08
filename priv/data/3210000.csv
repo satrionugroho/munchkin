@@ -1,0 +1,183 @@
+key,value,formula,multiplier
+cash_equivalents,Cash and cash equivalents,,1
+short_term_investment,Short-term investments,,1
+current_restricted_fund,Current restricted funds,,1
+current_financial_assets,Current financial assets,"current_pnl_assets,current_investment_assets,current_investment_assets,current_other_assets",1
+current_pnl_assets,Current financial assets at fair value through profit or loss,,1
+current_income_assets,Current financial assets fair value through other comprehensive income,,1
+current_investment_assets,Current financial assets amortized cost investments,,1
+current_other_assets,Current other financial assets,,1
+current_derivative_financial,Current derivative financial assets,,1
+trade_receivables,Trade receivables,"third_party_trade_receivables,related_trade_receivables",1
+third_party_trade_receivables,Trade receivables third parties,,1
+related_trade_receivables,Trade receivables related parties,,1
+current_lease,Current finance lease receivables,,1
+receivables_on_subsidy,Receivables on subsidy,,1
+other_receivables,Other receivables,"third_party_other_receivables,related_other_receivables",1
+third_party_other_receivables,Other receivables third parties,,1
+related_other_receivables,Other receivables related parties,,1
+total_current_inventories,Total Current inventories,"real_estate_inventories,current_inventories",1
+real_estate_inventories,Current real estate assets,,1
+current_inventories,Current inventories,,1
+prepaid_expenses,Current prepaid expenses,,1
+guarantees,Current guarantees,,1
+current_advances,Current advances,,1
+prepaid_taxes,Current prepaid taxes,,1
+tax_refund,Current claims for tax refund,,1
+tax_amesty,Current tax amnesty assets,,1
+non_financial_assets,Other current non-financial assets,,1
+assets_for_sale,Non-current assets or disposal groups classified as held-for-sale,,1
+assets_for_owners,Non-current assets or disposal groups classified as held-for-distribution to owners,,1
+total_current_assets,Total current assets,"cash_equivalents,short_term_investment,current_restricted_fund,current_financial_assets,current_derivative_financial,trade_receivables,current_lease,receivables_on_subsidy,other_receivables,total_current_inventories,prepaid_expenses,guarantees,current_advances,prepaid_taxes,tax_refund,tax_amesty,non_financial_assets,assets_for_sale,assets_for_owners",1
+financial_lease,Non-current finance lease receivables,,1
+non_current_restricted_funds,Non-current restricted funds,,1
+aircraft_maintenance,Aircraft maintenance reserve funds,,1
+related_receivables,Receivables from related parties,,1
+stockholders_receivables,Receivables from stockholders,,1
+non_current_other_receivables,Other non-current receivables,"non_current_other_third_party_receivables,non_current_other_related_receivables",1
+non_current_other_third_party_receivables,Other non-current receivables third parties,,1
+non_current_other_related_receivables,Other non-current receivables related parties,,1
+accounted_equity,Investments accounted for using equity method,,1
+investment_ventures_associates,Investments in joint ventures and associates,"investment_ventures,investment_associates",1
+investment_ventures,Investments in joint ventures,,1
+investment_associates,Investments in associates,,1
+non_current_guarantees,Non-current guarantees,,1
+non_current_advances,Non-current advances,,1
+non_current_financial_assets,Non-current financial assets,"non_current_pnl_assets,non_current_income_assets,non_current_amortized_assets,non_current_other_financial_assets",1
+non_current_pnl_assets,Non-current financial assets at fair value through profit or loss,,1
+non_current_income_assets,Non-current financial assets fair value through other comprehensive income,,1
+non_current_amortized_assets,Non-current financial assets amortized cost,,1
+non_current_other_financial_assets,Non-current other financial assets,,1
+non_current_derivative_assets,Non-current derivative financial assets,,1
+non_current_prepaid_expenses,Non-current prepaid expenses,,1
+non_current_prepaid_taxes,Non-current prepaid taxes,,1
+deferred_tax_assets,Deferred tax assets,,1
+total_non_current_inventories,Total Non-current inventories,"non_current_real_estate_inventories,non_current_inventories",1
+non_current_real_estate_inventories,Non-current real estate assets,,1
+non_current_inventories,Non-current inventories,,1
+investment_properties,Investment properties,,1
+ppe,"Property, plant, and equipment",,1
+right_of_use_assets,Right of use assets,,1
+toll_road_concessions,Toll road concession rights,,1
+deferred_charges,Deferred charges,"deferred_landright_charges,deferred_other_charges",1
+deferred_landright_charges,Deferred charges on landrights and buildings,,1
+deferred_other_charges,Other deferred charges,,1
+non_current_tax_refund,Non-current claims for tax refund,,1
+post_employment_benefits,Post-employment benefit assets,,1
+goodwill,Goodwill,,1
+intangible_assets_oth_goodwill,Intangible assets other than goodwill,,1
+non_current_tax_amnesty,Non-current tax amnesty assets,,1
+other_non_current_assets,Other non-current non-financial assets,,1
+total_non_current_assets,Total non-current assets,"financial_lease,non_current_restricted_funds,aircraft_maintenance,related_receivables,stockholders_receivables,non_current_other_receivables,accounted_equity,investment_ventures_associates,non_current_guarantees,non_current_advances,non_current_financial_assets,non_current_derivative_assets,non_current_prepaid_expenses,non_current_prepaid_taxes,deferred_tax_assets,total_non_current_inventories,investment_properties,ppe,right_of_use_assets,toll_road_concessions,deferred_charges,non_current_tax_refund,post_employment_benefits,goodwill,intangible_assets_oth_goodwill,non_current_tax_amnesty,other_non_current_assets",1
+total_assets,Total assets,"total_current_assets,total_non_current_assets",1
+short_term_loans,Short term bank loans,,1
+short_term_non_bank_loans,Short-term non-bank loans,,0
+trade_payables,Trade payables,"third_party_trade_payables,related_trade_payables",1
+third_party_trade_payables,Trade payables third parties,,1
+related_trade_payables,Trade payables related parties,,1
+other_payables,Other payables,"third_party_other_payables,related_other_payables",1
+third_party_other_payables,Other payables third parties,,1
+related_other_payables,Other payables related parties,,1
+current_customer_advances,Current advances from customers,"third_party_current_customer_advances,related_current_customer_advances",1
+third_party_current_customer_advances,Current advances from customers third parties,,1
+related_current_customer_advances,Current advances from customers related parties,,1
+dividends_payable,Dividends payable,,1
+other_current_liabilities,Other current financial liabilities,,1
+current_accrued_expenses,Current accrued expenses,,1
+short_term_obligations,Short-term post-employment benefit obligations,,1
+taxes_payable,Taxes payable,,1
+project_payable,Project payables,,1
+current_deposits,Current deposits,,1
+current_unearned_revenue,Current unearned revenue,,1
+current_deferred_revenue,Current deferred revenue,,1
+current_provisions,Current provisions,"overlay_current_provisions,aircraft_current_provisions,other_current_provisions",1
+overlay_current_provisions,Current provisions for overlay,,1
+aircraft_current_provisions,Current provisions for aircraft return and maintenance funds,,1
+other_current_provisions,Other current provisions,,1
+current_contract_liabilities,Current contract liabilities,,1
+short_term_debt,Current maturities of long-term liabilities,"bank_loan_maturities,secured_loan_maturities,unsecured_loan_maturities,step_loan_maturities,government_loan_maturities,subordinated_loan_maturities,join_operation_maturities,land_maturities,lease_liabilitis_maturities,electricity_purchase_maturities,notes_maturities,medium_notes_maturities,bonds_maturities,sukuk_maturities,subordinated_bonds_maturities,other_maturities",1
+bank_loan_maturities,Current maturities of bank loans,,1
+secured_loan_maturities,Current maturities of secured loans,,1
+unsecured_loan_maturities,Current maturities of unsecured loans,,1
+step_loan_maturities,Current maturities of step loans,,1
+government_loan_maturities,Current maturities of loans from government of the republic of indonesia,,1
+subordinated_loan_maturities,Current maturities of subordinated loans,,1
+join_operation_maturities,Current maturities of joint operations liabilities,,1
+land_maturities,Current maturities of land acquisition liabilities,,1
+lease_liabilitis_maturities,Current maturities of finance lease liabilities,,1
+electricity_purchase_maturities,Current maturities of electricity purchase payables,,1
+notes_maturities,Current maturities of notes payable,,1
+medium_notes_maturities,Current maturities of medium term notes,,1
+bonds_maturities,Current maturities of bonds payable,,1
+sukuk_maturities,Current maturities of sukuk,,1
+subordinated_bonds_maturities,Current maturities of subordinated bonds,,1
+other_maturities,Current maturities of other borrowings,,1
+related_current_due,Current due to related parties,,1
+stakeholders_current_due,Current due to stockholders,,1
+short_term_derive_liabilities,Short-term derivative financial liabilities,,1
+current_tax_amnesty,Current tax amnesty liabilities,,1
+other_current_non_financial_liabilities,Other current non-financial liabilities,,1
+non_current_asset_liabilities,Liabilities directly associated with non-current assets or disposal groups classified as held-for-sale or as held-for-distribution to owners,,1
+total_current_liabilities,Total current liabilities,"short_term_loans,short_term_non_bank_loans,trade_payables,other_payables,current_customer_advances,dividends_payable,other_current_liabilities,current_accrued_expenses,short_term_obligations,taxes_payable,project_payable,current_deposits,current_unearned_revenue,current_deferred_revenue,current_provisions,current_contract_liabilities,short_term_debt,related_current_due,stakeholders_current_due,short_term_derive_liabilities,current_tax_amnesty,other_current_non_financial_liabilities,non_current_asset_liabilities",1
+long_term_liabilities,Long-term derivative financial liabilities,,1
+deferred_tax_liabilities,Deferred tax liabilities,,1
+related_non_current_due,Non-current due to related parties,,1
+stakeholders_non_current_due,Non-current due to stockholders,,1
+non_current_contract_liabilities,Non-current contract liabilities,,1
+long_term_maturities,Long-term liabilities net of current maturities,"long_term_bank_loans,long_term_institution_loan,long_term_secured_loans,long_term_unsecured_loans,long_term_step_loans,long_term_government,long_term_subordinated,long_term_joint_operations,long_term_land_acquisition,long_term_lease,long_term_purchase,long_term_notes,long_term_medium_notes,long_term_bonds,long_term_sukuk,long_term_subordinated_bonds,long_term_other",1
+long_term_bank_loans,Long-term bank loans,,1
+long_term_institution_loan,Long term non-bank financial insitutions loan,,1
+long_term_secured_loans,Long-term secured loans,,1
+long_term_unsecured_loans,Long-term unsecured loans,,1
+long_term_step_loans,Long-term step loans,,1
+long_term_government,Long-term loans from government of the republic of indonesia,,1
+long_term_subordinated,Long-term subordinated loans,,1
+long_term_joint_operations,Long-term joint operations liabilities,,1
+long_term_land_acquisition,Long-term land acquisition liabilities,,1
+long_term_lease,Long-term finance lease liabilities,,1
+long_term_purchase,Long-term electricity purchase payables,,1
+long_term_notes,Long-term notes payable,,1
+long_term_medium_notes,Long-term medium term notes,,1
+long_term_bonds,Long-term bonds payable,,1
+long_term_sukuk,Long-term sukuk,,1
+long_term_subordinated_bonds,Long-term subordinated bonds,,1
+long_term_other,Long-term other borrowings,,1
+convertible_bonds,Convertible bonds,,1
+non_current_unearned_revenue,Non-current unearned revenue,,1
+non_current_deposits,Non-current deposits,,1
+non_current_deferred_revenue,Non-current deferred revenue,,1
+non_current_provisions,Non-current provisions,"overlay_non_current_provisions,aircraft_non_current_provisions,other_non_current_provisions",1
+overlay_non_current_provisions,Non-current provisions for overlay,,1
+aircraft_non_current_provisions,Non-current provisions for aircraft return and maintenance funds,,1
+other_non_current_provisions,Other non-current provisions,,1
+long_term_obligations,Long-term post-employment benefit obligations,,1
+non_current_tax_amnesty_liabilies,Non-current tax amnesty liabilities,,1
+other_non_current_liabilities,Other non-current financial liabilities,,1
+other_non_current_non_financial_liabilities,Other non-current non-financial liabilities,,1
+total_non_current_liabilities,Total non-current liabilities,"long_term_liabilities,deferred_tax_liabilities,related_non_current_due,stakeholders_non_current_due,non_current_contract_liabilities,long_term_maturities,convertible_bonds,non_current_unearned_revenue,non_current_deposits,non_current_deferred_revenue,non_current_provisions,long_term_obligations,non_current_tax_amnesty_liabilies,other_non_current_liabilities,other_non_current_non_financial_liabilities",1
+total_liabilities,Total liabilities,"total_liabilities,total_non_current_liabilities",1
+stocks,Common stocks,,1
+preferred_stocks,Preferred stocks,,1
+additional_paid_in_capital,Additional paid-in capital,,1
+treasury_stocks,Treasury stocks,,-1
+advances_in_capital_stocks,Advances in capital stock,,1
+stock_options,Stock options,,1
+translation_adjustment,Translation adjustment,,1
+revalutaion_reserves,Revaluation reserves,,1
+translation_reserves,Reserve of exchange differences on translation,,1
+income_reserves,Reserve for changes in fair value of fair value through other comprehensive income financial assets,,1
+equity_reserves,Reserve of gains (losses) from investments in equity instruments,,1
+share_based_reserves,Reserve of share-based payments,,1
+cashflow_reserves,Reserve of cash flow hedges,,1
+defined_benefit_reserves,Reserve of remeasurements of defined benefit plans,,1
+other_reserves,Other reserves,,1
+equity_subsidiary_differences,Difference Due to Changes of Equity in Subsidiary/Associates,,1
+other_equity_components,Other components of equity,,1
+retained_earnings,Retained earnings (deficit),"appropriated_earnings,unappropriated_earnings",1
+appropriated_earnings,Appropriated retained earnings,,1
+unappropriated_earnings,Unappropriated retained earnings,,1
+total_equity_to_owners,Total equity attributable to equity owners of parent entity,"stocks,preferred_stocks,additional_paid_in_capital,treasury_stocks,advances_in_capital_stocks,stock_options,translation_adjustment,revalutaion_reserves,translation_reserves,translation_reserves,revalutaion_reserves,translation_adjustment,income_reserves,equity_reserves,share_based_reserves,cashflow_reserves,defined_benefit_reserves,other_reserves,equity_subsidiary_differences,other_equity_components,retained_earnings",1
+proforma_equity,Proforma equity,,1
+non_controlling_interest,Non-controlling interests,,1
+total_equity,Total equity,"total_equity_to_owners,proforma_equity,non_controlling_interest",1
+total_liabilities_and_equity,Total liabilities and equity,"total_liabilities,total_equity",1

@@ -36,7 +36,7 @@ defmodule Munchkin.Accounts.User do
     |> validate_required([:firstname, :lastname, :email, :email_source])
     |> should_mark_email_valid?()
     |> should_cast_password?()
-    |> downcase_emaiL()
+    |> downcase_email()
     |> unique_constraint(:email)
   end
 
@@ -135,7 +135,7 @@ defmodule Munchkin.Accounts.User do
     end)
   end
 
-  defp downcase_emaiL(changeset) do
+  defp downcase_email(changeset) do
     case get_change(changeset, :email) do
       email -> put_change(changeset, :email, String.downcase(email))
       _ -> changeset

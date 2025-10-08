@@ -25,11 +25,13 @@ defmodule MunchkinWeb.API.V1.SessionController do
 
   def create(conn, %{"type" => "google_auth"} = params) do
     with raw when not is_nil(raw) <- Map.get(params, "token"),
+         source <- Map.get(params, "source", "web"),
+         otp <- Map.get(params, "code"),
          encoded <- URI.decode(raw),
          {:ok, token} <- Base.decode64(encoded),
          {:ok, raw_user} <- Accounts.find_or_create_user(token),
          %Accounts.User{} = user <- Accounts.get_user(raw_user.id),
-         {:ok, tokens} <- maybe_create_user_token(user, nil) do
+         {:ok, tokens} <- maybe_create_user_token(user, otp, source) do
       Munchkin.DelayedJob.delay(fn ->
         Accounts.update_user(user, %{}, :login_changeset)
       end)
@@ -43,11 +45,12 @@ defmodule MunchkinWeb.API.V1.SessionController do
 
   def create(conn, params) do
     with email <- Map.get(params, "email"),
+         source <- Map.get(params, "source", "web"),
          password when is_bitstring(password) <- Map.get(params, "password"),
          otp <- Map.get(params, "code"),
          {:ok, user} <- find_user_by_email(email),
          true <- Argon2.verify_pass(password, user.password_hash),
-         {:ok, tokens} <- maybe_create_user_token(user, otp) do
+         {:ok, tokens} <- maybe_create_user_token(user, otp, source) do
       Munchkin.DelayedJob.delay(fn ->
         Accounts.update_user(user, %{}, :login_changeset)
       end)
@@ -132,33 +135,33 @@ defmodule MunchkinWeb.API.V1.SessionController do
     end
   end
 
-  defp maybe_create_user_token(%User{verified_at: date} = user, otp) when date != nil do
+  defp maybe_create_user_token(%User{verified_at: date} = user, otp, source) when date != nil do
     user.two_factor_tokens
     |> Enum.find(&Kernel.is_nil(&1.used_at))
     |> case do
-      %UserToken{} = token -> should_verify_the_otp(user, token, otp)
-      _ -> should_create_user_token(user)
+      %UserToken{} = token -> should_verify_the_otp(user, token, otp, source)
+      _ -> should_create_user_token(user, source)
     end
   end
 
-  defp maybe_create_user_token(_user, _otp), do: {:ok, nil}
+  defp maybe_create_user_token(_user, _otp, _token), do: {:ok, nil}
 
-  defp should_create_user_token(user) do
-    case Accounts.create_user_access_token(user) do
+  defp should_create_user_token(user, source) do
+    case Accounts.create_user_access_token(user, source) do
       {:ok, tokens} -> {:ok, tokens}
-      _ -> maybe_create_user_token(nil, nil)
+      _ -> maybe_create_user_token(nil, nil, source)
     end
   end
 
-  defp should_verify_the_otp(user, token, otp) when not is_nil(otp) do
+  defp should_verify_the_otp(user, token, otp, source) when not is_nil(otp) do
     NimbleTOTP.valid?(token.token, otp)
     |> case do
-      true -> should_create_user_token(user)
+      true -> should_create_user_token(user, source)
       _ -> {:error, gettext("cannot verify the otp token")}
     end
   end
 
-  defp should_verify_the_otp(user, _token, _otp),
+  defp should_verify_the_otp(user, _token, _otp, _source),
     do: {:retry, user, [gettext("should enter the otp")]}
 
   defp send_forgot_password_email(user, token) do
@@ -171,9 +174,11 @@ defmodule MunchkinWeb.API.V1.SessionController do
     |> case do
       %UserToken{} = token ->
         Repo.transact(fn ->
+          source = find_source(token)
+
           Accounts.update_user_token(token, %{used_at: NaiveDateTime.utc_now(:second), user: user})
 
-          should_create_user_token(user)
+          should_create_user_token(user, source)
         end)
 
       _ ->
@@ -222,4 +227,9 @@ defmodule MunchkinWeb.API.V1.SessionController do
       })
     end)
   end
+
+  defp find_source(%UserToken{token: <<source::binary-size(5)>> <> _rest}),
+    do: String.reverse(source)
+
+  defp find_source(_), do: "web"
 end

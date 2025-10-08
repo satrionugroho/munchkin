@@ -17,7 +17,9 @@ defmodule Munchkin.Application do
       # Start to serve requests, typically the last entry
       MunchkinWeb.Endpoint,
       Munchkin.DelayedJob,
-      Munchkin.Cache
+      Munchkin.Cache,
+      Munchkin.Engine,
+      Munchkin.Downloader
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

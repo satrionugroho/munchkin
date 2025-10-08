@@ -1,0 +1,50 @@
+key,value,formula,multiplier
+sales_and_revenue,Sales and revenue,,1
+cost_sales_revenue,Cost of sales and revenue,,-1
+total_gross_profit,Total gross profit,,1
+selling_expenses,Selling expenses,,-1
+general_adm_exp,General and administrative expenses,,-1
+finance_income,Finance income,,1
+interest_finance,Interest and finance costs,,-1
+gains_in_exchange,Gains (losses) on changes in foreign exchange rates,,1
+pnl_associates_equity,Share of profit (loss) of associates accounted for using equity method,,1
+pnl_joint_ventures,Share of profit (loss) of joint ventures accounted for using equity method,,1
+other_income,Other income,,1
+other_expenses,Other expenses,,-1
+other_gains,Other gains (losses),,1
+total_profit_before_tax,Total profit (loss) before tax,"sales_and_revenue,cost_sales_revenue,selling_expenses,general_adm_exp,finance_income,interest_finance,gains_in_exchange,pnl_associates_equity,pnl_joint_ventures,other_income,other_expenses,other_gains",1
+tax_benefit,Tax benefit (expenses),,1
+total_profit_operations,Total profit (loss) from continuing operations,"total_profit_before_tax,tax_benefit",1
+pnl_discountinued_operations,Profit (loss) from discontinued operations,,1
+total_profit,Total profit (loss),"total_profit_operations,pnl_discountinued_operations",1
+other_comprehensive_income_to_pnl,"Other comprehensive income that will not be reclassified to profit or loss, after tax",,1
+other_comprehensive_income_ppe,"Other comprehensive income for gains (losses) on revaluation of property and equipment, after tax",,1
+other_comprehensive_income_obligation,"Other comprehensive income for remeasurement of defined benefit obligation, after tax",,1
+other_comprehensive_income_not_to_pnl,"Other adjustments to other comprehensive income that will not be reclassified to profit or loss, after tax",,1
+total_other_comprehensive_income,"Total other comprehensive income that will not be reclassified to profit or loss, after tax","other_comprehensive_income_to_pnl,other_comprehensive_income_ppe,other_comprehensive_income_obligation,other_comprehensive_income_not_to_pnl",1
+exchange_on_translation,"Gains (losses) on exchange differences on translation, after tax",,1
+reclassification_adjustments,"Reclassification adjustments on exchange differences on translation, after tax",,-1
+cashflow_hedges_pnl,"Gains (losses) on cash flow hedges, after tax",,1
+reclassification_cashflow,"Reclassification adjustments on cash flow hedges, after tax",,-1
+carrying_equity_amount,"Carrying amount of non-financial asset (liability) whose acquisition or incurrence was hedged on highly probable forecast transaction, adjusted from equity, after tax",,1
+investments_pnl,"Gains (losses) on hedges of net investments in foreign operations, after tax",,1
+reclassification_investments,"Reclassification adjustments on hedges of net investments in foreign operations, after tax",,-1
+shared_equity_income,"Share of other comprehensive income of associates accounted for using equity method, after tax",,1
+shared_joint_venture_income,"Share of other comprehensive income of joint ventures accounted for using equity method, after tax",,1
+other_adjustments_income,"Other adjustments to other comprehensive income that may be reclassified to profit or loss, after tax",,1
+total_other_comprehensive_pnl,"Total other comprehensive income that may be reclassified to profit or loss, after tax","exchange_on_translation,reclassification_adjustments,cashflow_hedges_pnl,reclassification_cashflow,carrying_equity_amount,investments_pnl,reclassification_investments,shared_equity_income,shared_joint_venture_income,other_adjustments_income",1
+total_comprehensive_income_after_tax,"Total other comprehensive income, after tax","total_other_comprehensive_income,total_other_comprehensive_pnl",1
+total_comprehensive_income,Total comprehensive income,"total_profit,total_comprehensive_income_after_tax",1
+pnl_attibutable,Profit (loss) attributable to,"pnl_to_parent,pnl_to_nci",1
+pnl_to_parent,Profit (loss) attributable to parent entity,,1
+pnl_to_nci,Profit (loss) attributable to non-controlling interests,,1
+comprehensive_income,Comprehensive income attributable to,"comprehensive_income_to_parent,comprehensive_income_to_nci",1
+comprehensive_income_to_parent,Comprehensive income attributable to parent entity,,1
+comprehensive_income_to_nci,Comprehensive income attributable to non-controlling interests,,1
+eps,Earnings (loss) per share,"basic_earnings,diluted_earnings",1
+basic_earnings,Basic earnings per share attributable to equity owners of the parent entity,"basic_earnings_ops,basic_earnings_discontinued_ops",1
+basic_earnings_ops,Basic earnings (loss) per share from continuing operations,,1
+basic_earnings_discontinued_ops,Basic earnings (loss) per share from discontinued operations,,1
+diluted_earnings,Diluted earnings (loss) per share,"diluted_earnings_ops,diluted_earnings_discontinued_ops",1
+diluted_earnings_ops,Diluted earnings (loss) per share from continuing operations,,1
+diluted_earnings_discontinued_ops,Diluted earnings (loss) per share from discontinued operations,,1

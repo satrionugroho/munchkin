@@ -77,6 +77,10 @@ config :munchkin, MunchkinWeb.Mailers,
 
 config :munchkin, Munchkin, name: "app"
 
+config :munchkin, Munchkin.Engine.Jkse,
+  database_id: "d2ebd050-ca08-4a9d-aecf-5207791b8359",
+  instance: {Munchkin.Inventory, :get_source}
+
 config :munchkin, Munchkin.Integrations.Payment, engine: Munchkin.ThirdParty.XenditMock
 
 # Import environment specific config. This must remain at the bottom

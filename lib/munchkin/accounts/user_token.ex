@@ -7,6 +7,7 @@ defmodule Munchkin.Accounts.UserToken do
     field :valid_until, :utc_datetime
     field :used_at, :utc_datetime
     field :type, :integer
+    field :source, :string, virtual: true
 
     belongs_to :user, Munchkin.Accounts.User
 
@@ -16,7 +17,7 @@ defmodule Munchkin.Accounts.UserToken do
   @doc false
   def changeset(user_token, attrs) do
     user_token
-    |> cast(attrs, [:valid_until, :used_at, :type])
+    |> cast(attrs, [:valid_until, :used_at, :type, :source])
     |> assign_user(Map.get(attrs, :user))
     |> validate_required([:valid_until, :type])
     |> validate_inclusion(:type, 1..5)
@@ -42,23 +43,36 @@ defmodule Munchkin.Accounts.UserToken do
   end
 
   defp create_token(changeset) do
+    source = get_field(changeset, :source, "web")
+
     case get_field(changeset, :token) do
       nil ->
         type = get_field(changeset, :type) |> to_string()
-        put_change(changeset, :token, generated_token(type))
+        put_change(changeset, :token, generated_token(type, source))
 
       _ ->
         changeset
     end
   end
 
-  defp generated_token("5"), do: NimbleTOTP.secret(32)
+  defp generated_token("5", _source), do: NimbleTOTP.secret(32)
 
-  defp generated_token(type) do
+  defp generated_token(type, source) when type in ["2", "3"] do
+    len = Map.get(variants(), type)
+    padleft = generate_pad(source)
+    gen = :rand.bytes(len)
+
+    Kernel.<>(padleft, gen)
+  end
+
+  defp generated_token(type, _source) do
     len = Map.get(variants(), type)
 
     :rand.bytes(len)
   end
+
+  defp generate_pad("excel"), do: String.reverse("excel")
+  defp generate_pad(_), do: :rand.bytes(5)
 
   defp variants do
     %{

@@ -436,22 +436,24 @@ defmodule Munchkin.Accounts do
       {:ok, %UserToken{}}
 
   """
-  def create_user_access_token(%User{} = user) do
+  def create_user_access_token(user_or_user_id, source \\ "web")
+
+  def create_user_access_token(%User{} = user, source) do
     user
     |> Repo.preload([:access_tokens])
     |> Map.get(:access_tokens)
     |> Enum.sort(fn a, b ->
       DateTime.after?(a.valid_until, b.valid_until)
     end)
-    |> do_create_access_token_with_refresh(user)
+    |> do_create_access_token_with_refresh(user, source)
   end
 
-  def create_user_access_token(user_id) do
+  def create_user_access_token(user_id, source) do
     get_user!(user_id)
-    |> create_user_access_token()
+    |> create_user_access_token(source)
   end
 
-  defp do_create_access_token_with_refresh(tokens, user) do
+  defp do_create_access_token_with_refresh(tokens, user, source) do
     token_ids = Enum.filter(tokens, &Kernel.is_nil(&1.used_at)) |> Enum.map(& &1.id)
     query = from t in UserToken, where: t.id in ^token_ids
 
@@ -465,6 +467,7 @@ defmodule Munchkin.Accounts do
 
     attrs = %{
       user: user,
+      source: source,
       valid_until: DateTime.utc_now(:second) |> DateTime.shift(day: 7),
       type: UserToken.access_token_type()
     }

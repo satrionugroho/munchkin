@@ -1,0 +1,95 @@
+key,value,formula,multiplier
+cash_receipts,Cash receipts from operating activities,"finance_lease,consumer_receipts,factoring_receipts",1
+finance_lease,Receipts from finance leases,,1
+consumer_receipts,Receipts from consumer financing,,1
+factoring_receipts,Receipts from factoring,,1
+cash_payments,Cash payments from operating activities,"finance_payments,consumer_payments,factoring_payments,gna_cash_payments",1
+finance_payments,Payments for finance leases,,-1
+consumer_payments,Payments for consumer financing,,-1
+factoring_payments,Payments for factoring,,-1
+gna_cash_payments,Payments for general and administrative expense,,-1
+cash_operations,Cash generated from (used in) operations,"cash_payments,cash_receipts",1
+joint_finance_received_loan,Received from loan channeling and joint financing cooperation,,1
+joint_finance_loan,Payments for loan channeling and joint financing cooperation,,-1
+interests_received,Interests received from operating activities,,1
+interests_paid,Interests paid from operating activities,,1
+corporate_income_tax,Payments for corporate income tax,,-1
+refunded_income_taxes,Income taxes refunded (paid) from operating activities,,1
+repayment_deposits,Repayment (placement) of refundable deposits,,1
+interests_loan,Receipts of interest from loan receivable,,1
+other_flows,Other cash inflows (outflows) from operating activities,,1
+net_cash_assets_and_liabilities,Net cash flows received from (used in) operating activities before changes in assets and liabilities,,1
+decreased_operation,Decrease (increase) from operation assets,"decreased_securities,decreased_credit,decreased_assets",1
+decreased_securities,Decrease (increase) from securities,,1
+decreased_credit,Decrease (increase) from credit,,1
+decreased_assets,Decrease (increase) from other assets,,1
+increased_liabilities,Increase (decrease) from liabilities,"increased_deposits,increased_other_liabilities",1
+increased_deposits,Increase (decrease) from deposits and deposits from other banks,,1
+increased_other_liabilities,Increase (decrease) from other liabilities,,1
+total_netcash_opex,Total net cash flows received from (used in) operating activities,"cash_operations,joint_finance_received_loan,joint_finance_loan,interests_received,interests_paid,corporate_income_tax,refunded_income_taxes,repayment_deposits,interests_loan,other_flows_from_financing,net_cash_assets_and_liabilities,decreased_operation,increased_liabilities",1
+disposal_investments,Proceeds from disposal of investment properties,,1
+acquisition_investments,Payments for acquisition of investment properties,,-1
+proceeds_disposal_ppe,Proceeds from disposal of property and equipment,,1
+acquisition_ppe,Payments for acquisition of property and equipment,,-1
+disposal_foreclosed,Proceeds from disposal of foreclosed assets,,1
+disposal_non_finance,Proceeds from disposal of other non-financial assets,,1
+acquisition_non_finance,Payments for acquisition of other non-financial assets,,-1
+withdrawal_income,Withdrawal (placement) of financial assets fair value through other comprehensive income,,1
+placement_cost,Placement of financial assets amotized cost investments,,-1
+withdrawal_cost_investment,Withdrawal of financial assets amortized cost investments,,1
+proceeds_subsidiaries,Proceeds from disposal of subsidiaries,,1
+payments_acquisition,Payments for acquisition of subsidiaries,,-1
+proceeds_interests,Proceeds from sales of interests in subsidiaries without loss of control from investing activities,,1
+payments_interests,Payments for acquisition of additional interests in subsidiaries,,-1
+joint_venture_sales,Proceeds from sales of interests in joint ventures,,1
+joint_venture_acquisition,Payments for acquisition of interests in joint ventures,,-1
+proceeds_sales_interests,Proceeds from sales of interests in associates,,1
+payments_acquisition_interests,Payments for acquisition of interests in associates,,-1
+proceeds_disposal_groups,Proceeds from disposal of non-current assets or disposal groups classified as held-for-sale and discontinued operations,,1
+dividends_received_from_investing,Dividends received from investing activities,,1
+interests_received_from_investing,Interests received from investing activities,,1
+interests_paid_from_investing,Interests paid from investing activities,,-1
+income_tax_from_investing,Income taxes refunded (paid) from investing activities,,1
+other_flows_from_investing,Other cash inflows (outflows) from investing activities,,1
+total_netcash_from_investing,Total net cash flows received from (used in) investing activities,"disposal_investments,acquisition_investments,proceeds_disposal_ppe,acquisition_ppe,disposal_foreclosed,disposal_non_finance,acquisition_non_finance,withdrawal_income,placement_cost,withdrawal_cost_investment,proceeds_subsidiaries,payments_acquisition,proceeds_interests,payments_interests,joint_venture_sales,joint_venture_acquisition,proceeds_sales_interests,payments_acquisition_interests,proceeds_disposal_groups,dividends_received_from_investing,interests_received_from_investing,interests_paid_from_investing,income_tax_from_investing,other_flows_from_investing",1
+notes_payable,Proceeds from notes payable,,1
+notes_payable_payments,Payments of notes payable,,-1
+bank_loans,Proceeds from bank loans,,1
+bank_loans_payments,Payments of bank loans,,-1
+non_bank_loan,Proceeds from non-bank financial institution loan,,1
+non_bank_loan_payments,Payments of non-bank financial institution loan,,-1
+subordinated_loans,Proceeds from subordinated loans,,1
+subordinated_loans_payments,Payments of subordinated loans,,-1
+lease_liabilities,Proceeds from finance lease liabilities,,1
+lease_liabilities_payments,Payments of finance lease liabilities,,-1
+medium_notes,Proceeds from medium term notes,,1
+medium_notes_payments,Payments of medium term notes,,-1
+issuance_of_sukuk,Issuance of mudharabah sukuk,,1
+mudharabah_payments,Payments of mudharabah sukuk,,-1
+securities_debt,Proceeds from debt securities,,1
+payment_of_securities_debt,Payments of debt securities,,-1
+subordinated_bonds,Subordinated bonds issued,,1
+subordinated_bonds_payments,Payments of subordinated bonds,,-1
+insurance_costs,Payments of bonds issuance costs,,-1
+other_borrowings,Proceeds from other borrowings,,1
+other_borrowings_payments,Payments of other borrowings,,-1
+payment_of_securities_issuance,Payments of debt securities issuance costs,,-1
+insurance_stocks,Proceeds from issuance of common stocks,,1
+insurance_preferred_stocks,Proceeds from issuance of preferred stocks,,1
+equity_instruments,Proceeds from issuing other equity instruments,,1
+stock_issuance_payments,Payments of stock issuance costs,,-1
+sales_from_subsidiaries,Proceeds from sales of interests in subsidiaries without loss of control from financing activities,,1
+increase_non_controlling_interest,Proceed from increase of non-controlling interest,,1
+non_controlling_interest_payments,Payments for acquisition of non-controlling interests in subsidiaries,,-1
+interests_received_from_financing,Interests received from financing activities,,1
+interests_paid_from_financing,Interests paid from financing activities,,-1
+income_tax_from_financing,Income taxes refunded (paid) from financing activities,,1
+dividends_paid,Dividends paid from financing activities,,-1
+other_flows_from_financing,Other cash inflows (outflows) from financing activities,,1
+total_netcash_from_financing,Total net cash flows received from (used in) financing activities,"notes_payable,notes_payable_payments,bank_loans,non_bank_loan,non_bank_loan_payments,subordinated_loans,subordinated_loans_payments,lease_liabilities,lease_liabilities_payments,medium_notes,medium_notes_payments,issuance_of_sukuk,mudharabah_payments,securities_debt,payment_of_securities_debt,subordinated_bonds,subordinated_bonds_payments,insurance_costs,other_borrowings,other_borrowings_payments,payment_of_securities_issuance,insurance_stocks,insurance_preferred_stocks,equity_instruments,stock_issuance_payments,sales_from_subsidiaries,increase_non_controlling_interest,non_controlling_interest_payments,interests_received_from_financing,interests_paid_from_financing,income_tax_from_financing,dividends_paid,other_flows_from_financing",1
+total_netcash,Total net increase (decrease) in cash and cash equivalents,"total_netcash_opex,total_netcash_from_investing,total_netcash_from_financing",1
+cash_and_cash_equivalent,"Cash and cash equivalents cash flows, beginning of the period",,1
+effect_exchange_rate,Effect of exchange rate changes on cash and cash equivalents,,1
+deconsolidated_cash_and_cash,Cash and cash equivalent of deconsolidated subsidiaries,,1
+other_cash_and_cash,Other increase (decrease) in cash and cash equivalents,,1
+cashflows,"Cash and cash equivalents cash flows, end of the period","total_netcash,cash_and_cash_equivalent,effect_exchange_rate,deconsolidated_cash_and_cash,other_cash_and_cash",1

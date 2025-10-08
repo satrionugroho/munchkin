@@ -50,7 +50,10 @@ defmodule MunchkinWeb.FetchCurrentUser do
     end
     |> then(fn
       {:ok, user} ->
+        source = define_source(token)
+
         Plug.Conn.assign(conn, :current_user, user)
+        |> Plug.Conn.assign(:source, source)
 
       {:error, message} ->
         unauthorized(conn, message)
@@ -116,6 +119,11 @@ defmodule MunchkinWeb.FetchCurrentUser do
     |> Phoenix.Controller.put_flash(:error, gettext("Restricted Area!. Need authenticate."))
     |> Phoenix.Controller.redirect(to: "/signin")
     |> Plug.Conn.halt()
+  end
+
+  defp define_source(token) do
+    <<_dt::binary-size(4)>> <> <<source::binary-size(5)>> <> _rest = Base.url_decode64!(token)
+    String.reverse(source)
   end
 
   def get_current_user(conn) do

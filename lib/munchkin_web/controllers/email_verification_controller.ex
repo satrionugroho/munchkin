@@ -1,6 +1,7 @@
 defmodule MunchkinWeb.EmailVerificationController do
   use MunchkinWeb, :controller
 
+  alias Munchkin.Subscription
   alias Munchkin.{Accounts, DelayedJob, Repo}
 
   def index(conn, params) do
@@ -13,6 +14,11 @@ defmodule MunchkinWeb.EmailVerificationController do
         Repo.transact(fn ->
           Accounts.update_user_token(user_token, %{used_at: DateTime.utc_now(:second)})
           Accounts.update_user(user_token.user_id, %{}, :email_verified_changeset)
+
+          Subscription.create_subscription(%{
+            user_id: user_token.user_id,
+            product_id: Subscription.free_tier!().id
+          })
         end)
       end)
 
