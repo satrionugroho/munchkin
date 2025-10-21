@@ -1,6 +1,9 @@
 defmodule Munchkin.Repo.Migrations.CreateUserTokens do
   use Ecto.Migration
 
+  @disable_migration_lock true
+  @disable_ddl_transaction true
+
   def change do
     create table(:user_tokens) do
       add :token, :binary
@@ -12,6 +15,6 @@ defmodule Munchkin.Repo.Migrations.CreateUserTokens do
       timestamps(type: :utc_datetime)
     end
 
-    create index(:user_tokens, [:user_id])
+    create index(:user_tokens, [:user_id], concurrently: true)
   end
 end

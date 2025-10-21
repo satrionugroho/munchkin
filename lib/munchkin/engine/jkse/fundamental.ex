@@ -122,7 +122,8 @@ defmodule Munchkin.Engine.Jkse.Fundamental do
       %{
         "balance_sheet" => Task.await(balance_sheet),
         "income_statement" => Task.await(income_statement),
-        "cashflow" => Task.await(cashflow)
+        "cashflow" => Task.await(cashflow),
+        "general" => general
       }
     end
   end
@@ -197,6 +198,7 @@ defmodule Munchkin.Engine.Jkse.Fundamental do
     |> Enum.map(&rename_key(translations, &1))
     |> Enum.reject(fn {key, _} -> is_nil(key) end)
     |> Enum.into(%{})
+    |> Map.put("type", type)
   end
 
   defp translate_data(keys, value, name, general) do

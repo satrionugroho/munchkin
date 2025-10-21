@@ -2,7 +2,7 @@ key,value,formula,multiplier
 receipts_from_brokerage,Receipts from brokerage commissions,,1
 receipts_from_im,Receipts from investment management fees,,1
 receipts_from_advisory,Receipts from financial advisory fees,,1
-receipts_from_clearing,Receipts from clearing and guarantee institution,,0
+receipts_from_clearing,Receipts from clearing and guarantee institution,,1
 receipts_from_security,Receipts from securities company,,1
 payments_to_securities,Payments to securities company,,-1
 payments_to_clearing,Payments to clearing and guarantee institution,,-1
@@ -57,16 +57,16 @@ interests_paid_from_investing,Interests paid from investing activities,,-1
 income_tax_from_investing,Income taxes refunded (paid) from investing activities,,1
 other_flows_from_investing,Other cash inflows (outflows) from investing activities,,1
 total_netcash_from_investing,Total net cash flows received from (used in) investing activities,"disposal_investments,acquisition_investments,proceeds_disposal_ppe,acquisition_ppe,proceeds_intangible_assets,acquisition_intangible_assets,disposal_non_finance,acquisition_non_finance,withdrawal_income,withdrawal_investing,placement_cost,withdrawal_cost_investment,proceeds_subsidiaries,payments_acquisition,proceeds_interests,payments_interests,joint_venture_sales,joint_venture_acquisition,proceeds_sales_interests,payments_acquisition_interests,dividends_received_from_investing,interests_received_from_investing,interests_paid_from_investing,income_tax_from_investing,other_flows_from_investing",1
-notes_payable,Proceeds from notes payable,,1
-notes_payable_payments,Payments of notes payable,,-1
-medium_notes,Proceeds from medium term notes,,1
-medium_notes_payments,Payments of medium term notes,,-1
+notes_payables,Proceeds from notes payable,,1
+notes_payables_payments,Payments of notes payable,,-1
+medium_notes_payables,Proceeds from medium term notes,,1
+medium_notes_payables_payments,Payments of medium term notes,,-1
 bank_loans,Proceeds from bank loans,,1
 bank_loans_payments,Payments of bank loans,,-1
 non_bank_loan,Proceeds from non-bank financial institution loan,,1
 non_bank_loan_payments,Payments of non-bank financial institution loan,,-1
-bonds_payable,Proceeds from bonds payable,,1
-bonds_payable_payments,Payments of bonds payable,,-1
+bonds_payables,Proceeds from bonds payable,,1
+bonds_payables_payments,Payments of bonds payable,,-1
 insurance_costs,Payments of bonds issuance costs,,-1
 subordinated_bonds,Subordinated bonds issued,,1
 subordinated_bonds_payments,Payments of subordinated bonds,,-1
@@ -83,7 +83,7 @@ interests_received_from_financing,Interests received from financing activities,,
 interests_paid_from_financing,Interests paid from financing activities,,-1
 income_tax_from_financing,Income taxes refunded (paid) from financing activities,,1
 other_flows_from_financing,Other cash inflows (outflows) from financing activities,,1
-total_netcash_from_financing,Total net cash flows received from (used in) financing activities,"notes_payable,notes_payable_payments,medium_notes,medium_notes_payments,bank_loans,bank_loans_payments,non_bank_loan,non_bank_loan_payments,bonds_payable,bonds_payable_payments,insurance_costs,subordinated_bonds,subordinated_bonds_payments,subordinated_bonds_costs,subordinated_loans,subordinated_loans_payments,insurance_stocks,insurance_preferred_stocks,equity_instruments,increase_non_controlling_interest,stock_issuance_payments,dividends_paid,interests_received_from_financing,interests_paid_from_financing,other_flows_from_financing",1
+total_netcash_from_financing,Total net cash flows received from (used in) financing activities,"notes_payables,notes_payables_payments,medium_notes_payables,medium_notes_payables_payments,bank_loans,bank_loans_payments,non_bank_loan,non_bank_loan_payments,bonds_payables,bonds_payables_payments,insurance_costs,subordinated_bonds,subordinated_bonds_payments,subordinated_bonds_costs,subordinated_loans,subordinated_loans_payments,insurance_stocks,insurance_preferred_stocks,equity_instruments,increase_non_controlling_interest,stock_issuance_payments,dividends_paid,interests_received_from_financing,interests_paid_from_financing,other_flows_from_financing",1
 total_netcash,Total net increase (decrease) in cash and cash equivalents,"total_netcash_opex,total_netcash_from_investing,total_netcash_from_financing",1
 cash_and_cash_equivalent,"Cash and cash equivalents cash flows, beginning of the period",,1
 effect_exchange_rate,Effect of exchange rate changes on cash and cash equivalents,,1

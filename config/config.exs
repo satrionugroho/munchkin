@@ -68,7 +68,8 @@ config :munchkin, Munchkin.Repo,
   database: "munchkin_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: 10,
+  migration_lock: :pg_advisory_lock
 
 config :munchkin, MunchkinWeb.Mailers,
   adapter: Swoosh.Adapters.Local,

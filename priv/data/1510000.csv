@@ -1,6 +1,6 @@
 key,value,formula,multiplier
 receipts_from_customers,Receipts from customers,,1
-investments_decuctions,Proceed from sales/capital deduction of investments in shares and other equity,,1
+investments_deductions,Proceed from sales/capital deduction of investments in shares and other equity,,1
 receipts_of_subsidy,Receipts of subsidy,,1
 receipts_from_royalties,"Receipts from royalties, fees, commissions and other revenues",,1
 receipts_from_trade,Receipts from contracts held-for-dealing or trading purposes,,1

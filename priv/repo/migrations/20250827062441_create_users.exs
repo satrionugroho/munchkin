@@ -1,6 +1,9 @@
 defmodule Munchkin.Repo.Migrations.CreateUsers do
   use Ecto.Migration
 
+  @disable_migration_lock true
+  @disable_ddl_transaction true
+
   def up do
     create table(:users) do
       add :firstname, :string
@@ -16,7 +19,7 @@ defmodule Munchkin.Repo.Migrations.CreateUsers do
       timestamps(type: :utc_datetime)
     end
 
-    create unique_index(:users, [:email])
+    create unique_index(:users, [:email], concurrently: true)
     execute "alter sequence users_id_seq START 1000 RESTART 1000 MINVALUE 1000"
   end
 

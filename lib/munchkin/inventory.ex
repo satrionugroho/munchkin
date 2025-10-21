@@ -1,14 +1,13 @@
 defmodule Munchkin.Inventory do
+  alias Munchkin.Inventory.FundamentalIDX
+  alias Munchkin.Inventory.Fundamental
   alias Munchkin.Repo
 
   alias Munchkin.Inventory.{
     Asset,
     AssetTicker,
     AssetSource,
-    TradeHistory,
-    BalanceSheet,
-    IncomeStatement,
-    Cashflow
+    TradeHistory
   }
 
   import Ecto.Query, warn: false
@@ -162,7 +161,7 @@ defmodule Munchkin.Inventory do
   def insert_fundamentals(data) do
     keys = Map.keys(data)
 
-    ~w(balance_sheet income_statement period cashflow ticker)
+    ~w(balance_sheet income_statement period cashflow ticker general)
     |> Enum.all?(&Enum.member?(keys, &1))
     |> case do
       true -> do_insert_fundamental_data(data)
@@ -180,71 +179,98 @@ defmodule Munchkin.Inventory do
     |> Enum.map(&String.upcase/1)
   end
 
-  defp do_insert_fundamental_data(%{"period" => period, "ticker" => ticker} = data) do
+  defp do_insert_fundamental_data(%{"ticker" => ticker, "period" => period} = params) do
     Ecto.Multi.new()
     |> Ecto.Multi.run(:params, fn _repo, _ ->
-      params = Munchkin.Utils.MapString.perform(data)
-
-      case Map.get(params, "source_id") do
-        nil -> Map.put(params, "source_id", Munchkin.Engine.Jkse.id())
-        _ -> params
-      end
+      Munchkin.Utils.MapString.perform(params)
+      |> then(fn p ->
+        case Map.get(p, "source_id") do
+          nil -> Map.put(params, "source_id", Munchkin.Engine.Jkse.id())
+          _ -> params
+        end
+      end)
       |> then(fn p -> {:ok, Map.put(p, "asset_id", ticker)} end)
     end)
-    |> Ecto.Multi.run(:asset, &get_data_from_given_params(&1, &2, "asset", Asset))
-    |> Ecto.Multi.run(:source, &get_data_from_given_params(&1, &2, "source", AssetSource))
-    |> Ecto.Multi.insert(:balance_sheet, &fundamental_changeset(&1, BalanceSheet, period))
-    |> Ecto.Multi.insert(:income_statement, &fundamental_changeset(&1, IncomeStatement, period))
-    |> Ecto.Multi.insert(:cashflow, &fundamental_changeset(&1, Cashflow, period))
+    |> Ecto.Multi.run(:fundamental_exists, fn repo, %{params: %{"source_id" => ref}} ->
+      case get_fundamental_by_period(ticker, period, repo: repo, ref_id: ref) do
+        nil -> {:ok, nil}
+        data -> {:ok, data}
+      end
+    end)
+    |> Ecto.Multi.merge(fn
+      %{fundamental_exists: fun, params: params} when is_nil(fun) ->
+        Ecto.Multi.new()
+        |> Ecto.Multi.run(
+          :asset,
+          &get_data_from_given_params(&1, %{params: params, left: &2}, "asset", Asset)
+        )
+        |> Ecto.Multi.run(
+          :source,
+          &get_data_from_given_params(&1, %{params: params, left: &2}, "source", AssetSource)
+        )
+
+      %{fundamental_exists: fun} ->
+        Ecto.Multi.new()
+        |> Ecto.Multi.put(:source, fun.source)
+        |> Ecto.Multi.put(:asset, fun.asset)
+    end)
+    |> Ecto.Multi.insert(:fundamental, &fundamental_changeset/1)
+    |> Ecto.Multi.insert(:channel, &fundamental_channel_changeset/1)
     |> Repo.transact()
   end
 
-  defp fundamental_changeset(opts, mod, period) do
-    type = apply(mod, :key, [])
+  def get_fundamental_by_period(ticker, period, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Repo)
+    ref_id = Keyword.get(opts, :ref_id, Munchkin.Engine.Jkse.id())
+    [ticker, exchange] = split_ticker_and_exchange(ticker)
 
-    opts
-    |> Map.get(:params, %{})
-    |> Map.get(type)
-    |> translate_fundamental_keys(type)
-    |> Map.merge(%{
-      "asset" => Map.get(opts, :asset),
-      "source" => Map.get(opts, :source),
-      "period" => period,
-      "yearly" => get_fundamental_yearly(period)
-    })
-    |> then(fn params ->
-      apply(mod, :changeset, [struct(mod), params])
-    end)
+    query =
+      from(t in Fundamental,
+        inner_join: a in AssetTicker,
+        on: a.asset_id == t.asset_id,
+        where: a.exchange == ^exchange and a.ticker == ^ticker,
+        where: t.period == ^period and t.ref_id == ^ref_id,
+        preload: [:asset, :source],
+        limit: 1
+      )
+
+    repo.one(query)
   end
 
-  defp translate_fundamental_keys(data, type) do
-    fun = String.to_existing_atom(type)
-    version = Map.get(data, "version")
+  defp fundamental_changeset(%{fundamental_exists: fun} = opts) when is_nil(fun) do
+    %{params: params, source: source, asset: asset} = opts
 
-    case version do
-      ver when ver in [nil, ""] ->
-        %{}
-
-      _ ->
-        apply(Munchkin.JkseToDB, fun, [version])
-        |> Enum.reduce(%{}, fn {key, val}, acc ->
-          Map.take(data, val)
-          |> Map.values()
-          |> Enum.sum_by(fn
-            nil -> 0
-            x -> x
-          end)
-          |> then(&Map.put(acc, key, &1))
-          |> then(
-            &Map.merge(&1, Map.take(data, ["filling_date", "ccy", "rounding", "conversion_rate"]))
-          )
-        end)
-    end
+    %Fundamental{}
+    |> Fundamental.changeset(%{asset: asset, source: source, period: Map.get(params, "period")})
   end
 
-  defp get_fundamental_yearly(period) do
-    ~w(audit fy)
-    |> Enum.map(&String.contains?(String.downcase(period), &1))
-    |> Enum.any?()
+  defp fundamental_changeset(opts) do
+    %{params: params, source: source, asset: asset, fundamental_exists: fun} = opts
+
+    options = %{
+      "asset" => asset,
+      "source" => source,
+      "period" => Map.get(params, "period"),
+      "parent" => fun,
+      "metadata" => %{
+        "type" => "revision",
+        "revise_at" => DateTime.utc_now(:second) |> DateTime.to_string()
+      }
+    }
+
+    %Fundamental{}
+    |> Fundamental.changeset(options)
+  end
+
+  defp fundamental_channel_changeset(%{fundamental: data} = opts) do
+    %{params: params} = opts
+
+    %FundamentalIDX{}
+    |> FundamentalIDX.changeset(Map.put(params, "id", data.id))
+  end
+
+  def get_fundamental(id, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Repo)
+    repo.get(Fundamental, id)
   end
 end
