@@ -29,7 +29,7 @@ prepaid_expenses,Current prepaid expenses,,1
 guarantees,Current guarantees,,1
 current_advances,Current advances,"investment_advances,advances_on_ppe,other_advances",1
 investment_advances,Current advances on investments,,1
-advances_on_ppe,Current advances on purchase of property and equipment,,0
+advances_on_ppe,Current advances on purchase of property and equipment,,1
 other_advances,Other current advances,,1
 prepaid_taxes,Current prepaid taxes,,1
 tax_refund,Current claims for tax refund,,1
@@ -82,7 +82,7 @@ other_non_current_assets,Other non-current non-financial assets,,1
 total_non_current_assets,Total non-current assets,"financial_lease,non_current_restricted_funds,related_receivables,stockholders_receivables,non_current_other_receivables,accounted_equity,non_current_guarantees,investment_ventures_associates,non_current_advances,non_current_financial_assets,non_current_derivative_assets,non_current_prepaid_expenses,non_current_prepaid_taxes,deferred_tax_assets,total_non_current_inventories,deferred_charges,non_current_tax_refund,post_employment_benefits,goodwill,intangible_assets_oth_goodwill,non_current_tax_amnesty,other_non_current_assets",1
 total_assets,Total assets,"total_current_assets,total_non_current_assets",1
 short_term_loans,Short term bank loans,,1
-short_term_non_bank_loans,Short-term non-bank loans,,0
+short_term_non_bank_loans,Short-term non-bank loans,,1
 trade_payables,Trade payables,"third_party_trade_payables,related_trade_payables",1
 third_party_trade_payables,Trade payables third parties,,1
 related_trade_payables,Trade payables related parties,,1

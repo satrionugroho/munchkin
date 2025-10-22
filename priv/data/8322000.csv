@@ -29,12 +29,12 @@ gains_in_exchange,Gains (losses) on changes in foreign exchange rates,,1
 disposal_ppe,Gains (losses) on disposal of property and equipment,,1
 disposal_foreclosed_assets,Gains (losses) on disposal of foreclosed assets,,1
 ijarah_assets_pnl,Gains (losses) on disposal of ijarah assets,,1
-recovery_impairment_losses,Recovery of impairment losses,,1
+impairment_recovery_loss,Recovery of impairment losses,,1
 pnl_associates_equity,Share of profit (loss) of associates accounted for using equity method,,1
 pnl_joint_ventures,Share of profit (loss) of joint ventures accounted for using equity method,,1
 other_income,Other income,,1
 other_gains,Other gains,,1
-total_income,Total Income,"interest_finance_income,guarantee_income,murabahah_income,revenue_sharing_income,ijarah_income,financing_income,opearaing_lease_income,premiums_guarantee,reinsurance_income,financial_trade_pnl,adm_income,provisions_income,dividends_income,derivative_realised_gains,written_assets_income,gains_in_exchange,disposal_ppe,disposal_foreclosed_assets,ijarah_assets_pnl,recovery_impairment_losses,pnl_associates_equity,pnl_joint_ventures,other_income,other_gains",1
+total_income,Total Income,"interest_finance_income,guarantee_income,murabahah_income,revenue_sharing_income,ijarah_income,financing_income,opearaing_lease_income,premiums_guarantee,reinsurance_income,financial_trade_pnl,adm_income,provisions_income,dividends_income,derivative_realised_gains,written_assets_income,gains_in_exchange,disposal_ppe,disposal_foreclosed_assets,ijarah_assets_pnl,impairment_recovery_loss,pnl_associates_equity,pnl_joint_ventures,other_income,other_gains",1
 revenue_sharing_expenses,Revenue sharing expenses,,-1
 insurance_expenses,Insurance expenses,"insurance_expenses,reinsurance_claims,retrocession_claims,claims_liability,policy_liability,adequacy_liability,reinsurers_liability,policyholder_liability,insurance_commision,other_underwriting_expenses,ujrah_paid,acquisition_costs",1
 claim_expenses,Claim expenses,,-1

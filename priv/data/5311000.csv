@@ -7,11 +7,11 @@ inv_management_income,Income from investment management services,,1
 advisory_income,Income from financial advisory services,,1
 realised_gains,Realised gains (losses) on trading of marketable securities,,1
 gains_in_securities,Gains (losses) on changes in fair value of marketable securities,,1
-dividends_income,Dividends income,,-1
+dividends_income,Dividends income,,1
 general_adm_exp,General and administrative expenses,,-1
 selling_expenses,Selling expenses,,-1
 finance_income,Finance income,,1
-pnl_on_exchange,Gains (losses) on foreign exchange transactions,,0
+pnl_on_exchange,Gains (losses) on foreign exchange transactions,,1
 final_tax,Final tax expenses,,-1
 other_income,Other income,,1
 other_expenses,Other expenses,,-1
