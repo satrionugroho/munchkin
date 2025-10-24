@@ -1,4 +1,5 @@
 defmodule Munchkin.Inventory.FundamentalIDX do
+  alias Munchkin.Engine.Jkse.Fundamental.Translation
   use Ecto.Schema
 
   import Ecto.Changeset, warn: false
@@ -23,5 +24,13 @@ defmodule Munchkin.Inventory.FundamentalIDX do
       :id
     ])
     |> validate_required([:id])
+  end
+
+  def translate(data, :general) do
+    data
+  end
+
+  def translate(data, _) do
+    Translation.parse(data)
   end
 end

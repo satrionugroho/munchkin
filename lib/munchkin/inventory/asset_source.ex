@@ -17,4 +17,11 @@ defmodule Munchkin.Inventory.AssetSource do
     |> cast(attrs, [:name, :abbr, :metadata])
     |> validate_required([:name])
   end
+
+  def detail(abbr) do
+    case abbr do
+      "idx" -> Munchkin.Inventory.FundamentalIDX
+      _ -> raise ArgumentError, "not implement for fundamental detail with #{inspect(abbr)}"
+    end
+  end
 end

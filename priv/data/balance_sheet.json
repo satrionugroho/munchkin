@@ -58,7 +58,7 @@
     "1210000:biological_assets",
     "4220000:5220000:6220000:investments_policyholder"
   ],
-  "other_current_asset": [
+  "other_current_assets": [
     "prepaid_expenses",
     "prepaid_taxes",
     "1210000:dividends_and_interest",
@@ -82,9 +82,9 @@
     "4220000:5220000:8220000:claims_for_tax_refund",
     "8220000:fair_value_other_income"
   ],
-  "total_current_asset": [
+  "total_current_assets": [
     "1210000:2210000:3210000:total_current_assets",
-    "#CALCULATED{total_assets,-other_non_current_asset,-intangible_assets,-property_plant_equipment}:4220000:5220000:6220000:8220000:"
+    "CALCULATED{total_assets,-other_non_current_asset,-intangible_assets,-property_plant_equipment}:4220000:5220000:6220000:8220000:"
   ],
   "property_plant_equipment": [
     "ppe",
@@ -116,14 +116,14 @@
     "8220000:amortized_asets_costs",
     "8220000:operating_lease"
   ],
-  "intagible_assets": [
+  "intangible_assets": [
     "goodwill",
     "intangible_assets_oth_goodwill",
     "right_of_use_assets",
     "1210000:2210000:3210000:deferred_charges",
     "4220000:6220000:8220000:deferred_acquisition_costs"
   ],
-  "other_non_current_asset": [
+  "other_non_current_assets": [
     "accounted_equity",
     "investment_ventures_associates",
     "deferred_tax_assets",
@@ -231,7 +231,7 @@
   ],
   "total_current_liabilities": [
     "1210000:2210000:3210000:total_current_liabilities",
-    "#CALCULATED{total_liabilities,-other_long_term_debt,-long_term_debt}:4220000:5220000:6220000:8220000:"
+    "CALCULATED{total_liabilities,-other_long_term_debt,-long_term_debt}:4220000:5220000:6220000:8220000:"
   ],
   "long_term_debt": [
     "1210000:long_term_derivative_liabilities",

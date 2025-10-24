@@ -69,7 +69,7 @@
     "4510000:deferred_acquisition_cost",
     "CALCULATED{net_cash_operating_activities,-operating_expense,-stock_based_expense}:2510000:3510000:6510000:"
   ],
-  "net_cash_operating_activities": "total_netcash_opex",
+  "net_cash_operating": "total_netcash_opex",
   "investing_income": [
     "1510000:2510000:3510000:5510000:6510000:disposal_investments",
     "1510000:2510000:3510000:4510000:disposal_intangible_assets",
@@ -152,7 +152,7 @@
     "1510000:2510000:3510000:payments_for_ppe"
   ],
   "other_investing_activities": "other_flows_from_investing",
-  "net_cash_from_investing": "total_netcash_from_investing",
+  "net_cash_investing": "total_netcash_from_investing",
   "financing_income": [
     "1510000:2510000:3510000:5510000:bank_loans",
     "1510000:2510000:3510000:5510000:non_bank_loans",
@@ -229,7 +229,7 @@
     "1510000:2510000:3510000:sales_from_subsidiaries",
     "1510000:2510000:3510000:4510000:5510000:6510000:other_flows_from_financing"
   ],
-  "net_cash_from_financing": "total_netcash_from_financing",
+  "net_cash_financing": "total_netcash_from_financing",
   "exchange_rate": "effect_exchange_rate",
   "change_in_cash": "total_netcash",
   "cash_in_beginning_period": "cash_and_cash_equivalent",

@@ -273,4 +273,26 @@ defmodule Munchkin.Inventory do
     repo = Keyword.get(opts, :repo, Repo)
     repo.get(Fundamental, id)
   end
+
+  def get_fundamental_data(ticker, period, opts \\ []) do
+    case get_fundamental_by_period(ticker, period, opts) do
+      nil ->
+        {:error,
+         "fundamental data with with ticker #{inspect(ticker)} and period of #{inspect(period)} is not found"}
+
+      f ->
+        do_get_fundamental_detail(f, opts)
+    end
+  end
+
+  defp do_get_fundamental_detail(%{source: %mod{} = source} = fundamental, opts) do
+    repo = Keyword.get(opts, :repo, Repo)
+    detail_struct = apply(mod, :detail, [source.abbr])
+
+    repo.get(detail_struct, fundamental.id)
+    |> case do
+      nil -> nil
+      data -> Munchkin.Inventory.Fundamental.Schema.parse(data, fundamental.period)
+    end
+  end
 end
