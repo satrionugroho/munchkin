@@ -1,7 +1,8 @@
 defmodule Munchkin.Inventory.Fundamental.IncomeStatement do
+  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :name,
-    :period,
     :revenue,
     :cogs,
     :gross_profit,
@@ -28,7 +29,6 @@ defmodule Munchkin.Inventory.Fundamental.IncomeStatement do
 
   @type t :: %__MODULE__{
           name: String.t(),
-          period: String.t(),
           revenue: Decimal.t(),
           cogs: Decimal.t(),
           gross_profit: Decimal.t(),
@@ -54,15 +54,13 @@ defmodule Munchkin.Inventory.Fundamental.IncomeStatement do
         }
 
   defimpl Inspect, for: __MODULE__ do
-    def inspect(%_mod{name: name, period: period}, _opts) do
-      "#IncomeStatement<ticker: #{name}, period: #{period}, rest: ...>"
+    def inspect(%_mod{name: name}, _opts) do
+      "#IncomeStatement<ticker: #{name}, rest: ...>"
     end
-  end
 
-  defimpl Jason.Encoder, for: __MODULE__ do
-    def encode(value, opts) do
-      Map.from_struct(value)
-      |> Jason.Encode.map(opts)
+    def inspect(data, _opts) do
+      name = Map.get(data, :name)
+      "#IncomeStatement<ticker: #{name}, data: ...>"
     end
   end
 end

@@ -4,7 +4,9 @@ defmodule Munchkin.Engine do
   @impl true
   def start(_type, _args) do
     children = [
-      Munchkin.Engine.Jkse.Supervisor
+      Munchkin.Engine.Translation,
+      Munchkin.Engine.Jkse.Supervisor,
+      Munchkin.Engine.Factset.Supervisor
     ]
 
     opts = [strategy: :one_for_one, name: Munchkin.Engine.Supervisor]

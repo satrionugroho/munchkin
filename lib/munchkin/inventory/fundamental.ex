@@ -20,6 +20,8 @@ defmodule Munchkin.Inventory.Fundamental do
       foreign_key: :ref_id,
       type: Ecto.UUID
 
+    has_many :tickers, through: [:asset, :tickers]
+
     timestamps(type: :utc_datetime)
   end
 
@@ -27,7 +29,11 @@ defmodule Munchkin.Inventory.Fundamental do
     fundamental
     |> cast(attrs, [:period, :metadata])
     |> Munchkin.Utils.Relations.cast_relations(
-      [asset: Munchkin.Inventory.Asset, source: Munchkin.Inventory.AssetSource, parent: {__MODULE__, [optional: true]}],
+      [
+        asset: Munchkin.Inventory.Asset,
+        source: Munchkin.Inventory.AssetSource,
+        parent: {__MODULE__, [optional: true]}
+      ],
       attrs
     )
     |> validate_required([:period])

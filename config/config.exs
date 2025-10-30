@@ -82,6 +82,10 @@ config :munchkin, Munchkin.Engine.Jkse,
   database_id: "d2ebd050-ca08-4a9d-aecf-5207791b8359",
   instance: {Munchkin.Inventory, :get_source}
 
+config :munchkin, Munchkin.Engine.Factset,
+  database_id: "7092d9a0-0113-49da-ba27-e5ef0dad4394",
+  instance: {Munchkin.Inventory, :get_source}
+
 config :munchkin, Munchkin.Integrations.Payment, engine: Munchkin.ThirdParty.XenditMock
 
 # Import environment specific config. This must remain at the bottom

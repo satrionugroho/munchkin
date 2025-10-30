@@ -28,7 +28,8 @@
     "8322000:consumer_financing_income",
     "8322000:lease_income",
     "8322000:operating_lease_income",
-    "8322000:premiums_guarantee"
+    "8322000:premiums_guarantee",
+    "factset:ff_sales"
   ],
   "cogs": [
     "1311000:2311000:3311000:cost_sales_revenue",
@@ -39,7 +40,8 @@
     "6312000:retrocession_premiums",
     "6312000:premium_to_reinsurance",
     "6312000:claim_expenses",
-    "8322000:revenue_sharing_expenses"
+    "8322000:revenue_sharing_expenses",
+    "factset:cogs_xdep"
   ],
   "gross_profit": [
     "1311000:2311000:3311000:total_gross_profit",
@@ -64,17 +66,24 @@
     "8322000:consumer_financing_income",
     "8322000:lease_income",
     "8322000:operating_lease_income",
-    "8322000:premiums_guarantee"
+    "8322000:premiums_guarantee",
+    "factset:gross_inc"
   ],
   "sales_marketing": [
     "1311000:2311000:3311000:4322000:5311000:8322000:selling_expenses",
     "6312000:commission_expenses",
-    "6312000:other_underwriting_expenses"
+    "6312000:other_underwriting_expenses",
+    "factset:mkt_exp",
+    "factset:adv_exp"
   ],
   "research_development": [
-    "3311000:interconnection_expenses"
+    "3311000:interconnection_expenses",
+    "factset:rd_exp"
   ],
-  "general_administrative": "general_adm_exp",
+  "general_administrative": [
+    "general_adm_exp",
+    "factset:ga_exp"
+  ],
   "depreciation_and_amortization": [
     "4322000:allowances_for_impairment",
     "4322000:rent_maintenance_improvement",
@@ -88,7 +97,8 @@
     "8322000:disposal_foreclosed_assets",
     "8322000:ijarah_assets_pnl",
     "8322000:salary_expenses",
-    "8322000:depreciation_ppe"
+    "8322000:depreciation_ppe",
+    "factset:-"
   ],
   "other_operating_income": [
     "1311000:2311000:3311000:5311000:8322000:other_income",
@@ -97,15 +107,20 @@
     "8322000:financial_trade_pnl",
     "8322000:unrealised_finance_pnl",
     "8322000:adm_income",
-    "8322000:provision_income"
+    "8322000:provision_income",
+    "factset:oper_inc_oth"
   ],
   "other_operating_expense": [
     "1311000:2311000:3311000:5311000:8322000:other_expenses",
     "4322000:other_operating_expenses",
     "4322000:other_fees_commissions",
-    "6312000:ujrah_paid"
+    "6312000:ujrah_paid",
+    "factset:oper_exp_oth"
   ],
-  "operating_income": "CALCULATED{gross_profit,other_operating_income,-sales_marketing,-research_development,-general_administrative,-depreciation_and_amortization,-other_operating_expense}",
+  "operating_income": [
+    "CALCULATED{gross_profit,other_operating_income,-sales_marketing,-research_development,-general_administrative,-depreciation_and_amortization,-other_operating_expense}",
+    "factset:ebit_oper_ps"
+  ],
   "non_operating_income": [
     "1311000:interest",
     "1311000:investment",
@@ -126,7 +141,8 @@
     "6312000:other_underwriting_income",
     "8322000:dividends_income",
     "8322000:derivative_realised_gains",
-    "8322000:written_assets_income"
+    "8322000:written_assets_income",
+    "factset:ff_sales"
   ],
   "non_operating_expenses": [
     "1311000:2311000:3311000:6312000:interest_finance",
@@ -134,16 +150,47 @@
     "2311000:3311000:5311000:8322000:other_gains",
     "4322000:non_operating_expense",
     "8322000:provision_impairment",
-    "8322000:other_losses"
+    "8322000:other_losses",
+    "factset:misc_exp_non_oper"
   ],
-  "income_before_tax": "CALCULATED{operating_income,non_operating_income,-non_operating_expenses}",
-  "income_tax_expense": "tax_benefit",
-  "other_comprehensive_income": "total_comprehensive_income_after_tax",
-  "net_income": "total_profit",
-  "non_controlling_interest": "pnl_to_nci",
-  "net_income_to_shareholders": "pnl_to_parent",
-  "basic_eps": "basic_earnings_eps",
-  "basic_discontinued_eps": "basic_earnings_discontinued_eps",
-  "diluted_eps": "diluted_earnings_ops",
-  "diluted_discontinued_eps": "diluted_earnings_discontinued_ops"
+  "income_before_tax": [
+    "CALCULATED{operating_income,non_operating_income,-non_operating_expenses}",
+    "factset:ptx_inc"
+  ],
+  "income_tax_expense": [
+    "tax_benefit",
+    "factset:inc_tax"
+  ],
+  "other_comprehensive_income": [
+    "total_comprehensive_income_after_tax",
+    "factset:-"
+  ],
+  "net_income": [
+    "total_profit",
+    "factset:consol_net_inc"
+  ],
+  "non_controlling_interest": [
+    "pnl_to_nci",
+    "factset:min_int_exp"
+  ],
+  "net_income_to_shareholders": [
+    "pnl_to_parent",
+    "factset:net_income"
+  ],
+  "basic_eps": [
+    "basic_earnings_eps",
+    "factset:eps_contin_oper"
+  ],
+  "basic_discontinued_eps": [
+    "basic_earnings_discontinued_eps",
+    "factset:eps_basic"
+  ],
+  "diluted_eps": [
+    "diluted_earnings_ops",
+    "factset:eps_headline_uk"
+  ],
+  "diluted_discontinued_eps": [
+    "diluted_earnings_discontinued_ops",
+    "factset:eps_headline_dil"
+  ]
 }

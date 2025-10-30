@@ -22,6 +22,7 @@ defmodule Munchkin.Repo.Migrations.CreateAssetTable do
       add :id, :uuid, primary_key: true
       add :name, :string
       add :abbr, :string
+      add :priority, :integer
       add :metadata, :jsonb, default: "{}"
 
       timestamps(type: :utc_datetime)
@@ -31,6 +32,7 @@ defmodule Munchkin.Repo.Migrations.CreateAssetTable do
       add :asset_id, references(:assets, on_delete: :nothing), primary_key: true
       add :ref_id, references(:asset_sources, on_delete: :nothing, type: :uuid), primary_key: true
       add :exchange, :string, null: false
+      add :region, :string
       add :ticker, :string
     end
 

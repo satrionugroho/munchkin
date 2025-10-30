@@ -7,6 +7,7 @@ defmodule Munchkin.Inventory.AssetSource do
   schema "asset_sources" do
     field :name, :string
     field :abbr, :string
+    field :priority, :integer
     field :metadata, :map, default: %{}
 
     timestamps(type: :utc_datetime)
@@ -14,13 +15,14 @@ defmodule Munchkin.Inventory.AssetSource do
 
   def changeset(asset_source, attrs \\ %{}) do
     asset_source
-    |> cast(attrs, [:name, :abbr, :metadata])
+    |> cast(attrs, [:name, :abbr, :metadata, :priority])
     |> validate_required([:name])
   end
 
   def detail(abbr) do
     case abbr do
-      "idx" -> Munchkin.Inventory.FundamentalIDX
+      "idx" -> Munchkin.Inventory.Fundamental.Provider.IDX
+      "fs" -> Munchkin.Inventory.Fundamental.Provider.Factset
       _ -> raise ArgumentError, "not implement for fundamental detail with #{inspect(abbr)}"
     end
   end

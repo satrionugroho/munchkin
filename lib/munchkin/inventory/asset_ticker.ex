@@ -7,6 +7,7 @@ defmodule Munchkin.Inventory.AssetTicker do
   schema "asset_tickers" do
     field :ticker, :string
     field :exchange, :string
+    field :region, :string
 
     belongs_to :asset, Munchkin.Inventory.Asset, primary_key: true
 

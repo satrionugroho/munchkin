@@ -43,7 +43,10 @@ defmodule MunchkinWeb do
       use Gettext, backend: MunchkinWeb.Gettext
 
       import Plug.Conn
-      import MunchkinWeb.FetchCurrentUser, only: [get_current_user: 1]
+
+      import MunchkinWeb.FetchCurrentUser,
+        only: [get_current_user: 1, get_current_source: 1, get_current_product: 1]
+
       import MunchkinWeb.Utils, only: [parse_search_params: 1, html_form: 2, html_form: 1]
 
       unquote(verified_routes())

@@ -30,7 +30,8 @@
     "5510000:proceeds_to_sales",
     "5510000:proceeds_repurchased_agreements",
     "5510000:receipts_from_customer",
-    "5510000:clearing_and_guarantee_withdrawal"
+    "5510000:clearing_and_guarantee_withdrawal",
+    "factset:net_inc_cf"
   ],
   "stock_based_expense": [
     "1510000:2510000:3510000:dividends_from_opex",
@@ -43,7 +44,8 @@
     "5510000:payments_repurchased_agreements",
     "5510000:6510000:interests_paid",
     "6510000:insurance_payments",
-    "6510000:underwriting_payments"
+    "6510000:underwriting_payments",
+    "factset:stk_opt_cf"
   ],
   "operating_expense": [
     "1510000:2510000:3510000:8510000:cash_payments",
@@ -61,15 +63,21 @@
     "6510000:commission_payments",
     "6510000:reinsurance_payments",
     "6510000:retrocession_payments",
-    "6510000:marketing_expenses"
+    "6510000:marketing_expenses",
+    "factset:-"
   ],
   "depreciation_and_amortization": [
     "1510000:4510000:5510000:8510000:decreased_operation",
     "1510000:4510000:5510000:8510000:increased_liabilities",
     "4510000:deferred_acquisition_cost",
-    "CALCULATED{net_cash_operating_activities,-operating_expense,-stock_based_expense}:2510000:3510000:6510000:"
+    "CALCULATED{net_cash_operating_activities,-operating_expense,-stock_based_expense}:2510000:3510000:6510000:",
+    "factset:dep_amort_exp",
+    "factset:dep_exp_cf"
   ],
-  "net_cash_operating": "total_netcash_opex",
+  "net_cash_operating": [
+    "total_netcash_opex",
+    "factset:oper_cf"
+  ],
   "investing_income": [
     "1510000:2510000:3510000:5510000:6510000:disposal_investments",
     "1510000:2510000:3510000:4510000:disposal_intangible_assets",
@@ -118,7 +126,8 @@
     "5510000:proceeds_interests",
     "5510000:income_tax_from_investing",
     "6510000:investment_income",
-    "6510000:sales_investment"
+    "6510000:sales_investment",
+    "factset:-"
   ],
   "capex": [
     "1510000:2510000:3510000:5510000:6510000:acquisition_investments",
@@ -149,10 +158,14 @@
     "1510000:2510000:3510000:acquisition_oil",
     "1510000:2510000:3510000:acquisition_rnd",
     "1510000:2510000:3510000:acquisition_toll_road",
-    "1510000:2510000:3510000:payments_for_ppe"
+    "1510000:2510000:3510000:payments_for_ppe",
+    "factset:capex_fix"
   ],
   "other_investing_activities": "other_flows_from_investing",
-  "net_cash_investing": "total_netcash_from_investing",
+  "net_cash_investing": [
+    "total_netcash_from_investing",
+    "factset:invest_activ_cf"
+  ],
   "financing_income": [
     "1510000:2510000:3510000:5510000:bank_loans",
     "1510000:2510000:3510000:5510000:non_bank_loans",
@@ -189,7 +202,8 @@
     "4510000:proceeds_from_borrowing",
     "4510000:proceeds_from_bonds",
     "4510000:proceeds_from_new_stocks",
-    "4510000:proceeds_from_capital"
+    "4510000:proceeds_from_capital",
+    "factset:div_cf"
   ],
   "financing_expense": [
     "1510000:2510000:3510000:5510000:bank_loans_payments",
@@ -221,17 +235,28 @@
     "4510000:issuance_mudharabah_cost",
     "4510000:payments_from_borrowing",
     "4510000:payments_from_interests",
-    "4510000:5510000:subordinated_bonds_costs"
+    "4510000:5510000:subordinated_bonds_costs",
+    "factset:-"
   ],
   "other_financing_activities": [
     "1510000:2510000:3510000:other_borrowings",
     "1510000:2510000:3510000:other_borrowings_payments",
     "1510000:2510000:3510000:sales_from_subsidiaries",
-    "1510000:2510000:3510000:4510000:5510000:6510000:other_flows_from_financing"
+    "1510000:2510000:3510000:4510000:5510000:6510000:other_flows_from_financing",
+    "factset:-"
   ],
-  "net_cash_financing": "total_netcash_from_financing",
-  "exchange_rate": "effect_exchange_rate",
-  "change_in_cash": "total_netcash",
+  "net_cash_financing": [
+    "total_netcash_from_financing",
+    "factset:fin_sources_cf"
+  ],
+  "exchange_rate": [
+    "effect_exchange_rate",
+    "factset:for_exch_cf"
+  ],
+  "change_in_cash": [
+    "total_netcash",
+    "factset:chg_cash_cf"
+  ],
   "cash_in_beginning_period": "cash_and_cash_equivalent",
   "cash_in_end_period": "cashflows"
 }

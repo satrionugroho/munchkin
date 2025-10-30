@@ -7,7 +7,8 @@
     "4220000:5220000:restricted_funds",
     "4220000:8220000:current_bi_accounts",
     "4220000:8220000:current_other_bank_accounts",
-    "4220000:5220000:deposits_clearing_and_settlement"
+    "4220000:5220000:deposits_clearing_and_settlement",
+    "factset:cash_only"
   ],
   "short_term_investment": [
     "guarantees",
@@ -23,7 +24,9 @@
     "5220000:derivative_financial_assets",
     "5220000:investment_in_idx",
     "6220000:investments_income",
-    "8220000:financial_assets_pnl"
+    "8220000:financial_assets_pnl",
+    "factset:cash_st",
+    "factset:-cash_only"
   ],
   "account_receivable": [
     "1210000:2210000:3210000:trade_receivables",
@@ -51,12 +54,14 @@
     "6220000:premium_receivables",
     "6220000:reinsurance_receivables",
     "6220000:coinsurance_receivables",
-    "6220000:retrocession_receivables"
+    "6220000:retrocession_receivables",
+    "factset:receiv_tot"
   ],
   "inventories": [
     "1210000:2210000:3210000:total_current_inventories",
     "1210000:biological_assets",
-    "4220000:5220000:6220000:investments_policyholder"
+    "4220000:5220000:6220000:investments_policyholder",
+    "factset:inven"
   ],
   "other_current_assets": [
     "prepaid_expenses",
@@ -80,11 +85,13 @@
     "4220000:8220000:lease_investments",
     "4220000:5220000:advances",
     "4220000:5220000:8220000:claims_for_tax_refund",
-    "8220000:fair_value_other_income"
+    "8220000:fair_value_other_income",
+    "factset:assets_curr_misc"
   ],
   "total_current_assets": [
     "1210000:2210000:3210000:total_current_assets",
-    "CALCULATED{total_assets,-other_non_current_asset,-intangible_assets,-property_plant_equipment}:4220000:5220000:6220000:8220000:"
+    "CALCULATED{total_assets,-other_non_current_asset,-intangible_assets,-property_plant_equipment}:4220000:5220000:6220000:8220000:",
+    "factset:assets_curr"
   ],
   "property_plant_equipment": [
     "ppe",
@@ -114,14 +121,16 @@
     "4220000:6220000:8220000:assets_for_owners",
     "8220000:loans",
     "8220000:amortized_asets_costs",
-    "8220000:operating_lease"
+    "8220000:operating_lease",
+    "factset:ppe_net"
   ],
   "intangible_assets": [
     "goodwill",
     "intangible_assets_oth_goodwill",
     "right_of_use_assets",
     "1210000:2210000:3210000:deferred_charges",
-    "4220000:6220000:8220000:deferred_acquisition_costs"
+    "4220000:6220000:8220000:deferred_acquisition_costs",
+    "factset:intang"
   ],
   "other_non_current_assets": [
     "accounted_equity",
@@ -150,9 +159,13 @@
     "4220000:8220000:muradhabah_financing",
     "4220000:5220000:6220000:8220000:other_assets",
     "4220000:5220000:6220000:tax_amnesty_assets",
-    "6220000:retrocession_assets"
+    "6220000:retrocession_assets",
+    "factset:invest_oth"
   ],
-  "total_assets": "total_assets",
+  "total_assets": [
+    "total_assets",
+    "factset:assets"
+  ],
   "account_payable": [
     "1210000:2210000:3210000:trade_payables",
     "1210000:receipts_payables",
@@ -163,7 +176,8 @@
     "6220000:commission_payables",
     "6220000:claim_payables",
     "6220000:retrocession_payables",
-    "8220000:guarantees_payables"
+    "8220000:guarantees_payables",
+    "factset:pay_acct"
   ],
   "short_term_debt": [
     "taxes_payable",
@@ -218,7 +232,8 @@
     "6220000:zakat_fund",
     "6220000:premium_deposists",
     "6220000:ujrah_liabilities",
-    "8220000:due_to_stockholders"
+    "8220000:due_to_stockholders",
+    "factset:debt_st"
   ],
   "other_current_liabilities": [
     "1210000:2210000:3210000:other_current_liabilities",
@@ -227,11 +242,13 @@
     "1210000:4220000:6220000:coinsurance_liabilities",
     "4220000:sharia_deposits",
     "4220000:5220000:6220000:8220000:accrued_expenses",
-    "8220000:other_finance_liabilities"
+    "8220000:other_finance_liabilities",
+    "factset:liabs_curr_misc"
   ],
   "total_current_liabilities": [
     "1210000:2210000:3210000:total_current_liabilities",
-    "CALCULATED{total_liabilities,-other_long_term_debt,-long_term_debt}:4220000:5220000:6220000:8220000:"
+    "CALCULATED{total_liabilities,-other_long_term_debt,-long_term_debt}:4220000:5220000:6220000:8220000:",
+    "factset:liabs_curr"
   ],
   "long_term_debt": [
     "1210000:long_term_derivative_liabilities",
@@ -258,7 +275,8 @@
     "5220000:6220000:bonds_payable",
     "5220000:6220000:sukuk",
     "5220000:medium_notes",
-    "8220000:mudharabah_sukuk"
+    "8220000:mudharabah_sukuk",
+    "factset:debt_lt"
   ],
   "other_long_term_debt": [
     "1210000:4220000:6220000:8220000:insurance_contract_liabilities",
@@ -268,11 +286,28 @@
     "1210000:2210000:3210000:other_non_current_non_financial_liabilities",
     "4220000:estimated_commitments_losses",
     "4220000:5220000:6220000:8220000:other_liabilities",
-    "4220000:6220000:liabilities_policyholder"
+    "4220000:6220000:liabilities_policyholder",
+    "factset:liabs_oth_xdfd_rev",
+    "factset:ins_liabs_oth"
   ],
-  "total_liabilities": "total_liabilities",
-  "shareholders_equity_in_company": "total_equity_to_owners",
-  "non_controlling_interest": "non_controlling_interest",
-  "total_equity": "total_equity",
-  "total_liabilities_and_equity": "total_liabilities_and_equity"
+  "total_liabilities": [
+    "total_liabilities",
+    "factset:CALCULATED{total_current_liabilities,long_term_debt,other_long_term_debt}"
+  ],
+  "shareholders_equity_in_company": [
+    "total_equity_to_owners",
+    "factset:shldrs_eq"
+  ],
+  "non_controlling_interest": [
+    "non_controlling_interest",
+    "factset:min_int_accum"
+  ],
+  "total_equity": [
+    "total_equity",
+    "factset:eq_tot"
+  ],
+  "total_liabilities_and_equity": [
+    "total_liabilities_and_equity",
+    "factset:liabs_shldrs_eq"
+  ]
 }

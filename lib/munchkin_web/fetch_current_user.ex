@@ -130,6 +130,17 @@ defmodule MunchkinWeb.FetchCurrentUser do
     Map.get(conn.assigns, :current_user)
   end
 
+  def get_current_source(conn) do
+    Map.get(conn.assigns, :source)
+  end
+
+  def get_current_product(conn) do
+    case get_current_user(conn) do
+      nil -> Munchkin.Subscription.free_tier!()
+      user -> List.first(user.subscriptions) |> Map.get(:product)
+    end
+  end
+
   defp update_last_used_token(token) do
     case Accounts.get_user_token(token) do
       {:ok, token} -> Accounts.update_user_token(token, %{updated_at: DateTime.utc_now(:second)})

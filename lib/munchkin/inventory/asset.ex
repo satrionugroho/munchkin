@@ -20,6 +20,8 @@ defmodule Munchkin.Inventory.Asset do
     field :subindustry, :string
     field :metadata, :map, default: %{}
 
+    has_many :tickers, Munchkin.Inventory.AssetTicker
+
     timestamps(type: :utc_datetime)
   end
 

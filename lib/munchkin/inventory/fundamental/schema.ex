@@ -1,23 +1,23 @@
 defmodule Munchkin.Inventory.Fundamental.Schema do
-  alias Munchkin.Inventory.FundamentalIDX
+  alias Munchkin.Inventory.Fundamental.Provider.Factset
+  alias Munchkin.Inventory.Fundamental.Provider.IDX, as: FundamentalIDX
   alias Munchkin.Inventory.Fundamental.{BalanceSheet, Cashflow, General, IncomeStatement}
 
-  @derive {Jason.Encoder,
-           only: [:id, :ticker, :general, :balance_sheet, :cashflow, :income_statement]}
-  defstruct [:id, :ticker, :general, :balance_sheet, :cashflow, :income_statement]
+  @derive Jason.Encoder
+  @derive JSON.Encoder
+  defstruct [:id, :ticker, :period, :general, :balance_sheet, :cashflow, :income_statement]
 
   @type t :: %__MODULE__{
           id: String.t(),
           ticker: String.t(),
+          period: String.t(),
           general: General.t(),
           balance_sheet: BalanceSheet.t(),
           cashflow: Cashflow.t(),
           income_statement: IncomeStatement.t()
         }
 
-  def parse(%FundamentalIDX{general: general} = data, period) do
-    ticker = Map.get(general, "code")
-
+  def parse(%FundamentalIDX{general: _general} = data, period, ticker) do
     [:general, :balance_sheet, :cashflow, :income_statement]
     |> Enum.reduce([id: data.id, ticker: ticker], fn key, acc ->
       Map.get(data, key, %{})
@@ -32,6 +32,18 @@ defmodule Munchkin.Inventory.Fundamental.Schema do
       end)
       |> then(&Keyword.put(acc, key, &1))
     end)
+    |> Keyword.put_new(:period, period)
+    |> then(&struct(__MODULE__, &1))
+  end
+
+  def parse(%Factset{} = fs, period, ticker) do
+    [:balance_sheet, :cashflow, :income_statement]
+    |> Enum.reduce([id: fs.id, ticker: ticker], fn key, acc ->
+      Map.put(fs.data, "ticker_exchange", ticker)
+      |> parse_item({Factset, key})
+      |> then(&Keyword.put(acc, key, &1))
+    end)
+    |> Keyword.put_new(:period, period)
     |> then(&struct(__MODULE__, &1))
   end
 

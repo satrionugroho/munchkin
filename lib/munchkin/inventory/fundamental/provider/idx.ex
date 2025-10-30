@@ -1,11 +1,11 @@
-defmodule Munchkin.Inventory.FundamentalIDX do
+defmodule Munchkin.Inventory.Fundamental.Provider.IDX do
   alias Munchkin.Engine.Jkse.Fundamental.Translation
   use Ecto.Schema
 
   import Ecto.Changeset, warn: false
 
   @primary_key {:id, Ecto.UUID, autogenerate: false}
-  schema "fundamentals_idx" do
+  schema "fundamental_idx" do
     field :general, :map
     field :balance_sheet, :map
     field :cashflow, :map
@@ -27,7 +27,20 @@ defmodule Munchkin.Inventory.FundamentalIDX do
   end
 
   def translate(data, :general) do
-    data
+    Enum.reduce(data, %{}, fn
+      {key, val}, acc when is_bitstring(val) ->
+        case String.contains?(val, "/") do
+          true ->
+            new_value = String.split(val, "/") |> List.last() |> String.trim()
+            Map.put(acc, key, new_value)
+
+          _ ->
+            Map.put(acc, key, val)
+        end
+
+      {key, val}, acc ->
+        Map.put(acc, key, val)
+    end)
   end
 
   def translate(data, _) do

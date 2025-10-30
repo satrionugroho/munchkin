@@ -1,7 +1,8 @@
 defmodule Munchkin.Inventory.Fundamental.BalanceSheet do
+  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :name,
-    :period,
     :cash_equivalent,
     :short_term_investment,
     :account_receivable,
@@ -27,7 +28,6 @@ defmodule Munchkin.Inventory.Fundamental.BalanceSheet do
 
   @type t :: %__MODULE__{
           name: String.t(),
-          period: String.t(),
           cash_equivalent: Decimal.t(),
           short_term_investment: Decimal.t(),
           account_receivable: Decimal.t(),
@@ -52,15 +52,12 @@ defmodule Munchkin.Inventory.Fundamental.BalanceSheet do
         }
 
   defimpl Inspect, for: __MODULE__ do
-    def inspect(%_mod{name: name, period: period}, _opts) do
-      "#BalanceSheet<ticker: #{name}, period: #{period}, rest: ...>"
+    def inspect(%_mod{name: name}, _opts) do
+      "#BalanceSheet<ticker: #{name}, rest: ...>"
     end
-  end
 
-  defimpl Jason.Encoder, for: __MODULE__ do
-    def encode(value, opts) do
-      Map.from_struct(value)
-      |> Jason.Encode.map(opts)
+    def inspect(_data, _opts) do
+      "#BalanceSheet<data: ...>"
     end
   end
 end

@@ -1,6 +1,8 @@
 defmodule Munchkin.Inventory.Fundamental.General do
   use Ecto.Schema
 
+  @derive JSON.Encoder
+  @derive Jason.Encoder
   defstruct [
     :period,
     :partner_name,
@@ -50,7 +52,6 @@ defmodule Munchkin.Inventory.Fundamental.General do
   ]
 
   @type t :: %__MODULE__{
-          period: String.t(),
           partner_name: String.t(),
           review_engagement: String.t(),
           last_period_start_date: String.t(),
@@ -101,12 +102,9 @@ defmodule Munchkin.Inventory.Fundamental.General do
     def inspect(%_mod{name: name, code: code, period: period}, _opts) do
       "#General<ticker: #{code}, name: #{name}, period: #{period}, rest: ...>"
     end
-  end
 
-  defimpl Jason.Encoder, for: __MODULE__ do
-    def encode(value, opts) do
-      Map.from_struct(value)
-      |> Jason.Encode.map(opts)
+    def inspect(_data, _opts) do
+      "#General<data: ...>"
     end
   end
 end

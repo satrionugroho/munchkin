@@ -22,7 +22,7 @@ defmodule Munchkin.Repo.Migrations.CreateFundamentals do
 
     create index(:fundamentals, [:asset_id, :ref_id, :period], concurrently: true)
 
-    create table(:fundamentals_idx, primary_key: false) do
+    create table(:fundamental_idx, primary_key: false) do
       add :id, references(:fundamentals, on_delete: :delete_all, type: :uuid), primary_key: true
 
       add :general, :map
