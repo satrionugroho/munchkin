@@ -34,6 +34,19 @@ defmodule Munchkin.Engine.Jkse.Stock do
     end)
   end
 
+  def company(ticker) when is_bitstring(ticker) do
+    url = get_url(:ticker_trading_info, %{"code" => ticker})
+
+    fetch(url, [])
+    |> case do
+      {:ok, %{"KodeEmiten" => ^ticker, "replies" => data}} ->
+        parse_data(data)
+
+      _ ->
+        {:error, "cannot get trading history"}
+    end
+  end
+
   def list do
     url = get_url(:stock_list)
 
@@ -51,10 +64,23 @@ defmodule Munchkin.Engine.Jkse.Stock do
     |> parse_suspension_data()
   end
 
-  defp parse_data({:ok, %{"data" => stocks}}) do
+  defp parse_data({:ok, %{"data" => stocks}}), do: parse_data(stocks)
+
+  defp parse_data([_ | _] = stocks) do
     Enum.map(stocks, fn data ->
-      Map.take(data, ["Open", "High", "Low", "Close", "Volume", "ForeignBuy", "ForeignSell"])
-      |> Enum.map(fn {key, value} -> {String.downcase(key), parse_value(value)} end)
+      Map.take(data, [
+        "Date",
+        "OpenPrice",
+        "High",
+        "Low",
+        "Close",
+        "Volume",
+        "ForeignBuy",
+        "ForeignSell",
+        "Value",
+        "TradebleShares"
+      ])
+      |> Enum.map(fn {key, value} -> {translate_key(key), parse_value(key, value)} end)
       |> then(fn d -> [{"ticker", Map.get(data, "StockCode")} | d] end)
       |> Enum.into(%{})
     end)
@@ -62,7 +88,19 @@ defmodule Munchkin.Engine.Jkse.Stock do
 
   defp parse_data(err), do: err
 
-  defp parse_value(numeric_data) do
+  defp parse_value("Date", date) do
+    case String.contains?(date, "T") do
+      true ->
+        String.split(date, "T")
+        |> List.first()
+        |> Date.from_iso8601!()
+
+      _ ->
+        :invalid
+    end
+  end
+
+  defp parse_value(_key, numeric_data) do
     Float.to_string(numeric_data)
     |> Decimal.new()
   end
@@ -84,6 +122,10 @@ defmodule Munchkin.Engine.Jkse.Stock do
   defp translate_key(key) when key in ["NamaEmiten", "Company_Name"], do: "name"
   defp translate_key(key) when key in ["KodeEmiten", "Code"], do: "ticker"
   defp translate_key("Corporate_Secretary"), do: "drop"
+  defp translate_key("OpenPrice"), do: "open"
+  defp translate_key("ForeignBuy"), do: "foreign_buy"
+  defp translate_key("ForeignSell"), do: "foreign_sell"
+  defp translate_key("TradebleShares"), do: "shares"
   defp translate_key(key), do: String.downcase(key)
 
   defp parse_suspension_data({:ok, %{"contentBody" => body}}) do

@@ -22,6 +22,10 @@ defmodule MunchkinWeb.API.V1.SubscriptionJSON do
     })
   end
 
+  def subscription_data(nil) do
+    %{}
+  end
+
   def payments_data([]), do: []
   def payments_data(payments), do: Enum.map(payments, &payment_data/1)
 

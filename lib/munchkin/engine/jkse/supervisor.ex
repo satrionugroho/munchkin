@@ -17,6 +17,7 @@ defmodule Munchkin.Engine.Jkse.Supervisor do
         receive do
           :load_translation ->
             Munchkin.Engine.Jkse.Fundamental.Type.available_types()
+            |> Enum.reject(&Regex.match?(~r/\d611000/, &1))
             |> Munchkin.Engine.Translation.add("idx")
 
           err ->

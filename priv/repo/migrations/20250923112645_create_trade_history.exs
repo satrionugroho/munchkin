@@ -6,11 +6,12 @@ defmodule Munchkin.Repo.Migrations.CreateTradeHistory do
       add :asset_id, references(:assets, on_delete: :nothing), primary_key: true
       add :ref_id, references(:asset_sources, on_delete: :nothing, type: :uuid), primary_key: true
       add :date, :date, primary_key: true
-      add :open, :decimal, precision: 8, scale: 5
-      add :high, :decimal, precision: 8, scale: 5
-      add :low, :decimal, precision: 8, scale: 5
-      add :close, :decimal, precision: 8, scale: 5
-      add :volume, :decimal, precision: 10, scale: 5
+      add :open, :decimal
+      add :high, :decimal
+      add :low, :decimal
+      add :close, :decimal
+      add :volume, :decimal
+      add :shares, :decimal
     end
 
     create index(:trade_histories, [:asset_id, :ref_id])

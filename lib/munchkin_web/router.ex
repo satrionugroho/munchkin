@@ -73,6 +73,9 @@ defmodule MunchkinWeb.Router do
       get "/accounts/two_factors", UserController, :two_factors
 
       get "/analyze/:ticker/:analyzer", AnalyzeController, :index
+      get "/company/:ticker", CompanyController, :show
+      get "/data/eod/:ticker", CompanyController, :eod
+      get "/data/last-trades/:ticker", CompanyController, :last_trade
     end
   end
 

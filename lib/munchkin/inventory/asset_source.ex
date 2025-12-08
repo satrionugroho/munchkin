@@ -19,6 +19,8 @@ defmodule Munchkin.Inventory.AssetSource do
     |> validate_required([:name])
   end
 
+  def detail(%__MODULE__{} = data), do: detail(data.abbr)
+
   def detail(abbr) do
     case abbr do
       "idx" -> Munchkin.Inventory.Fundamental.Provider.IDX

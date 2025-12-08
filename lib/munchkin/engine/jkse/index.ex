@@ -36,7 +36,7 @@ defmodule Munchkin.Engine.Jkse.Index do
 
   defp parse_data({:ok, %{"data" => indices}}) do
     Enum.map(indices, fn data ->
-      Map.take(data, ["Previous", "Highest", "Lowest", "Close", "Volume"])
+      Map.take(data, Map.keys(dict()))
       |> Enum.map(fn {key, value} -> {translate(key), parse_value(value)} end)
       |> then(fn d -> [{"ticker", Map.get(data, "IndexCode")} | d] end)
       |> Enum.into(%{})
@@ -66,7 +66,8 @@ defmodule Munchkin.Engine.Jkse.Index do
       "Previous" => "open",
       "Highest" => "high",
       "Lowest" => "low",
-      "Volume" => "volume"
+      "Volume" => "volume",
+      "MarketCapital" => "shares"
     }
   end
 end

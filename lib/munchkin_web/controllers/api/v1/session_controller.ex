@@ -10,7 +10,7 @@ defmodule MunchkinWeb.API.V1.SessionController do
 
   def create(conn, %{"refresh_token" => raw}) when not is_nil(raw) do
     with {:ok, token} <- Base.url_decode64(raw),
-         {:ok, user} <- Accounts.get_user_by_refresh_token(token),
+         {:ok, user} <- Accounts.get_user_by_refresh_token(raw),
          {:ok, tokens} <- generate_new_token(user, token) do
       render(conn, :create,
         user: user,
@@ -20,6 +20,10 @@ defmodule MunchkinWeb.API.V1.SessionController do
       {:error, message} ->
         put_status(conn, 403)
         |> render(:error, messages: [message])
+
+      _ ->
+        put_status(conn, 403)
+        |> render(:error, messages: [gettext("An error occured when requesting the new token")])
     end
   end
 
@@ -168,7 +172,7 @@ defmodule MunchkinWeb.API.V1.SessionController do
     MunchkinWeb.Mailers.ForgotPasswordMailer.send_email(user, token)
   end
 
-  defp generate_new_token(user, token) do
+  defp generate_new_token(user, <<_source::binary-size(4)>> <> token) do
     user.refresh_tokens
     |> Enum.find(&Kernel.==(&1.token, token))
     |> case do
@@ -203,8 +207,7 @@ defmodule MunchkinWeb.API.V1.SessionController do
       {:ok, false} ->
         render(conn, :error, messages: [gettext("Token is already used")])
 
-      err ->
-        IO.inspect(err)
+      _err ->
         render(conn, :error, messages: [gettext("error while reading the token")])
     end
   end

@@ -1,6 +1,5 @@
 defmodule Munchkin.Inventory.Fundamental.Cashflow do
-  @derive JSON.Encoder
-  @derive Jason.Encoder
+  @derive [JSON.Encoder, Jason.Encoder]
   defstruct [
     :name,
     :net_income,
@@ -8,12 +7,15 @@ defmodule Munchkin.Inventory.Fundamental.Cashflow do
     :operating_expense,
     :depreciation_and_amortization,
     :net_cash_operating,
-    :investing_income,
+    :investing_purchases,
+    :business_acquisition,
+    :fixed_assets,
     :capex,
     :other_investing_activities,
     :net_cash_investing,
-    :financing_income,
-    :financing_expense,
+    :issuance_stocks,
+    :dividends_paid,
+    :repurchase_stocks,
     :other_financing_activities,
     :net_cash_financing,
     :exchange_rate,
@@ -29,12 +31,15 @@ defmodule Munchkin.Inventory.Fundamental.Cashflow do
           operating_expense: Decimal.t(),
           depreciation_and_amortization: Decimal.t(),
           net_cash_operating: Decimal.t(),
-          investing_income: Decimal.t(),
+          investing_purchases: Decimal.t(),
+          business_acquisition: Decimal.t(),
+          fixed_assets: Decimal.t(),
           capex: Decimal.t(),
           other_investing_activities: Decimal.t(),
           net_cash_investing: Decimal.t(),
-          financing_income: Decimal.t(),
-          financing_expense: Decimal.t(),
+          issuance_stocks: Decimal.t(),
+          dividends_paid: Decimal.t(),
+          repurchase_stocks: Decimal.t(),
           other_financing_activities: Decimal.t(),
           net_cash_financing: Decimal.t(),
           exchange_rate: Decimal.t(),
@@ -50,6 +55,29 @@ defmodule Munchkin.Inventory.Fundamental.Cashflow do
 
     def inspect(_data, _opts) do
       "#Cashflow<data: ...>"
+    end
+  end
+
+  defimpl Enumerable, for: __MODULE__ do
+    def count(map) do
+      {:ok, map_size(map)}
+    end
+
+    def member?(map, {key, value}) do
+      {:ok, match?(%{^key => ^value}, map)}
+    end
+
+    def member?(_map, _other) do
+      {:ok, false}
+    end
+
+    def slice(map) do
+      size = map_size(map)
+      {:ok, size, &Enumerable.List.slice(&1)}
+    end
+
+    def reduce(map, acc, fun) do
+      Enumerable.List.reduce(:maps.to_list(map), acc, fun)
     end
   end
 end

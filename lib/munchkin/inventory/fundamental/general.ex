@@ -1,8 +1,7 @@
 defmodule Munchkin.Inventory.Fundamental.General do
   use Ecto.Schema
 
-  @derive JSON.Encoder
-  @derive Jason.Encoder
+  @derive [JSON.Encoder, Jason.Encoder]
   defstruct [
     :period,
     :partner_name,
@@ -105,6 +104,29 @@ defmodule Munchkin.Inventory.Fundamental.General do
 
     def inspect(_data, _opts) do
       "#General<data: ...>"
+    end
+  end
+
+  defimpl Enumerable, for: __MODULE__ do
+    def count(map) do
+      {:ok, map_size(map)}
+    end
+
+    def member?(map, {key, value}) do
+      {:ok, match?(%{^key => ^value}, map)}
+    end
+
+    def member?(_map, _other) do
+      {:ok, false}
+    end
+
+    def slice(map) do
+      size = map_size(map)
+      {:ok, size, &Enumerable.List.slice(&1)}
+    end
+
+    def reduce(map, acc, fun) do
+      Enumerable.List.reduce(:maps.to_list(map), acc, fun)
     end
   end
 end

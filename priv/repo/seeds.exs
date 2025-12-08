@@ -64,7 +64,7 @@ defmodule MunchkinMigrator do
 
     [
       %{name: "Indonesian Exchange", abbr: "idx", id: Ecto.UUID.generate()},
-      %{name: "EODHD", abbr: "eodhd", id: Ecto.UUID.generate()}
+      %{name: "Factset", abbr: "fs", id: Ecto.UUID.generate()}
     ]
     |> Enum.map(&Map.merge(&1, %{inserted_at: inserted, updated_at: inserted}))
     |> then(&Munchkin.Repo.insert_all(Munchkin.Inventory.AssetSource, &1))

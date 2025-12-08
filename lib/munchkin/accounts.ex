@@ -133,8 +133,13 @@ defmodule Munchkin.Accounts do
          {:ok, _user} = data <- verify_token_validity(token, expired_at) do
       data
     else
-      {:error, _} = err -> err
-      err -> err
+      {:error, _} = err ->
+        IO.inspect(err)
+        err
+
+      err ->
+        IO.inspect(err)
+        err
     end
   end
 
@@ -158,7 +163,13 @@ defmodule Munchkin.Accounts do
 
     case DateTime.after?(datetime, now) do
       true ->
-        {:ok, get_user!(token.user_id, [:access_tokens, :two_factor_tokens, :subscriptions])}
+        {:ok,
+         get_user!(token.user_id, [
+           :access_tokens,
+           :two_factor_tokens,
+           :subscriptions,
+           :refresh_tokens
+         ])}
 
       _ ->
         {:error, "token is invalid"}
@@ -177,14 +188,14 @@ defmodule Munchkin.Accounts do
       nil
   """
   def get_user_by_refresh_token(token) do
-    query = PartialQuery.active_token_query(UserToken.refresh_token_type(), token)
-
-    case Repo.one(query) do
-      %UserToken{} = token ->
-        {:ok, get_user!(token.user_id, [:access_tokens, :two_factor_tokens, :refresh_tokens])}
-
-      _ ->
-        {:error, "cannot get user from given token"}
+    with [expired_at, valid_token] <- decode_user_token(token),
+         query <- PartialQuery.active_token_query(UserToken.refresh_token_type(), valid_token),
+         %UserToken{} = token <- Repo.one(query),
+         {:ok, _user} = data <- verify_token_validity(token, expired_at) do
+      data
+    else
+      {:error, _} = err -> err
+      err -> err
     end
   end
 
@@ -522,7 +533,10 @@ defmodule Munchkin.Accounts do
 
   defp filter_unused_refresh_tokens(tokens) do
     Enum.reject(tokens, &Kernel.is_nil(&1.used_at))
-    |> Enum.sort(fn a, b -> DateTime.after?(a, b) end)
+    |> Enum.sort(fn
+      %Date{} = a, %Date{} = b -> DateTime.after?(a, b)
+      a, b -> DateTime.after?(a.inserted_at, b.inserted_at)
+    end)
     |> Enum.chunk_every(2)
     |> case do
       [] ->
@@ -533,7 +547,7 @@ defmodule Munchkin.Accounts do
 
       [_first | tokens] ->
         ids = List.flatten(tokens) |> Enum.map(& &1.id)
-        Repo.delete_all(from t in UserToken, where: t.id == ^ids)
+        Repo.delete_all(from t in UserToken, where: t.id in ^ids)
     end
   end
 

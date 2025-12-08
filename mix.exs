@@ -50,7 +50,7 @@ defmodule Munchkin.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 1.1.0"},
+      {:phoenix_live_view, "~> 1.1.17"},
       {:lazy_html, ">= 0.1.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
@@ -78,7 +78,8 @@ defmodule Munchkin.MixProject do
       {:cors_plug, "~> 3.0"},
       {:pythonx, "~> 0.4.0"},
       {:xlsxir, "~> 1.6.4"},
-      {:nimble_csv, "~> 1.3.0"}
+      {:nimble_csv, "~> 1.3.0"},
+      {:explorer, "~> 0.11.1"}
     ]
   end
 

@@ -10,6 +10,7 @@ defmodule Munchkin.Inventory.TradeHistory do
     field :low, :decimal
     field :close, :decimal
     field :volume, :decimal
+    field :shares, :decimal
 
     field :date, :date, primary_key: true
 
@@ -23,7 +24,7 @@ defmodule Munchkin.Inventory.TradeHistory do
 
   def changeset(trade, attrs \\ %{}) do
     trade
-    |> cast(attrs, [:open, :high, :low, :close, :volume, :date])
+    |> cast(attrs, [:open, :high, :low, :close, :volume, :date, :shares])
     |> Munchkin.Utils.Relations.cast_relations(
       [asset: Munchkin.Inventory.Asset, source: Munchkin.Inventory.AssetSource],
       attrs

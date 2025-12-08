@@ -114,17 +114,25 @@ defmodule Munchkin.Engine.Jkse.Fundamental do
   end
 
   defp do_parse_fundamental_data(file) do
-    with references <- Xlsxir.multi_extract(file),
+    wait_time = :timer.minutes(1)
+
+    with references when is_list(references) <- Xlsxir.multi_extract(file),
          general <- parse_general_data(references),
          balance_sheet <- parse_balance_sheet(references, general),
          income_statement <- parse_income_statement(references, general),
-         cashflow <- parse_cashflow(references, general) do
+         cashflow <- parse_cashflow(references, general),
+         metadata <- parse_metadata(references, general) do
       %{
-        "balance_sheet" => Task.await(balance_sheet),
-        "income_statement" => Task.await(income_statement),
-        "cashflow" => Task.await(cashflow),
+        "balance_sheet" => Task.await(balance_sheet, wait_time),
+        "income_statement" => Task.await(income_statement, wait_time),
+        "cashflow" => Task.await(cashflow, wait_time),
+        "metadata" => Task.await(metadata, wait_time),
         "general" => general
       }
+    else
+      err ->
+        :logger.warning("cannot parse fundamental data with reason #{inspect(err)}")
+        err
     end
   end
 
@@ -154,11 +162,22 @@ defmodule Munchkin.Engine.Jkse.Fundamental do
     end)
   end
 
+  defp parse_metadata(references, general) do
+    Task.async(fn ->
+      find_correct_ref(Type.ppe(), references)
+      |> parse_data("ppe", general)
+    end)
+  end
+
   defp find_correct_ref(types, references) do
     Enum.find(references, fn
       {:ok, ref} ->
         name = Xlsxir.get_info(ref, :name)
         Enum.member?(types, name)
+
+      {:error, reason} ->
+        :logger.warning("cannot parse file with error #{inspect(reason)}")
+        nil
     end)
     |> then(fn
       {:ok, ref} -> ref
@@ -166,30 +185,59 @@ defmodule Munchkin.Engine.Jkse.Fundamental do
     end)
   end
 
+  defp equalize_keys(keys, values) when length(keys) == length(values), do: keys
+  defp equalize_keys(keys, _val), do: ["Test" | keys]
+
   defp parse_data(nil, _name, _general_data), do: %{}
 
   defp parse_data(ref, "general_information", general_data) do
     with raw_keys <- Xlsxir.get_col(ref, "C"),
          val <- Xlsxir.get_col(ref, "B"),
-         true <- validate_against_key(val, raw_keys),
          type <- Xlsxir.get_info(ref, :name),
-         keys <- ["Test" | raw_keys] do
+         keys <- equalize_keys(raw_keys, val) do
       translate_data(keys, val, {"general_information", type}, general_data)
+    end
+  end
+
+  defp parse_data(ref, "ppe", _general_data) do
+    with keys <- Xlsxir.get_col(ref, "L"),
+         values <- Xlsxir.get_col(ref, "K"),
+         data <- validate_ppe_data(keys, values) do
+      data
     end
   end
 
   defp parse_data(ref, _name, general_data) do
     with raw_keys <- Xlsxir.get_col(ref, "D"),
          cy_value <- Xlsxir.get_col(ref, "B"),
-         true <- validate_against_key(cy_value, raw_keys),
          type <- Xlsxir.get_info(ref, :name),
-         keys <- ["Test" | raw_keys] do
+         keys <- equalize_keys(raw_keys, cy_value) do
       translate_data(keys, cy_value, type, general_data)
     end
   end
 
-  def validate_against_key(val, keys) when length(val) > length(keys), do: true
-  def validate_against_key(_, _), do: false
+  defp validate_ppe_data(keys, values) when length(keys) == length(values) do
+    filtered = [
+      "property, plant, and equipment",
+      "right of use assets",
+      "directly owned",
+      "assets under construction"
+    ]
+
+    Enum.zip(keys, values)
+    |> Enum.filter(fn
+      {nil, _v} -> false
+      {k, _v} -> Enum.member?(filtered, String.downcase(k))
+    end)
+    |> Enum.group_by(&elem(&1, 0))
+    |> Enum.reduce(%{}, fn {k, v}, acc ->
+      Enum.take(v, 2)
+      |> Enum.map(&elem(&1, 1))
+      |> then(&Map.put(acc, parameterize(k), &1))
+    end)
+  end
+
+  defp validate_ppe_data(_, _), do: %{}
 
   defp translate_data(keys, value, {"general_information", type}, _void) do
     translations = Munchkin.Engine.Jkse.Fundamental.Translation.get(type)
@@ -231,7 +279,7 @@ defmodule Munchkin.Engine.Jkse.Fundamental do
 
   defp rename_key(_translations, _), do: {nil, 0}
 
-  defp find_key(translations, key) do
+  defp find_key(translations, key) when not is_nil(translations) do
     Enum.find(translations, fn
       {_k, %{"value" => v}} ->
         String.downcase(v)
@@ -240,6 +288,11 @@ defmodule Munchkin.Engine.Jkse.Fundamental do
       {_k, v} ->
         v == key
     end)
+  end
+
+  defp find_key(_translations, key) do
+    :logger.warning("cannot find translations with key #{inspect(key)}")
+    nil
   end
 
   defp calculate_formulas(data, translations, base) do
@@ -282,8 +335,8 @@ defmodule Munchkin.Engine.Jkse.Fundamental do
 
   defp get_current_value(data, key, mul, default \\ nil) do
     case Map.get(data, key) do
-      nil -> default
-      num -> Kernel.*(num, mul)
+      num when is_number(num) -> Kernel.*(num, mul)
+      _ -> default
     end
   end
 
@@ -330,5 +383,11 @@ defmodule Munchkin.Engine.Jkse.Fundamental do
       _key, acc when not is_nil(acc) -> acc
       key, _acc -> Map.get(data, key)
     end)
+  end
+
+  defp parameterize(key) do
+    String.replace(key, " ", "_")
+    |> String.replace(~r/\W/, "")
+    |> String.downcase()
   end
 end

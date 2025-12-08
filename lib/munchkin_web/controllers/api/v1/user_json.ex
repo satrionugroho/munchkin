@@ -80,7 +80,8 @@ defmodule MunchkinWeb.API.V1.UserJSON do
       method: user.email_source,
       last_active: get_last_active(user.access_tokens),
       active_subscription:
-        MunchkinWeb.API.V1.SubscriptionJSON.subscription_data(last_subscription)
+        MunchkinWeb.API.V1.SubscriptionJSON.subscription_data(last_subscription),
+      limitations: limitation(last_subscription)
     }
     |> with_two_fa?(user, Keyword.get(opts, :two_factor_enabled?, true))
   end
@@ -111,5 +112,37 @@ defmodule MunchkinWeb.API.V1.UserJSON do
       nil -> nil
       data -> Map.get(data, :inserted_at)
     end
+  end
+
+  defp limitation(%Munchkin.Subscription.Plan{tier: 1}) do
+    %{
+      year: 5,
+      quarter: 10,
+      analize: 3
+    }
+  end
+
+  defp limitation(%Munchkin.Subscription.Plan{tier: 2}) do
+    %{
+      year: 3,
+      quarter: 6,
+      analize: 5
+    }
+  end
+
+  defp limitation(%Munchkin.Subscription.Plan{tier: 3}) do
+    %{
+      year: 5,
+      quarter: 8,
+      analize: 10
+    }
+  end
+
+  defp limitation(%Munchkin.Subscription.Plan{}) do
+    %{
+      year: 10,
+      quarter: 12,
+      analize: 100
+    }
   end
 end

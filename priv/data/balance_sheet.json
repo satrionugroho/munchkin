@@ -132,34 +132,43 @@
     "4220000:6220000:8220000:deferred_acquisition_costs",
     "factset:intang"
   ],
-  "other_non_current_assets": [
+  "deferred_tax_assets": [
+    "deferred_tax_assets",
+    "factset:dfd_tax_db"
+  ],
+  "long_term_investment": [
     "accounted_equity",
     "investment_ventures_associates",
-    "deferred_tax_assets",
     "investment_properties",
-    "1210000:non_current_customer_receivables",
-    "1210000:2210000:3210000:non_current_restricted_funds",
-    "1210000:2210000:3210000:non_current_guarantees",
-    "1210000:2210000:3210000:non_current_advances",
     "1210000:2210000:3210000:non_current_financial_assets",
+    "1210000:4220000:6220000:8220000:reinsurance_assets",
+    "1210000:2210000:3210000:non_current_tax_refund",
+    "1210000:2210000:3210000:non_current_tax_amnesty",
     "1210000:2210000:non_current_derivative_assets",
-    "1210000:2210000:non_current_prepaid_expenses",
+    "4220000:5220000:6220000:tax_amnesty_assets",
+    "6220000:retrocession_assets",
+    "1210000:2210000:3210000:4220000:5220000:post_employment_benefits",
+    "1210000:2210000:3210000:non_current_restricted_funds",
+    "factset:invest_adv"
+  ],
+  "long_term_receivables": [
+    "1210000:2210000:3210000:non_current_advances",
+    "1210000:non_current_customer_receivables",
+    "1210000:2210000:3210000:non_current_guarantees",
     "1210000:2210000:non_current_prepaid_taxes",
+    "1210000:2210000:non_current_prepaid_expenses",
+    "3210000:non_current_other_receivables",
+    "factset:notes_receiv_lt"
+  ],
+  "other_non_current_assets": [
     "1210000:2210000:3210000:total_non_current_assets",
     "1210000:non_current_inventories",
     "2210000:3210000:total_non_current_inventories",
-    "1210000:2210000:3210000:non_current_tax_refund",
-    "1210000:2210000:3210000:non_current_tax_amnesty",
     "1210000:2210000:3210000:other_non_current_assets",
-    "1210000:2210000:3210000:4220000:5220000:post_employment_benefits",
-    "1210000:4220000:6220000:8220000:reinsurance_assets",
     "1210000:4220000:8220000:foreclosed_assets",
-    "3210000:non_current_other_receivables",
     "4220000:8220000:other_financial_assets",
     "4220000:8220000:muradhabah_financing",
     "4220000:5220000:6220000:8220000:other_assets",
-    "4220000:5220000:6220000:tax_amnesty_assets",
-    "6220000:retrocession_assets",
     "factset:invest_oth"
   ],
   "total_assets": [
@@ -197,7 +206,6 @@
     "1210000:2210000:6220000:reinsurance_payables",
     "1210000:2210000:factoring_payables",
     "1210000:2210000:3210000:3210000:current_deferred_revenue",
-    "1210000:2210000:3210000:current_provisions",
     "1210000:2210000:3210000:current_contract_liabilities",
     "1210000:2210000:due_to_customers",
     "1210000:share_based_liabilities",
@@ -250,26 +258,27 @@
     "CALCULATED{total_liabilities,-other_long_term_debt,-long_term_debt}:4220000:5220000:6220000:8220000:",
     "factset:liabs_curr"
   ],
+  "provisions": [
+    "current_provisions",
+    "non_current_provisions",
+    "factset:prov_risk"
+  ],
   "long_term_debt": [
     "1210000:long_term_derivative_liabilities",
     "1210000:2210000:3210000:related_non_current_due",
     "1210000:2210000:3210000:stakeholders_non_current_due",
     "1210000:2210000:3210000:non_current_contract_liabilities",
     "1210000:2210000:3210000:long_term_liabilities",
-    "2210000:3210000:4220000:5220000:6220000:8220000:deferred_tax_liabilities",
     "2210000:non_current_maturities",
     "1210000:3210000:convertible_bonds",
     "1210000:2210000:3210000:non_current_tax_amnesty_liabilities",
     "1210000:2210000:3210000:non_current_unearned_revenue",
     "1210000:2210000:3210000:non_current_deposits",
     "1210000:2210000:non_current_advances_from_customers",
-    "1210000:2210000:3210000:non_current_deferred_revenue",
-    "1210000:2210000:3210000:non_current_provisions",
     "1210000:2210000:3210000:long_term_obligations",
     "2210000:3210000:long_term_maturities",
     "4220000:8220000:securities_issued",
     "4220000:securities_company_payables",
-    "4220000:5220000:6220000:8220000:contract_liabilities",
     "4220000:5220000:8220000:subordinated_loans",
     "5220000:subordinated_bonds",
     "5220000:6220000:bonds_payable",
@@ -277,6 +286,12 @@
     "5220000:medium_notes",
     "8220000:mudharabah_sukuk",
     "factset:debt_lt"
+  ],
+  "deferrred_tax_liabilities": [
+    "1210000:2210000:3210000:non_current_deferred_revenue",
+    "4220000:5220000:6220000:8220000:contract_liabilities",
+    "2210000:3210000:4220000:5220000:6220000:8220000:deferred_tax_liabilities",
+    "factset:-"
   ],
   "other_long_term_debt": [
     "1210000:4220000:6220000:8220000:insurance_contract_liabilities",
@@ -292,6 +307,8 @@
   ],
   "total_liabilities": [
     "total_liabilities",
+    "4220000:total_syirkah_funds",
+    "4220000:total_accoumulated_tabarru_funds",
     "factset:CALCULATED{total_current_liabilities,long_term_debt,other_long_term_debt}"
   ],
   "shareholders_equity_in_company": [

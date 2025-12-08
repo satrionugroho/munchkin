@@ -32,11 +32,11 @@ defmodule Munchkin.Repo.Migrations.CreateFundamentals do
       add :metadata, :map, default: %{}
     end
 
-    create unique_index(:fundamentals_idx, [:id], concurrently: true)
+    create unique_index(:fundamental_idx, [:id], concurrently: true)
   end
 
   def down do
-    drop table(:fundamentals_idx)
+    drop table(:fundamental_idx)
     drop table(:fundamentals)
   end
 end

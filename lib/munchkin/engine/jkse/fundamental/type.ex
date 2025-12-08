@@ -14,6 +14,7 @@ defmodule Munchkin.Engine.Jkse.Fundamental.Type do
   def balance_sheets, do: filter_keys("balance_sheet")
   def income_statements, do: filter_keys("income_statement")
   def cashflows, do: filter_keys("cashflow")
+  def ppe, do: filter_keys("ppe")
   def general_information, do: filter_keys("general_information")
 
   def periods do
@@ -38,10 +39,18 @@ defmodule Munchkin.Engine.Jkse.Fundamental.Type do
       "1311000" => "income_statement",
       "2311000" => "income_statement",
       "3311000" => "income_statement",
+      "4312000" => "income_statement",
       "4322000" => "income_statement",
       "5311000" => "income_statement",
       "6312000" => "income_statement",
       "8322000" => "income_statement",
+      "1611000" => "ppe",
+      "2611000" => "ppe",
+      "3611000" => "ppe",
+      "4611000" => "ppe",
+      "5611000" => "ppe",
+      "6611000" => "ppe",
+      "8611000" => "ppe",
       "1510000" => "cashflow",
       "2510000" => "cashflow",
       "3510000" => "cashflow",

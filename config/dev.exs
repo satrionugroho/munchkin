@@ -10,6 +10,12 @@ config :munchkin, MunchkinWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: String.to_integer(System.get_env("PORT") || "4000")],
+  https: [
+    port: 4001,
+    cipher_suite: :strong,
+    certfile: "/Users/satrionugroho/.office-addin-dev-certs/localhost.crt",
+    keyfile: "/Users/satrionugroho/.office-addin-dev-certs/localhost.key"
+  ],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
@@ -77,5 +83,4 @@ config :phoenix_live_view,
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 
-config :munchkin, Munchkin.Mailer,
-  adapter: Swoosh.Adapters.Local
+config :munchkin, Munchkin.Mailer, adapter: Swoosh.Adapters.Local

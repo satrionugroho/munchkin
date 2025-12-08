@@ -49,9 +49,15 @@ defmodule Munchkin.Engine.Jkse.Fundamental.Translation do
   defp get_data(_, _version, "factset:" <> _rest), do: 0
 
   defp get_data(_data, version, "CALCULATED" <> rest = key) do
-    case String.contains?(rest, version) do
-      true -> key
-      _ -> 0
+    case Regex.match?(~r/\d/, key) do
+      true ->
+        case String.contains?(rest, version) do
+          true -> key
+          _ -> 0
+        end
+
+      _ ->
+        key
     end
   end
 
@@ -85,6 +91,9 @@ defmodule Munchkin.Engine.Jkse.Fundamental.Translation do
       {key, val}, acc when is_list(val) ->
         value = Enum.map(val, &calculated_value(data, &1)) |> Enum.sum()
         Map.put(acc, key, value)
+
+      {key, nil}, acc ->
+        Map.put(acc, key, 0)
     end)
   end
 
@@ -92,22 +101,22 @@ defmodule Munchkin.Engine.Jkse.Fundamental.Translation do
     String.split(rest, "}")
     |> List.first()
     |> String.split(",")
-    |> Enum.reduce(0, fn key, acc ->
-      mul =
-        case String.contains?(key, "-") do
-          true -> -1
-          _ -> 1
-        end
-
-      case Map.get(data, key, 0) do
-        nil -> acc
-        val when is_number(val) -> acc + val * mul
-        val when is_bitstring(val) -> acc + calculated_value(data, val)
-      end
+    |> Enum.reduce(0, fn
+      "-" <> key, acc -> get_calculation_value(data, key, acc, -1)
+      key, acc -> get_calculation_value(data, key, acc, 1)
     end)
   end
 
   defp calculated_value(data, _key) do
     data
+  end
+
+  defp get_calculation_value(data, key, acc, mul) do
+    case Map.get(data, key, 0) do
+      nil -> acc
+      [_h | _k] = val -> acc + (Enum.map(val, &calculated_value(data, &1)) |> Enum.sum())
+      val when is_number(val) -> acc + val * mul
+      val when is_bitstring(val) -> acc + calculated_value(data, val)
+    end
   end
 end

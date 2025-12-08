@@ -56,7 +56,9 @@ defmodule Munchkin.Inventory do
   def create_asset(attrs) do
     Ecto.Multi.new()
     |> Ecto.Multi.run(:params, fn _repo, _ ->
-      {:ok, Munchkin.Utils.MapString.perform(attrs)}
+      Munchkin.Utils.MapString.perform(attrs)
+      |> Map.put_new("source_id", Munchkin.Engine.Jkse.id())
+      |> then(fn p -> {:ok, p} end)
     end)
     |> Ecto.Multi.run(:source, &Gate.get_data_from_given_params(&1, &2, "source", AssetSource))
     |> Ecto.Multi.insert(:asset, fn %{params: params} ->
@@ -80,7 +82,14 @@ defmodule Munchkin.Inventory do
   def add_trade_data(attrs) do
     Ecto.Multi.new()
     |> Ecto.Multi.run(:params, fn _repo, _ ->
-      {:ok, Munchkin.Utils.MapString.perform(attrs)}
+      Munchkin.Utils.MapString.perform(attrs)
+      |> then(fn p ->
+        ticker = Map.get(p, "ticker")
+
+        Map.put_new(p, "source_id", Munchkin.Engine.Jkse.id())
+        |> Map.put("asset_id", ticker)
+      end)
+      |> then(fn p -> {:ok, p} end)
     end)
     |> Ecto.Multi.run(:asset, &Gate.get_data_from_given_params(&1, &2, "asset", Asset))
     |> Ecto.Multi.run(:source, &Gate.get_data_from_given_params(&1, &2, "source", AssetSource))
@@ -108,36 +117,107 @@ defmodule Munchkin.Inventory do
   def get_asset_trade_history(ticker_or_id, opts \\ [])
 
   def get_asset_trade_history(ticker_and_exchange, opts) do
-    limit = Keyword.get(opts, :limit, 100)
+    limit = Keyword.get(opts, :limit, 1000)
     repo = Keyword.get(opts, :repo, Repo)
+    type_id = Keyword.get(opts, :type)
+    start_date = Keyword.get(opts, :start_date)
 
     try do
       id = String.to_integer(ticker_and_exchange)
 
       query =
-        from t in TradeHistory, where: t.asset_id == ^id, limit: ^limit, order_by: {:desc, :date}
+        case start_date do
+          nil ->
+            from t in TradeHistory,
+              where: t.asset_id == ^id,
+              limit: ^limit,
+              order_by: {:desc, :date}
+
+          date ->
+            from t in TradeHistory,
+              where: t.asset_id == ^id and t.date >= ^date,
+              order_by: {:desc, :date}
+        end
 
       repo.all(query)
     rescue
       ArgumentError ->
         [ticker, exchange] = split_ticker_and_exchange(ticker_and_exchange)
 
-        ticker_query =
+        base_query =
           from t in AssetTicker,
             where: t.exchange == ^exchange and t.ticker == ^ticker,
-            select: %{id: t.asset_id},
             limit: 1
 
+        ticker_query =
+          case type_id do
+            nil ->
+              from(b in base_query, select: %{id: b.asset_id})
+
+            id ->
+              from b in base_query,
+                join: a in Munchkin.Inventory.Asset,
+                on: a.id == b.asset_id,
+                where: a.type_id == ^id,
+                select: %{id: b.asset_id}
+          end
+
         query =
-          from(t in TradeHistory,
-            inner_lateral_join: a in subquery(ticker_query),
-            on: a.id == t.id,
-            limit: ^limit,
-            order_by: {:desc, :date},
-            select: [t]
-          )
+          case start_date do
+            nil ->
+              from(t in TradeHistory,
+                where: t.asset_id == subquery(ticker_query),
+                limit: ^limit,
+                order_by: {:desc, :date}
+              )
+
+            date ->
+              from t in TradeHistory,
+                where: t.asset_id == subquery(ticker_query) and t.date >= ^date,
+                order_by: {:desc, :date}
+          end
 
         repo.all(query)
+    end
+  end
+
+  def get_last_trade_history(ticker_or_id, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Repo)
+    type_id = Keyword.get(opts, :type)
+
+    try do
+      id = String.to_integer(ticker_or_id)
+      query = from t in TradeHistory, where: t.asset_id == ^id, limit: 1, order_by: {:desc, :date}
+      repo.one(query)
+    rescue
+      ArgumentError ->
+        [ticker, exchange] = split_ticker_and_exchange(ticker_or_id)
+
+        base_query =
+          from t in AssetTicker,
+            where: t.exchange == ^exchange and t.ticker == ^ticker,
+            limit: 1
+
+        ticker_query =
+          case type_id do
+            nil ->
+              from(b in base_query, select: %{id: b.asset_id})
+
+            id ->
+              from b in base_query,
+                join: a in Munchkin.Inventory.Asset,
+                on: a.id == b.asset_id,
+                where: a.type_id == ^id,
+                select: %{id: b.asset_id}
+          end
+
+        query =
+          from t in TradeHistory,
+            where: t.asset_id == subquery(ticker_query),
+            limit: 1,
+            order_by: {:desc, :date}
+
+        repo.one(query)
     end
   end
 
@@ -209,18 +289,30 @@ defmodule Munchkin.Inventory do
 
   def get_fundamental_by_period(ticker, period, opts \\ []) do
     repo = Keyword.get(opts, :repo, Repo)
-    ref_id = Keyword.get(opts, :ref_id, Munchkin.Engine.Jkse.id())
     [ticker, exchange] = split_ticker_and_exchange(ticker)
 
     query =
-      from(t in Fundamental,
-        inner_join: a in AssetTicker,
-        on: a.asset_id == t.asset_id,
-        where: a.exchange == ^exchange and a.ticker == ^ticker,
-        where: t.period == ^period and t.ref_id == ^ref_id,
-        preload: [:asset, :source],
-        limit: 1
-      )
+      case Keyword.get(opts, :ref_id) do
+        nil ->
+          from(t in Fundamental,
+            inner_join: a in AssetTicker,
+            on: a.asset_id == t.asset_id,
+            where: a.exchange == ^exchange and a.ticker == ^ticker,
+            where: t.period == ^period,
+            preload: [:source, [asset: :tickers]],
+            limit: 1
+          )
+
+        ref_id ->
+          from(t in Fundamental,
+            inner_join: a in AssetTicker,
+            on: a.asset_id == t.asset_id,
+            where: a.exchange == ^exchange and a.ticker == ^ticker,
+            where: t.period == ^period and t.ref_id == ^ref_id,
+            preload: [:source, [asset: :tickers]],
+            limit: 1
+          )
+      end
 
     repo.one(query)
   end
@@ -299,6 +391,12 @@ defmodule Munchkin.Inventory do
           |> then(fn k -> [k | acc] end)
         end)
         |> do_get_fundamental_detail(opts)
+        |> then(fn res ->
+          case period do
+            [_ | _] -> res
+            _ -> List.first(res)
+          end
+        end)
 
       data ->
         IO.inspect(data)
@@ -308,7 +406,14 @@ defmodule Munchkin.Inventory do
     end
   end
 
-  defp do_get_fundamental_detail(data, opts) do
+  def fundamental_data_standardization(%Fundamental{} = data) do
+    do_get_fundamental_detail(data, [])
+    |> List.first()
+  end
+
+  def fundamental_data_standardization(_), do: {:error, "please parse from fundamental schema"}
+
+  defp do_get_fundamental_detail(data, opts) when is_list(data) do
     repo = Keyword.get(opts, :repo, Repo)
 
     Enum.group_by(data, & &1.source.abbr)
@@ -319,6 +424,12 @@ defmodule Munchkin.Inventory do
       |> then(fn x -> [x | acc] end)
     end)
     |> :lists.flatten()
+  end
+
+  defp do_get_fundamental_detail(%Fundamental{} = data, opts) do
+    repo = Keyword.get(opts, :repo, Repo)
+    mod = AssetSource.detail(data.source)
+    get_representative_detail([data], mod, repo)
   end
 
   defp get_representative_detail([fun | _rest] = data, mod, repo) do
@@ -361,4 +472,118 @@ defmodule Munchkin.Inventory do
       end
     end)
   end
+
+  def beta_calculation(stock, index \\ "COMPOSITE", opts \\ []) do
+    shift_year = Keyword.get(opts, :period, 2) |> Kernel.*(-1)
+    start_date = Date.utc_today() |> Date.shift(year: shift_year)
+    mode = Keyword.get(opts, :mode, "log_return")
+
+    stock_data =
+      get_asset_trade_history(stock,
+        type_id: Munchkin.Inventory.AssetType.stock(),
+        start_date: start_date
+      )
+
+    index_data =
+      get_asset_trade_history(index,
+        type_id: Munchkin.Inventory.AssetType.index(),
+        start_date: start_date
+      )
+
+    stock_df =
+      Enum.map(stock_data, &Map.take(&1, [:close, :date])) |> Munchkin.Calculation.dataframe()
+
+    index_df =
+      Enum.map(index_data, &Map.take(&1, [:close, :date])) |> Munchkin.Calculation.dataframe()
+
+    Munchkin.Calculation.beta_calculation(stock_df, index_df, mode)
+  end
+
+  def dcf_parameter(stock, index, opts \\ []) do
+    risk_free_rate = Keyword.get(opts, :risk_free_rate, 0.04)
+    market_risk = Keyword.get(opts, :market_risk, 0.05)
+    cost_of_debt = Keyword.get(opts, :cost_of_debt, 0.05)
+    tax_rate = Keyword.get(opts, :corporate_tax_rate, 0.2)
+    type = Keyword.get(opts, :type, "fcf")
+    growth_rate = Keyword.get(opts, :growth_rate, 0.08)
+    terminal_growth_rate = Keyword.get(opts, :terminal_growth_rate, 0.025)
+    forecast_period = Keyword.get(opts, :forecast_period, 5)
+    beta = beta_calculation(stock, index)
+
+    cost_of_equity = risk_free_rate + (beta + market_risk)
+
+    today = Date.utc_today()
+
+    range =
+      Range.new(Date.shift(today, year: -1).year, today.year) |> Enum.map(fn y -> "#{y}FY" end)
+
+    latest_fundamental =
+      get_fundamental_by_periods(stock, range)
+      |> List.first()
+      |> do_get_fundamental_detail([])
+      |> List.first()
+
+    latest_balance_sheet = Map.get(latest_fundamental, :balance_sheet)
+    shareholders_equity = Map.get(latest_balance_sheet, :shareholders_equity_in_company)
+    total_liabilities = Map.get(latest_balance_sheet, :total_liabilities)
+
+    total_value = shareholders_equity + total_liabilities
+    weight_equity = shareholders_equity / total_value
+    weight_debt = total_liabilities / total_value
+    wacc = weight_equity * cost_of_equity + weight_debt * cost_of_debt * (1 - tax_rate)
+
+    cf_projections =
+      Range.new(1, forecast_period)
+      |> Enum.reduce([], fn year, acc ->
+        current_cf = calculate_current_cashflow(latest_fundamental, type, year, growth_rate)
+        present_value = current_cf / :math.pow(1 + wacc, year)
+
+        [%{year: year, fcf: current_cf, present_value: present_value} | acc]
+      end)
+      |> Enum.sort_by(&Map.get(&1, :year))
+      |> IO.inspect()
+
+    terminal_fcf =
+      List.last(cf_projections) |> Map.get(:fcf) |> Kernel.*(1 + terminal_growth_rate)
+
+    terminal_val = terminal_fcf / (wacc - terminal_growth_rate)
+    present_val_term = terminal_val / :math.pow(1 + wacc, forecast_period)
+    present_cf = Enum.sum_by(cf_projections, &Map.get(&1, :present_value))
+
+    net_debt =
+      latest_balance_sheet.short_term_debt + latest_balance_sheet.long_term_debt -
+        latest_balance_sheet.cash_equivalent
+
+    enterprise_val = present_cf + present_val_term
+    fair_val = enterprise_val - net_debt
+
+    %{
+      discount_rate: wacc,
+      enterprise_val: enterprise_val,
+      net_debt: net_debt,
+      fair_value: fair_val,
+      terminal_fcf: terminal_fcf,
+      terminal_val: terminal_val,
+      present_val_term: present_val_term,
+      present_cf: present_cf
+    }
+  end
+
+  defp calculate_current_cashflow(fundamental, "fcf", year, growth_rate) do
+    case Map.get(fundamental, :cashflow) do
+      nil -> 0
+      cf -> cf.net_cash_operating - cf.capex * -1
+    end
+    |> then(fn fcf ->
+      IO.inspect(fcf)
+
+      Range.new(1, year)
+      |> Enum.reduce(fcf, fn _, acc ->
+        acc = acc * (1 + growth_rate)
+        acc
+      end)
+    end)
+  end
+
+  defp calculate_current_cashflow(_, _, _, _), do: 0
 end
