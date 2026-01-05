@@ -45,4 +45,12 @@ defmodule MunchkinWeb.API.V1.CompanyController do
         )
     end
   end
+
+  def last_fundamental_year(conn, %{"ticker" => ticker} = opts) do
+    with period_type <- Map.get(opts, "period", "fy"),
+         data <- Munchkin.Inventory.last_available_fundamental_data(ticker, period_type),
+         market_capitals <- Munchkin.Inventory.market_capital(ticker) do
+      render(conn, :last_fundamental_year, data: data, market_capitals: market_capitals)
+    end
+  end
 end

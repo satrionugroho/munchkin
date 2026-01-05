@@ -23,6 +23,20 @@ defmodule MunchkinWeb.API.V1.CompanyJSON do
     }
   end
 
+  def render("last_fundamental_year.json", %{
+        data: %Munchkin.Inventory.Fundamental{} = data,
+        market_capitals: caps
+      }) do
+    %{
+      data: %{
+        year: data.period |> String.replace(~r/\D/, "") |> String.to_integer(),
+        market_capitals: caps
+      },
+      messages: [],
+      actions: "get last fundamental year"
+    }
+  end
+
   def render("error.json", %{messages: messages, actions: actions}) do
     %{
       data: nil,

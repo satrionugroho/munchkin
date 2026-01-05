@@ -1,11 +1,13 @@
 defmodule CompanyMigrator do
   def get_company_data(ticker) do
-    # Munchkin.Repo.transact(fn ->
-    #   get_company_info(ticker)
-    #   get_company_eod(ticker)
-    # end)
+    Munchkin.Repo.transact(fn ->
+      get_company_info(ticker)
+      get_company_eod(ticker)
+    end)
 
     get_company_statements(ticker)
+
+    :timer.sleep(500)
   end
 
   defp get_company_info(ticker) do

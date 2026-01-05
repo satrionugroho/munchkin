@@ -76,6 +76,7 @@ defmodule MunchkinWeb.Router do
       get "/company/:ticker", CompanyController, :show
       get "/data/eod/:ticker", CompanyController, :eod
       get "/data/last-trades/:ticker", CompanyController, :last_trade
+      get "/data/fundamentals/:ticker", CompanyController, :last_fundamental_year
     end
   end
 

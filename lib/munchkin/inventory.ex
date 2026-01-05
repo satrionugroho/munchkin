@@ -541,7 +541,6 @@ defmodule Munchkin.Inventory do
         [%{year: year, fcf: current_cf, present_value: present_value} | acc]
       end)
       |> Enum.sort_by(&Map.get(&1, :year))
-      |> IO.inspect()
 
     terminal_fcf =
       List.last(cf_projections) |> Map.get(:fcf) |> Kernel.*(1 + terminal_growth_rate)
@@ -586,4 +585,82 @@ defmodule Munchkin.Inventory do
   end
 
   defp calculate_current_cashflow(_, _, _, _), do: 0
+
+  def last_available_fundamental_data(ticker_or_id, type \\ "FY", opts \\ []) do
+    t = String.downcase(type)
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+    valid_type = Enum.find(fundamental_periods(), "fy", &Kernel.==(&1, t)) |> String.upcase()
+    period_clause = "%#{valid_type}"
+
+    try do
+      id = String.to_integer(ticker_or_id)
+
+      query =
+        from f in Fundamental,
+          where: f.asset_id == ^id and ilike(f.period, ^period_clause),
+          order_by: {:desc, f.period},
+          limit: 1
+
+      repo.one(query)
+    rescue
+      ArgumentError ->
+        [ticker, exchange] = split_ticker_and_exchange(ticker_or_id)
+
+        base_query =
+          from t in AssetTicker,
+            select: [:asset_id],
+            where: t.exchange == ^exchange and t.ticker == ^ticker,
+            limit: 1
+
+        query =
+          from f in Fundamental,
+            where: f.asset_id == subquery(base_query) and ilike(f.period, ^period_clause),
+            order_by: {:desc, f.period},
+            limit: 1
+
+        repo.one(query)
+    end
+  end
+
+  def market_capital(ticker_or_id, opts \\ []) do
+    type_id = Keyword.get(opts, :type)
+    [ticker, exchange] = split_ticker_and_exchange(ticker_or_id)
+
+    base_query =
+      from t in AssetTicker,
+        where: t.exchange == ^exchange and t.ticker == ^ticker,
+        limit: 1
+
+    ticker_query =
+      case type_id do
+        nil ->
+          from(b in base_query, select: %{id: b.asset_id})
+
+        id ->
+          from b in base_query,
+            join: a in Munchkin.Inventory.Asset,
+            on: a.id == b.asset_id,
+            where: a.type_id == ^id,
+            select: %{id: b.asset_id}
+      end
+
+    query =
+      from(t in TradeHistory,
+        group_by: fragment("DATE_PART(?, ?)", "month", t.date),
+        group_by: [t.date, t.close, t.shares],
+        where:
+          t.asset_id == subquery(ticker_query) and
+            fragment("DATE_PART(?, ?) = ?", "month", t.date, 12),
+        having: fragment("DATE_PART(?, ?)", "day", t.date) > 26,
+        order_by: {:asc, :date},
+        select: {t.close, t.shares, t.date}
+      )
+
+    Repo.all(query)
+    |> Enum.group_by(&elem(&1, 2).year)
+    |> Enum.reduce(%{}, fn {k, v}, acc ->
+      {price, shares, _} = List.last(v)
+      Map.put(acc, k, Decimal.mult(price, shares) |> Decimal.to_float())
+    end)
+  end
 end
