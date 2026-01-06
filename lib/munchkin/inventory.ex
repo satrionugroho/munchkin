@@ -660,7 +660,12 @@ defmodule Munchkin.Inventory do
     |> Enum.group_by(&elem(&1, 2).year)
     |> Enum.reduce(%{}, fn {k, v}, acc ->
       {price, shares, _} = List.last(v)
-      Map.put(acc, k, Decimal.mult(price, shares) |> Decimal.to_float())
+
+      Map.put(acc, k, %{
+        price: Decimal.to_integer(price),
+        shares: Decimal.to_integer(shares),
+        market_capital: Decimal.mult(price, shares) |> Decimal.to_float()
+      })
     end)
   end
 end
