@@ -47,4 +47,34 @@ defmodule MunchkinWeb.API.V1.AnalyzeController do
   defp get_year_range(2), do: Range.new(0, 3)
   defp get_year_range(3), do: Range.new(0, 5)
   defp get_year_range(_), do: Range.new(0, 10)
+
+  def marked(conn, params) do
+    with user <- get_current_user(conn),
+         {:ok, summary} <- Munchkin.Inventory.analize(user, params) do
+      render(conn, :marked, data: summary.id)
+    end
+  end
+
+  def summary(conn, params) do
+    with user <- get_current_user(conn),
+         analize <- Munchkin.Inventory.create_summary(params) do
+      render(conn, :marked, data: Ecto.UUID.generate())
+    end
+  end
+
+  def get_analizer_result(conn, %{"id" => id}) do
+    with user <- get_current_user(conn),
+         result <- Munchkin.Inventory.get_analize_result(id),
+         true <- result.user_id === user.id do
+      render(conn, :analize, data: result)
+    end
+  end
+
+  def get_summary_result(conn, %{"id" => raw}) do
+    with user <- get_current_user(conn),
+         {:ok, id} <- Base.decode64(raw),
+         result <- Munchkin.Inventory.get_summary(id) do
+      render(conn, :summary, data: result)
+    end
+  end
 end

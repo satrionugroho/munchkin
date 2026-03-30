@@ -143,7 +143,7 @@ defmodule Munchkin.Accounts do
     end
   end
 
-  defp decode_user_token(token) do
+  def decode_user_token(token) do
     with {:ok, decoded_token} <- Base.url_decode64(token),
          <<head::binary-size(4)>> <> valid_token <- decoded_token,
          list_head <- :binary.bin_to_list(head),
@@ -517,12 +517,25 @@ defmodule Munchkin.Accounts do
     |> Enum.find(&Kernel.is_nil(&1.used_at))
     |> case do
       %UserToken{} = token ->
-        token
+        case NaiveDateTime.compare(NaiveDateTime.utc_now(), token.valid_until) do
+          :gt ->
+            attrs = %{
+              user: user,
+              valid_until: DateTime.utc_now(:second) |> DateTime.shift(day: 14),
+              type: UserToken.refresh_token_type()
+            }
+
+            {:ok, tok} = create_user_token(attrs)
+            tok
+
+          _ ->
+            token
+        end
 
       _ ->
         attrs = %{
           user: user,
-          valid_until: DateTime.utc_now(:second) |> DateTime.shift(day: 7),
+          valid_until: DateTime.utc_now(:second) |> DateTime.shift(day: 14),
           type: UserToken.refresh_token_type()
         }
 

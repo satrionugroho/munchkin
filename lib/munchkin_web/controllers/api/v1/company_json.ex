@@ -23,6 +23,14 @@ defmodule MunchkinWeb.API.V1.CompanyJSON do
     }
   end
 
+  def render("ok_route.json", _) do
+    %{
+      data: :ok,
+      messages: [],
+      actions: "leftover"
+    }
+  end
+
   def render("last_fundamental_year.json", %{
         data: %Munchkin.Inventory.Fundamental{} = data,
         market_capitals: caps
@@ -62,7 +70,7 @@ defmodule MunchkinWeb.API.V1.CompanyJSON do
   defp trade_history(trade) do
     Map.from_struct(trade)
     |> Enum.reduce(%{}, fn
-      {key, val}, acc when key in [:open, :high, :low, :close] ->
+      {key, val}, acc when key in [:open, :high, :low, :close, :volume] ->
         Map.put(acc, key, Decimal.to_float(val))
 
       {:shares, val}, acc ->

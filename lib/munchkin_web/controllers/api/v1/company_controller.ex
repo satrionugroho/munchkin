@@ -46,11 +46,30 @@ defmodule MunchkinWeb.API.V1.CompanyController do
     end
   end
 
+  def index(conn, %{"ticker" => ticker}) do
+    with %Munchkin.Inventory.Asset{} = asset <- Munchkin.Inventory.get_index(ticker),
+         [_ | _] = trades <- Munchkin.Inventory.get_asset_trade_history(asset.id) do
+      render(conn, :eod, trades: trades)
+    else
+      _ ->
+        render(conn, :not_found,
+          messages: [
+            gettext("cannot get trade history with ticker=%{ticker}", ticker: inspect(ticker))
+          ],
+          actions: "get trade history"
+        )
+    end
+  end
+
   def last_fundamental_year(conn, %{"ticker" => ticker} = opts) do
     with period_type <- Map.get(opts, "period", "fy"),
          data <- Munchkin.Inventory.last_available_fundamental_data(ticker, period_type),
          market_capitals <- Munchkin.Inventory.market_capital(ticker) do
       render(conn, :last_fundamental_year, data: data, market_capitals: market_capitals)
     end
+  end
+
+  def ok_route(conn, _) do
+    render(conn, :ok_route)
   end
 end

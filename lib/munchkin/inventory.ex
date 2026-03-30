@@ -1,4 +1,5 @@
 defmodule Munchkin.Inventory do
+  alias Munchkin.Inventory.Analize
   alias Munchkin.Repo
   alias Munchkin.Inventory.Fundamental
   alias Munchkin.Inventory.Fundamental.Gate
@@ -7,6 +8,7 @@ defmodule Munchkin.Inventory do
     Asset,
     AssetTicker,
     AssetSource,
+    Summary,
     TradeHistory
   }
 
@@ -48,6 +50,34 @@ defmodule Munchkin.Inventory do
 
         query =
           from a in Asset, where: a.id == subquery(ticker_query), preload: [:tickers], limit: 1
+
+        repo.one(query)
+    end
+  end
+
+  def get_index(ticker_or_id, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    try do
+      id = String.to_integer(ticker_or_id)
+
+      query =
+        from a in Asset, where: a.id == ^id and a.type_id == :index, preload: [:tickers], limit: 1
+
+      repo.one(query)
+    rescue
+      ArgumentError ->
+        ticker_query =
+          from t in AssetTicker,
+            where: t.ticker == ^ticker_or_id,
+            select: %{id: t.asset_id},
+            limit: 1
+
+        query =
+          from a in Asset,
+            where: a.id == subquery(ticker_query) and a.type_id == :index,
+            preload: [:tickers],
+            limit: 1
 
         repo.one(query)
     end
@@ -121,6 +151,8 @@ defmodule Munchkin.Inventory do
     repo = Keyword.get(opts, :repo, Repo)
     type_id = Keyword.get(opts, :type)
     start_date = Keyword.get(opts, :start_date)
+    default_fields = TradeHistory.__schema__(:fields)
+    fields = Keyword.get(opts, :fields, default_fields)
 
     try do
       id = String.to_integer(ticker_and_exchange)
@@ -139,7 +171,16 @@ defmodule Munchkin.Inventory do
               order_by: {:desc, :date}
         end
 
-      repo.all(query)
+      case Keyword.get(opts, :output) do
+        :sql ->
+          repo.to_sql(:all, from(q in query, select: ^fields))
+
+        :map ->
+          repo.all(from(q in query, select: map(q, ^fields)))
+
+        _ ->
+          repo.all(from(q in query, select: ^fields))
+      end
     rescue
       ArgumentError ->
         [ticker, exchange] = split_ticker_and_exchange(ticker_and_exchange)
@@ -177,7 +218,16 @@ defmodule Munchkin.Inventory do
                 order_by: {:desc, :date}
           end
 
-        repo.all(query)
+        case Keyword.get(opts, :output) do
+          :sql ->
+            repo.to_sql(:all, from(q in query, select: ^fields))
+
+          :map ->
+            repo.all(from(q in query, select: map(q, ^fields)))
+
+          _ ->
+            repo.all(from(q in query, select: ^fields))
+        end
     end
   end
 
@@ -667,5 +717,88 @@ defmodule Munchkin.Inventory do
         market_capital: Decimal.mult(price, shares) |> Decimal.to_float()
       })
     end)
+  end
+
+  def analize(user, params) do
+    %Analize{}
+    |> Analize.changeset(%{user: user, analizers: params})
+    |> Repo.insert()
+  end
+
+  def get_analize_result(id, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Repo)
+    query = from s in Analize, where: s.id == ^id, limit: 1
+    repo.one(query)
+  end
+
+  def create_summary(opts \\ %{}) do
+    with id when not is_nil(id) <- Map.get(opts, "key"),
+         sanitized_params <- Map.drop(opts, ["key"]),
+         analizer when not is_nil(analizer) <- get_analize_result(id),
+         params <- compose_summary_params(analizer, sanitized_params),
+         nil <- get_summary_from_params(analizer, params),
+         summary <- do_create_summary(analizer, params) do
+      {:ok, summary}
+    else
+      [%Summary{} = summary, %Analize{} = analizer] ->
+        case tied_analizer_to_summary(analizer, summary) do
+          {:ok, _} -> {:ok, summary}
+          err -> err
+        end
+
+      err ->
+        IO.inspect(err)
+        err
+    end
+  end
+
+  defp compose_summary_params(%Analize{} = analizer, params) do
+    %{
+      spec: params,
+      analizer: analizer.analizers
+    }
+  end
+
+  defp get_summary_from_params(analize, params) do
+    params
+    |> Jason.encode!()
+    |> then(&:crypto.hash(:sha256, &1))
+    |> get_summary()
+    |> then(&[&1, analize])
+  end
+
+  defp do_create_summary(%Analize{} = analizer, params) do
+    Repo.transact(fn ->
+      %Summary{}
+      |> Summary.changeset(%{params: params})
+      |> Repo.insert()
+      |> case do
+        {:ok, struct} ->
+          case tied_analizer_to_summary(analizer, struct) do
+            {:ok, _} -> {:ok, struct}
+            err -> err
+          end
+
+        _ ->
+          :ok
+      end
+    end)
+  end
+
+  defp tied_analizer_to_summary(analizer, summary) do
+    Ecto.Changeset.change(analizer, summary_id: summary.hex)
+    |> Repo.update()
+  end
+
+  def get_summary(id, opts \\ [])
+
+  def get_summary(id, opts) when is_binary(id) do
+    repo = Keyword.get(opts, :repo, Repo)
+    query = from s in Summary, where: s.hex == ^id, limit: 1
+    repo.one(query)
+  end
+
+  def get_summary(id, _result) do
+    {:error, "cannot get summary with specification #{inspect(id)}"}
   end
 end

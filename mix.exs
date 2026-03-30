@@ -79,7 +79,11 @@ defmodule Munchkin.MixProject do
       {:pythonx, "~> 0.4.0"},
       {:xlsxir, "~> 1.6.4"},
       {:nimble_csv, "~> 1.3.0"},
-      {:explorer, "~> 0.11.1"}
+      {:explorer, "~> 0.11.1"},
+      {:langchain, "~> 0.5.2"},
+      {:nx, "~> 0.9"},
+      {:scholar, "~> 0.4.1"},
+      {:exla, ">= 0.11.0"}
     ]
   end
 

@@ -88,6 +88,20 @@ config :munchkin, Munchkin.Engine.Factset,
 
 config :munchkin, Munchkin.Integrations.Payment, engine: Munchkin.ThirdParty.XenditMock
 
+config :pythonx, :uv_init,
+  pyproject_toml: """
+  [project]
+  name = "munchkin"
+  version = "0.0.0"
+  requires-python = "==3.12.*"
+  dependencies = [
+    "numpy>=2.3",
+    "scipy>=1.15.3"
+  ]
+  """
+
+config :nx, :default_backend, EXLA.Backend
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

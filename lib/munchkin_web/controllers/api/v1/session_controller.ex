@@ -21,7 +21,10 @@ defmodule MunchkinWeb.API.V1.SessionController do
         put_status(conn, 403)
         |> render(:error, messages: [message])
 
-      _ ->
+      err ->
+        IO.inspect(raw)
+        IO.inspect(err)
+
         put_status(conn, 403)
         |> render(:error, messages: [gettext("An error occured when requesting the new token")])
     end

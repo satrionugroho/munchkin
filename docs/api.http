@@ -1,6 +1,6 @@
 @BASE_URL = http://localhost:4000/api/v1
 @ticker = BBCA-JK
-@user_email = exceluser@gmail.com
+@user_email = satrio.nu27@gmail.com
 @user_password = satrio1234S
 
 # // @user_password = KudaMakanKalengKacang
@@ -100,6 +100,13 @@ Content-Type: application/json
 ### Get EOD data
 
 GET {{BASE_URL}}/data/eod/{{ticker}} HTTP/1.1
+Authorization: Bearer {{CREATE_SESSION.response.body.$.data.tokens.access}}
+Content-Type: application/json
+
+
+### Get Index data
+
+GET {{BASE_URL}}/data/eod/COMPOSITE HTTP/1.1
 Authorization: Bearer {{CREATE_SESSION.response.body.$.data.tokens.access}}
 Content-Type: application/json
 

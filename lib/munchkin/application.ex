@@ -19,7 +19,8 @@ defmodule Munchkin.Application do
       Munchkin.DelayedJob,
       Munchkin.Cache,
       Munchkin.Engine,
-      Munchkin.Downloader
+      Munchkin.Downloader,
+      Munchkin.Langchain.Engine
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

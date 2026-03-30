@@ -72,9 +72,17 @@ defmodule MunchkinWeb.Router do
       resources "/accounts", UserController, only: [:index, :create]
       get "/accounts/two_factors", UserController, :two_factors
 
+      post "/analyze/:ticker/marked", AnalyzeController, :marked
+      post "/analyze/summary", AnalyzeController, :summary
+
+      get "/analyze/result/:id", AnalyzeController, :get_analizer_result
+      get "/analyze/summary/:id", AnalyzeController, :get_summary_result
+
       get "/analyze/:ticker/:analyzer", AnalyzeController, :index
       get "/company/:ticker", CompanyController, :show
+      get "/data/eod/", CompanyController, :ok_route
       get "/data/eod/:ticker", CompanyController, :eod
+      get "/data/index/:ticker", CompanyController, :index
       get "/data/last-trades/:ticker", CompanyController, :last_trade
       get "/data/fundamentals/:ticker", CompanyController, :last_fundamental_year
     end
