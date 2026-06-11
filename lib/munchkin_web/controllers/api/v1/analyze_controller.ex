@@ -56,8 +56,8 @@ defmodule MunchkinWeb.API.V1.AnalyzeController do
   end
 
   def summary(conn, params) do
-    with user <- get_current_user(conn),
-         analize <- Munchkin.Inventory.create_summary(params) do
+    with _user <- get_current_user(conn),
+         _analize <- Munchkin.Inventory.create_summary(params) do
       render(conn, :marked, data: Ecto.UUID.generate())
     end
   end
@@ -71,7 +71,7 @@ defmodule MunchkinWeb.API.V1.AnalyzeController do
   end
 
   def get_summary_result(conn, %{"id" => raw}) do
-    with user <- get_current_user(conn),
+    with _user <- get_current_user(conn),
          {:ok, id} <- Base.decode64(raw),
          result <- Munchkin.Inventory.get_summary(id) do
       render(conn, :summary, data: result)

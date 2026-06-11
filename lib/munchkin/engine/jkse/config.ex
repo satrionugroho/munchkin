@@ -82,7 +82,7 @@ defmodule Munchkin.Engine.Jkse.Config do
   defp params do
     %{
       stock_summary: [["date", "drop"], ["start", 0], ["length", 9999]],
-      company_profile: ["KodeEmiten", ["language", "en-us"]],
+      company_profile: ["KodeEmiten", ["language", "id-id"]],
       corporate_action: [
         ["kodeEmiten", "drop"],
         ["start", 0],

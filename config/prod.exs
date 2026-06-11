@@ -14,7 +14,19 @@ config :swoosh, api_client: Swoosh.ApiClient.Req
 config :swoosh, local: false
 
 # Do not print debug messages in production
-config :logger, level: :info
+config :logger, level: :debug
+
+config :munchkin, Munchkin.Repo,
+  database: "munchkin_prod",
+  stacktrace: false
+
+config :munchkin, Munchkin.Engine.Jkse,
+  database_id: "95cc770e-1864-430c-bdcd-bbc71c20c804",
+  instance: {Munchkin.Inventory, :get_source}
+
+config :munchkin, Munchkin.Engine.Factset,
+  database_id: "738eb45b-ae86-47f4-9916-b4d775e4a5b9",
+  instance: {Munchkin.Inventory, :get_source}
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.

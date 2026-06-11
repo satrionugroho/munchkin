@@ -102,6 +102,12 @@ config :pythonx, :uv_init,
 
 config :nx, :default_backend, EXLA.Backend
 
+config :munchkin, Munchkin.Scheduller,
+  jobs: [
+    {"5 10 * * *", {Munchkin.Downloader.Company, :today, []}},
+    {"5 10 * * *", {Munchkin.Downloader.Index, :today, []}}
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

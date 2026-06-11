@@ -31,7 +31,7 @@ defmodule Munchkin.Langchain.Advanced do
   end
 
   defp technical_message_details(msg, ticker) do
-    ticker
+    IO.inspect(ticker)
     msg
   end
 end

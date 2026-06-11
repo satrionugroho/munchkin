@@ -78,7 +78,12 @@ defmodule Munchkin.Engine.Jkse.Stock do
         "ForeignBuy",
         "ForeignSell",
         "Value",
-        "TradebleShares"
+        "TradebleShares",
+        "Bid",
+        "BidVolume",
+        "Offer",
+        "OfferVolume",
+        "Frequency"
       ])
       |> Enum.map(fn {key, value} -> {translate_key(key), parse_value(key, value)} end)
       |> then(fn d -> [{"ticker", Map.get(data, "StockCode")} | d] end)
@@ -100,9 +105,19 @@ defmodule Munchkin.Engine.Jkse.Stock do
     end
   end
 
+  defp parse_value(_key, numeric_data) when is_integer(numeric_data) do
+    Decimal.new(numeric_data)
+  end
+
   defp parse_value(_key, numeric_data) do
-    Float.to_string(numeric_data)
-    |> Decimal.new()
+    case Float.round(numeric_data) == numeric_data do
+      true ->
+        Decimal.new(trunc(numeric_data))
+
+      _ ->
+        Float.to_string(numeric_data)
+        |> Decimal.new()
+    end
   end
 
   defp get_date({:ok, %{"data" => stocks}} = result) do
@@ -126,6 +141,9 @@ defmodule Munchkin.Engine.Jkse.Stock do
   defp translate_key("ForeignBuy"), do: "foreign_buy"
   defp translate_key("ForeignSell"), do: "foreign_sell"
   defp translate_key("TradebleShares"), do: "shares"
+  defp translate_key("BidVolume"), do: "bid_volume"
+  defp translate_key("Offer"), do: "ask"
+  defp translate_key("OfferVolume"), do: "ask_volume"
   defp translate_key(key), do: String.downcase(key)
 
   defp parse_suspension_data({:ok, %{"contentBody" => body}}) do

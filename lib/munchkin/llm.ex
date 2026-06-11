@@ -1,5 +1,4 @@
 defmodule Munchkin.LLM do
-  alias LangChain.Message
   alias LangChain.Chains.LLMChain
 
   def simple(params, opts \\ []) do

@@ -30,14 +30,22 @@ defmodule Munchkin.Inventory do
     repo.get(AssetSource, id)
   end
 
-  def get_asset(raw_id_or_ticker, opts \\ []) do
+  def get_asset(id, opts \\ [])
+
+  def get_asset(id, opts) when is_number(id) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    query = from a in Asset, where: a.id == ^id, preload: [:tickers], limit: 1
+
+    repo.one(query)
+  end
+
+  def get_asset(raw_id_or_ticker, opts) do
     repo = Keyword.get(opts, :repo, Munchkin.Repo)
 
     try do
       id = String.to_integer(raw_id_or_ticker)
-      query = from a in Asset, where: a.id == ^id, preload: [:tickers], limit: 1
-
-      repo.one(query)
+      get_asset(id, repo: repo)
     rescue
       ArgumentError ->
         [ticker, exchange] = split_ticker_and_exchange(raw_id_or_ticker)
@@ -83,7 +91,9 @@ defmodule Munchkin.Inventory do
     end
   end
 
-  def create_asset(attrs) do
+  def create_asset(attrs, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
     Ecto.Multi.new()
     |> Ecto.Multi.run(:params, fn _repo, _ ->
       Munchkin.Utils.MapString.perform(attrs)
@@ -106,7 +116,7 @@ defmodule Munchkin.Inventory do
         exchange: Map.get(params, "exchange")
       })
     end)
-    |> Repo.transact()
+    |> repo.transact()
   end
 
   def add_trade_data(attrs) do
@@ -624,8 +634,6 @@ defmodule Munchkin.Inventory do
       cf -> cf.net_cash_operating - cf.capex * -1
     end
     |> then(fn fcf ->
-      IO.inspect(fcf)
-
       Range.new(1, year)
       |> Enum.reduce(fcf, fn _, acc ->
         acc = acc * (1 + growth_rate)
@@ -747,7 +755,6 @@ defmodule Munchkin.Inventory do
         end
 
       err ->
-        IO.inspect(err)
         err
     end
   end
@@ -800,5 +807,113 @@ defmodule Munchkin.Inventory do
 
   def get_summary(id, _result) do
     {:error, "cannot get summary with specification #{inspect(id)}"}
+  end
+
+  def get_all_tickers() do
+    Repo.all(AssetTicker)
+  end
+
+  def insert_daily_asset_data(data, date, opts \\ [])
+  def insert_daily_asset_data([], _date, _opts), do: {:error, "cannot insert empty data"}
+
+  def insert_daily_asset_data(data, date, opts) when is_bitstring(date) do
+    case Date.from_iso8601(date) do
+      {:ok, d} -> insert_daily_asset_data(data, d, opts)
+      _ -> {:error, "cannot parse date"}
+    end
+  end
+
+  def insert_daily_asset_data([_ | _] = data, %Date{} = date, opts) do
+    type = Keyword.get(opts, :type, "stock")
+
+    assets =
+      Repo.all(
+        from t in AssetTicker,
+          join: a in Asset,
+          on: t.asset_id == a.id,
+          select: {t.asset_id, t.ticker},
+          where: t.exchange == "JK" and a.type_id == ^type
+      )
+
+    stabilize_assets(assets, data, type)
+    |> do_perform_daily_asset_data(data, date)
+  end
+
+  defp stabilize_assets(current_assets, data, type) do
+    tickers = Enum.map(data, &Map.get(&1, "ticker"))
+    avail_tickers = Enum.map(current_assets, &elem(&1, 1))
+
+    Enum.reduce(tickers, current_assets, fn ticker, acc ->
+      case Enum.member?(avail_tickers, ticker) do
+        false -> [should_create_asset(ticker, type) | acc]
+        _ -> acc
+      end
+    end)
+    |> Enum.reject(&is_nil/1)
+  end
+
+  defp stabilize_assets_params(ticker, "index") do
+    %{"name" => ticker}
+  end
+
+  defp stabilize_assets_params(ticker, _type) do
+    Munchkin.Engine.Jkse.Company.profile(ticker)
+  end
+
+  defp should_create_asset(ticker, type) do
+    stabilize_assets_params(ticker, type)
+    |> Map.put("ticker", ticker)
+    |> Map.put("type_id", type)
+    |> Map.put("exchange", "JK")
+    |> create_asset()
+    |> case do
+      {:ok, %{ticker: ticker}} -> {ticker.asset_id, ticker.ticker}
+      _ -> nil
+    end
+  end
+
+  defp daily_asset_data_asset_finder(assets, ticker) do
+    Enum.find(assets, fn {_id, t} -> ticker == t end)
+    |> case do
+      {id, _} -> id
+      _ -> nil
+    end
+  end
+
+  defp get_frequency(f) do
+    try do
+      Decimal.to_integer(f)
+    rescue
+      FunctionClauseError ->
+        nil
+    end
+  end
+
+  defp do_perform_daily_asset_data(assets, data, date) do
+    Enum.map(data, fn %{"ticker" => ticker} = d ->
+      %{
+        open: Map.get(d, "open"),
+        high: Map.get(d, "high"),
+        low: Map.get(d, "low"),
+        close: Map.get(d, "close"),
+        volume: Map.get(d, "volume"),
+        shares: Map.get(d, "shares"),
+        ask: Map.get(d, "ask"),
+        ask_volume: Map.get(d, "ask_volume"),
+        bid: Map.get(d, "bid"),
+        bid_volume: Map.get(d, "bid_volume"),
+        frequency: Map.get(d, "frequency") |> get_frequency(),
+        ref_id: Munchkin.Engine.Jkse.id(),
+        date: date,
+        asset_id: daily_asset_data_asset_finder(assets, ticker)
+      }
+    end)
+    |> Enum.reject(fn %{asset_id: a} -> is_nil(a) end)
+    |> then(
+      &Repo.insert_all(TradeHistory, &1,
+        conflict_target: [:date, :asset_id, :ref_id],
+        on_conflict: :replace_all
+      )
+    )
   end
 end

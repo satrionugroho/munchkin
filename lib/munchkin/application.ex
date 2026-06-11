@@ -16,6 +16,7 @@ defmodule Munchkin.Application do
       # {Munchkin.Worker, arg},
       # Start to serve requests, typically the last entry
       MunchkinWeb.Endpoint,
+      Munchkin.Scheduler,
       Munchkin.DelayedJob,
       Munchkin.Cache,
       Munchkin.Engine,

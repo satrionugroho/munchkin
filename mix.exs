@@ -83,7 +83,9 @@ defmodule Munchkin.MixProject do
       {:langchain, "~> 0.5.2"},
       {:nx, "~> 0.9"},
       {:scholar, "~> 0.4.1"},
-      {:exla, ">= 0.11.0"}
+      {:exla, ">= 0.11.0"},
+      {:tzdata, "~> 1.1"},
+      {:quantum, "~> 3.0"}
     ]
   end
 
