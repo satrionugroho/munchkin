@@ -84,8 +84,11 @@ defmodule Munchkin.MixProject do
       {:nx, "~> 0.9"},
       {:scholar, "~> 0.4.1"},
       {:exla, ">= 0.11.0"},
+      {:plotly_ex, "~> 0.1"},
       {:tzdata, "~> 1.1"},
-      {:quantum, "~> 3.0"}
+      {:quantum, "~> 3.0"},
+      {:ex_cldr, "~> 2.47"},
+      {:ex_cldr_numbers, "~> 2.38"}
     ]
   end
 

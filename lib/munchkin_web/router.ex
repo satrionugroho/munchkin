@@ -17,7 +17,17 @@ defmodule MunchkinWeb.Router do
     plug :put_root_layout, html: {MunchkinWeb.Layouts, :admin}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug MunchkinWeb.FetchCurrentUser, type: :cookies
+    plug MunchkinWeb.FetchCurrentUser, type: :cookies, user: :admin
+  end
+
+  pipeline :authenticated_user do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, html: {MunchkinWeb.Layouts, :user}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+    plug MunchkinWeb.FetchCurrentUser, type: :cookies, user: :normal
   end
 
   pipeline :api do
@@ -37,7 +47,28 @@ defmodule MunchkinWeb.Router do
     get "/accounts/verification", EmailVerificationController, :index
   end
 
-  scope "/", MunchkinWeb do
+  scope "/app", MunchkinWeb.EndUser do
+    pipe_through :browser
+
+    resources "/signin", SessionController, only: [:index, :create, :delete]
+    resources "/registrations", RegistrationController, [:index, :create]
+  end
+
+  scope "/", MunchkinWeb.EndUser do
+    pipe_through :authenticated_user
+
+    get "/", HomeController, :index
+    resources "/analyze", AnalyzeController, only: [:index, :show]
+    resources "/portfolio", PortfolioController, only: [:index, :show]
+
+    live "/transactions", TransactionLive
+    get "/transactions/search-ticker", TransactionController, :search
+    resources "/transactions", TransactionController, only: [:show]
+
+    # live "/analyze/:ticker", AnalyzeLive
+  end
+
+  scope "/admin", MunchkinWeb do
     pipe_through :admin_browser
 
     get "/", PageController, :home

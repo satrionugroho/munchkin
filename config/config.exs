@@ -78,14 +78,6 @@ config :munchkin, MunchkinWeb.Mailers,
 
 config :munchkin, Munchkin, name: "app"
 
-config :munchkin, Munchkin.Engine.Jkse,
-  database_id: "b1a29f58-1c62-46fd-a9d0-6c88be622fa0",
-  instance: {Munchkin.Inventory, :get_source}
-
-config :munchkin, Munchkin.Engine.Factset,
-  database_id: "6fb321df-70e3-4dfe-be59-f42b1319ec96",
-  instance: {Munchkin.Inventory, :get_source}
-
 config :munchkin, Munchkin.Integrations.Payment, engine: Munchkin.ThirdParty.XenditMock
 
 config :pythonx, :uv_init,

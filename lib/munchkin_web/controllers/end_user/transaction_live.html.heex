@@ -1,0 +1,249 @@
+<Layouts.flash_group flash={@flash} />
+
+<div class="w-full">
+  <Layouts.plain_modal
+    id="sell_transaction_modal"
+    title={gettext("Wanna sell an existing asset?")}
+  >
+    <.live_component
+      module={MunchkinWeb.SellTransactionComponent}
+      current_user={@current_user}
+      id="sell_transaction_component"
+    />
+  </Layouts.plain_modal>
+
+  <Layouts.plain_modal id="buy_transaction_modal" title={gettext("Get a new asset")}>
+    <.live_component
+      module={MunchkinWeb.BuyTransactionComponent}
+      user={@current_user}
+      id="buy_transaction_component"
+    />
+  </Layouts.plain_modal>
+</div>
+
+<div class="w-full">
+  <div class="w-full flex mb-4">
+    <div class="w-3/4"></div>
+    <div class="w-1/4 flex justify-end">
+      <button class="btn" popovertarget="create-transaction" style="anchor-name:--anchor-1">
+        <.icon name="hero-plus" />
+        <span>{gettext("Add Transaction")}</span>
+      </button>
+      <ul
+        class="dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
+        popover
+        id="create-transaction"
+      >
+        <li>
+          <a onclick="buy_transaction_modal.showModal()">
+            <.icon name="hero-document-plus" />
+            <span>{gettext("Buy")}</span>
+          </a>
+        </li>
+        <li>
+          <a onclick="sell_transaction_modal.showModal()">
+            <.icon name="hero-document-minus" />
+            <span>{gettext("Sell")}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="w-full">
+    <.stats>
+      <:item
+        title={gettext("Number of transactions")}
+        value={Munchkin.Cldr.Number.to_string!(@total_transaction, format: :short)}
+        description={gettext("Total number of transactions")}
+        background="bg-primary"
+      />
+
+      <:item
+        title={gettext("Current month transactions")}
+        value={
+          Munchkin.Cldr.Number.to_string!(@current_month_transaction,
+            currency: "IDR",
+            format: :short
+          )
+        }
+        description={gettext("Total amount of current month transactions")}
+        background="bg-info"
+      />
+    </.stats>
+  </div>
+
+  <div role="tablist" class="tabs tabs-border mt-5">
+    <a
+      role="tab"
+      phx-click="change-tab"
+      phx-value-tab="ongoing"
+      class={["tab", @tab == "ongoing" && "tab-active"]}
+    >
+      <.transaction_ongoing_badge with_text={true} />
+    </a>
+    <a
+      role="tab"
+      phx-click="change-tab"
+      phx-value-tab="pending"
+      class={["tab", @tab == "pending" && "tab-active"]}
+    >
+      <.transaction_pending_badge with_text={true} />
+    </a>
+    <a
+      role="tab"
+      phx-click="change-tab"
+      phx-value-tab="executed"
+      class={["tab", @tab == "executed" && "tab-active"]}
+    >
+      <.transaction_executed_badge with_text={true} />
+    </a>
+    <a
+      role="tab"
+      phx-click="change-tab"
+      phx-value-tab="queue"
+      class={["tab", @tab == "queue" && "tab-active"]}
+    >
+      <.transaction_queue_badge with_text={true} />
+    </a>
+  </div>
+
+  <div class="w-full mt-4">
+    <div class="w-full">
+      <.table id="transactions_list" rows={@transactions}>
+        <:col :let={trx} label="ID">
+          <div class="flex">
+            <span class="mr-2">
+              <.transaction_type_badge type={trx.transaction_type.label} />
+            </span>
+            <span class="mr-2">
+              <.transaction_status_badge status={trx.status.label} />
+            </span>
+            <span>
+              {concatenate(trx.id)}
+            </span>
+            <button
+              type="button"
+              class="cursor-pointer ml-2 text-primary"
+              phx-hook="ModalOpenerHook"
+              id={"trx_id_#{trx.id}"}
+              data-target="detail_transaction"
+              data-data={json_data(trx)}
+            >
+              <.icon name="hero-identification" />
+            </button>
+          </div>
+        </:col>
+        <:col :let={trx} label="Asset Name">{trx.asset.name}</:col>
+        <:col :let={trx} label="Price">{trx.price}</:col>
+        <:col :let={trx} label="Qty">
+          {gettext("%{qty} shares (%{lot} LOT)", qty: trx.quantity, lot: ceil(trx.quantity / 100))}
+        </:col>
+      </.table>
+      <div :if={@paginated?} class="w-full flex justify-between mt-4">
+        <span>
+          {gettext("Showing %{first}-%{last} of %{total} records",
+            first: (@current_page - 1) * @each_page + 1,
+            last: @current_page * @each_page,
+            total: @total
+          )}
+        </span>
+        <.paginate current={@current_page} max={5} action="paginate" />
+      </div>
+    </div>
+
+    <Layouts.plain_modal
+      id="detail_transaction"
+      title={gettext("Detail Transaction")}
+      subtitle={gettext("Here is your detailed transactions")}
+    >
+      <ul class="list">
+        <li class="list-row !flex">
+          <div class="flex w-full items-center">
+            <div class="w-1/4 font-bold">{gettext("Unique ID")}</div>
+            <div class="w-3/4" data-ref="id">ID</div>
+          </div>
+        </li>
+        <li class="list-row !flex">
+          <div class="flex w-full items-center">
+            <div class="w-1/4 font-bold">{gettext("Asset Name")}</div>
+            <div class="w-3/4" data-ref="asset_name">Name</div>
+          </div>
+        </li>
+        <li class="list-row !flex">
+          <div class="flex w-full items-center">
+            <div class="w-1/4 font-bold">{gettext("Status")}</div>
+            <div class="w-3/4" data-ref="status">Price</div>
+          </div>
+        </li>
+        <li class="list-row !flex">
+          <div class="flex w-full items-center">
+            <div class="w-1/4 font-bold">{gettext("Price")}</div>
+            <div class="w-3/4" data-ref="price">Price</div>
+          </div>
+        </li>
+        <li class="list-row !flex">
+          <div class="flex w-full items-center">
+            <div class="w-1/4 font-bold">{gettext("Net Value")}</div>
+            <div class="w-3/4" data-ref="asset_id">Price</div>
+          </div>
+        </li>
+        <li class="list-row !flex">
+          <div class="flex w-full items-center">
+            <div class="w-1/4 font-bold">{gettext("Total Fee")}</div>
+            <div class="w-3/4" data-ref="fee">Price</div>
+          </div>
+        </li>
+        <li class="list-row !flex">
+          <div class="flex w-full items-center">
+            <div class="w-1/4 font-bold">{gettext("Total Value")}</div>
+            <div class="w-3/4" data-ref="total_value">Price</div>
+          </div>
+        </li>
+        <li class="list-row !flex">
+          <div class="flex w-full items-center">
+            <div class="w-1/4 font-bold">{gettext("Settlement Date")}</div>
+            <div class="w-3/4">
+              <div data-ref="settlement_date"></div>
+
+              <.form
+                id="settlement_form"
+                class="w-full ml-2 items-center flex"
+                phx-submit="verify"
+              >
+                <input
+                  type="hidden"
+                  name="transaction_id"
+                  id="transaction_id"
+                  data-input="id"
+                />
+                <div class="flex mb-2">
+                  <.button
+                    variant="info"
+                    type="button"
+                    data-click="settlement_date"
+                    data-ref="settlement_form"
+                    phx-click={JS.toggle(to: "#reference_form", display: "flex")}
+                  >
+                    {gettext("Verify")}
+                  </.button>
+                </div>
+
+                <div class="hidden ml-2" id="reference_form">
+                  <.input
+                    name="reference_id"
+                    value=""
+                    placeholder={gettext("Input your reference number")}
+                  />
+                  <div class="ml-2">
+                    <.button variant="primary">{gettext("Submit")}</.button>
+                  </div>
+                </div>
+              </.form>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </Layouts.plain_modal>
+  </div>
+</div>

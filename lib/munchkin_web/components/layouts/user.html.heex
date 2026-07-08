@@ -8,6 +8,12 @@
       {assigns[:page_title]}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/choices.js@11.1.0/public/assets/styles/choices.min.css"
+    />
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js">
+    </script>
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
     <script>
@@ -25,6 +31,7 @@
           setTheme(localStorage.getItem("phx:theme") || "system");
         }
         window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
+        
         window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
 
       window.addEventListener("DOMContentLoaded", () => {
@@ -38,14 +45,26 @@
             sidebars.forEach(f => f.pathname == adjustedPathname && f.classList.add("bg-primary"))
         }
       })
+
+      const Sunder = new Event("sunder", { bubles: true, cancelabel: false})
+      window.addEventListener("sunder", (evt) => {
+        const {target} = evt
+        const f = new FormData(target)
+        const o = Object.fromEntries(f.entries())
+        const l = o.target
+        
+        window.location.href = `${target.action}/${l}`
+      })
       })();
+    </script>
+    <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js">
     </script>
   </head>
   <body class="bg-base-300 w-full h-screen">
     <div class="drawer drawer-open">
       <input id="mainDrawer" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content flex flex-col justify-between">
-        <main class="w-full flex flex-start px-4 py-6 bg-base-300">
+        <main class="w-full flex flex-start px-4 py-6 bg-base-300 flex-col">
           {@inner_content}
         </main>
 
@@ -59,12 +78,30 @@
         <ul class="menu bg-base-200 rounded-box w-56 min-h-full">
           <li>
             <h1 class="p-4 cursor-default font-bold text-lg">
-              Dashboard
+              {gettext("Dashboard")}
             </h1>
           </li>
-          <Layouts.sidebar_item href="/admin" title={gettext("Overview")} icon="hero-home" />
-          <Layouts.sidebar_item href="/users" title={gettext("Users")} icon="hero-users" />
-          <Layouts.sidebar_item href="/admin" title={gettext("Admins")} icon="hero-user-group" />
+          <Layouts.sidebar_item href="/" title={gettext("Overview")} icon="hero-home" />
+          <Layouts.sidebar_item
+            href="/analyze"
+            title={gettext("Analize")}
+            icon="hero-document-magnifying-glass"
+          />
+          <Layouts.sidebar_item
+            href="/portfolio"
+            title={gettext("Portfolio")}
+            icon="hero-presentation-chart-line"
+          />
+          <Layouts.sidebar_item
+            href="/transactions"
+            title={gettext("Transactions")}
+            icon="hero-document-text"
+          />
+          <Layouts.sidebar_item
+            href="/reports"
+            title={gettext("Reports")}
+            icon="hero-document-chart-bar"
+          />
         </ul>
       </div>
     </div>

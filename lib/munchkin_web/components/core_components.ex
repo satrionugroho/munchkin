@@ -88,7 +88,7 @@ defmodule MunchkinWeb.CoreComponents do
       <.button phx-click="go" variant="primary">Send!</.button>
       <.button navigate={~p"/"}>Home</.button>
   """
-  attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
+  attr :rest, :global, include: ~w(href type navigate patch method download name value disabled)
   attr :class, :string
   attr :variant, :string, values: ~w(primary info error warning plain)
   slot :inner_block, required: true
@@ -123,6 +123,42 @@ defmodule MunchkinWeb.CoreComponents do
     end
   end
 
+  attr :value, :string, required: true
+  attr :text, :string
+
+  def tooltip(assigns) do
+    assigns = assign_new(assigns, :text, gettext("Hover Me"))
+
+    ~H"""
+    <div :if={Map.get(assigns, :value)} class="tooltip" data-tip={@value}>
+      <button class="btn">{@text}</button>
+    </div>
+    """
+  end
+
+  attr :value, :string, required: true
+
+  def infotip(assigns) do
+    ~H"""
+    <div :if={Map.get(assigns, :value)} class="tooltip tooltip-right" data-tip={@value}>
+      <.icon name="hero-information-circle" />
+    </div>
+    """
+  end
+
+  attr :text, :string, required: true
+  attr :id, :string
+  attr :required, :boolean, default: false
+
+  def label(assigns) do
+    ~H"""
+    <label for={@id}>
+      <span>{@text}</span>
+      <span :if={@required} class="text-red-600">*</span>
+    </label>
+    """
+  end
+
   @doc """
   Renders an input with label and error messages.
 
@@ -152,6 +188,8 @@ defmodule MunchkinWeb.CoreComponents do
   attr :id, :any, default: nil
   attr :name, :any
   attr :label, :string, default: nil
+  attr :info, :string, default: nil
+  attr :required, :boolean, default: false
   attr :value, :any
 
   attr :type, :string,
@@ -172,7 +210,7 @@ defmodule MunchkinWeb.CoreComponents do
 
   attr :rest, :global,
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
-                multiple pattern placeholder readonly required rows size step)
+                multiple pattern placeholder readonly rows size step)
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     errors = if Phoenix.Component.used_input?(field), do: field.errors, else: []
@@ -182,6 +220,7 @@ defmodule MunchkinWeb.CoreComponents do
     |> assign(:errors, Enum.map(errors, &translate_error(&1)))
     |> assign_new(:name, fn -> if assigns.multiple, do: field.name <> "[]", else: field.name end)
     |> assign_new(:value, fn -> field.value end)
+    |> assign(:id, fn -> if assigns.name, do: field.name, else: field.id end)
     |> input()
   end
 
@@ -215,7 +254,10 @@ defmodule MunchkinWeb.CoreComponents do
   def input(%{type: "select"} = assigns) do
     ~H"""
     <fieldset class="fieldset mb-2">
-      <legend class="fieldset-legend">{@label}</legend>
+      <legend class="fieldset-legend">
+        <.label id={@id} text={@label} required={@required} />
+        <.infotip :if={@info} value={@info} />
+      </legend>
       <select
         id={@id}
         name={@name}
@@ -252,10 +294,19 @@ defmodule MunchkinWeb.CoreComponents do
   end
 
   # All other inputs text, datetime-local, url, password, etc. are handled here...
-  def input(assigns) do
+  def input(%{name: name} = assigns) do
+    assigns =
+      case Map.get(assigns, :id) do
+        id when is_bitstring(id) -> assigns
+        _ -> Map.put(assigns, :id, name)
+      end
+
     ~H"""
     <fieldset class="fieldset mb-2">
-      <legend :if={@label} class="fieldset-legend">{@label}</legend>
+      <legend :if={@label} class="fieldset-legend">
+        <.label id={@id} text={@label} required={@required} />
+        <.infotip :if={@info} value={@info} />
+      </legend>
       <input
         type={@type}
         name={@name}
@@ -511,6 +562,246 @@ defmodule MunchkinWeb.CoreComponents do
           <% end %>
         </div>
       </div>
+    </div>
+    """
+  end
+
+  slot :item, required: true do
+    attr :title, :string
+    attr :class, :string
+    attr :background, :string
+    attr :value, :string, required: true
+    attr :icon, :string
+    attr :description, :string
+    attr :link, :string
+  end
+
+  def stats(assigns) do
+    assigns =
+      case length(assigns.item) do
+        1 -> assign(assigns, :grid_class, "grid-cols-1")
+        2 -> assign(assigns, :grid_class, "grid-cols-2")
+        3 -> assign(assigns, :grid_class, "grid-cols-3")
+        4 -> assign(assigns, :grid_class, "grid-cols-4")
+        _ -> assign(assigns, :grid_class, "grid-cols-5")
+      end
+
+    ~H"""
+    <div class={["shadow w-full grid gap-4", @grid_class]}>
+      <div
+        :for={item <- @item}
+        class={[
+          "flex-auto rounded-sm px-2 py-1 flex items-center min-w-64",
+          Map.get(item, :background, "")
+        ]}
+      >
+        <div class="flex flex-col flex-auto px-4">
+          <div class={["text-sm text-gray-200", Map.get(item, :class, "")]}>
+            <.icon :if={Map.get(item, :icon)} name={item.icon} />
+          </div>
+          <div class="stat-title mb-2 capitalize">{item.title}</div>
+          <div class={["text-4xl font-bold", Map.get(item, :class, "text-white")]}>{item.value}</div>
+          <div class="text-sm text-gray-300 mt-2">{item.description}</div>
+        </div>
+        <div :if={Map.get(item, :link)}>
+          <.link href={item.link}>
+            <.icon name="hero-chevron-right" class="size-5" />
+          </.link>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  attr :title, :string, required: true
+  attr :description, :string
+
+  def title(assigns) do
+    ~H"""
+    <div class="w-full flex flex-col px-4 py-2 border-1 rounded border-neutral">
+      <h1 class="text-2xl text-neutral-content font-bold">{@title}</h1>
+      <div :if={Map.get(assigns, :description)} class="mt-2 text-neutral-content">{@description}</div>
+    </div>
+    """
+  end
+
+  attr :text, :string, required: true
+  attr :size, :string, values: ~w(xs sm md lg xl)
+  attr :type, :string, values: ~w(soft outline dash normal)
+  attr :variant, :string, values: ~w(primary info error warning plain)
+
+  def badge(assigns) do
+    assigns = badge_assigns(assigns)
+
+    ~H"""
+    <div class={["badge", @size, @type, @variant]}>
+      <.icon :if={Map.get(assigns, :icon)} name={@icon} />
+      <span>{@text}</span>
+    </div>
+    """
+  end
+
+  defp badge_assigns(assigns) do
+    badge_size(assigns)
+    |> badge_type()
+    |> badge_variant()
+  end
+
+  defp badge_size(assigns) do
+    case Map.get(assigns, :size) do
+      "xs" -> "badge-xs"
+      "sm" -> "badge-sm"
+      "lg" -> "badge-lg"
+      "xl" -> "badge-xl"
+      _ -> "badge-md"
+    end
+    |> then(&assign(assigns, :size, &1))
+  end
+
+  defp badge_type(assigns) do
+    case Map.get(assigns, :type) do
+      "soft" -> "badge-soft"
+      "outline" -> "badge-outline"
+      "dash" -> "badge-dash"
+      _ -> ""
+    end
+    |> then(&assign(assigns, :type, &1))
+  end
+
+  defp badge_variant(assigns) do
+    case Map.get(assigns, :variant) do
+      "primary" -> "badge-primary"
+      "info" -> "badge-info"
+      "error" -> "badge-error"
+      "warning" -> "badge-warning"
+      "success" -> "badge-success"
+      _ -> "badge-neutral"
+    end
+    |> then(&assign(assigns, :variant, &1))
+  end
+
+  attr :status, :string, values: ~w(pending ongoing queue executed)
+
+  def transaction_status_badge(%{status: status} = assigns) do
+    assigns = assign(assigns, :status, String.downcase(status))
+
+    ~H"""
+    <div>
+      <.transaction_ongoing_badge :if={@status == "ongoing"} />
+      <.transaction_pending_badge :if={@status == "pending"} />
+      <.transaction_queue_badge :if={@status == "queue"} />
+      <.transaction_executed_badge :if={@status == "executed"} />
+    </div>
+    """
+  end
+
+  attr :with_text, :boolean, default: false
+  attr :class, :string, default: ""
+
+  def transaction_ongoing_badge(assigns) do
+    ~H"""
+    <div class={["flex", @class != "" && @class]}>
+      <.badge text="O" variant="warning" />
+      <span :if={@with_text} class="ml-2">{gettext("Ongoing")}</span>
+    </div>
+    """
+  end
+
+  attr :with_text, :boolean, default: false
+  attr :class, :string, default: ""
+
+  def transaction_pending_badge(assigns) do
+    ~H"""
+    <div class={["flex", @class != "" && @class]}>
+      <.badge text="P" />
+      <span :if={@with_text} class="ml-2">{gettext("Pending")}</span>
+    </div>
+    """
+  end
+
+  attr :with_text, :boolean, default: false
+  attr :class, :string, default: ""
+
+  def transaction_executed_badge(assigns) do
+    ~H"""
+    <div class={["flex", @class != "" && @class]}>
+      <.badge text="E" variant="primary" />
+      <span :if={@with_text} class="ml-2">{gettext("Executed")}</span>
+    </div>
+    """
+  end
+
+  attr :with_text, :boolean, default: false
+  attr :class, :string, default: ""
+
+  def transaction_queue_badge(assigns) do
+    ~H"""
+    <div class={["flex", @class != "" && @class]}>
+      <.badge text="Q" variant="info" />
+      <span :if={@with_text} class="ml-2">{gettext("Queue")}</span>
+    </div>
+    """
+  end
+
+  def transaction_statuses(assigns) do
+    ~H"""
+    <div class="w-full flex my-2">
+      <.transaction_executed_badge with_text={true} class="last-child:mr-0 mr-2" />
+      <.transaction_ongoing_badge with_text={true} class="last-child:mr-0 mr-2" />
+      <.transaction_queue_badge with_text={true} class="last-child:mr-0 mr-2" />
+      <.transaction_pending_badge with_text={true} class="last-child:mr-0 mr-2" />
+    </div>
+    """
+  end
+
+  attr :type, :string, values: ~w(buy sell)
+
+  def transaction_type_badge(%{type: type} = assigns) do
+    assigns = assign(assigns, :type, String.downcase(type))
+
+    ~H"""
+    <div class="w-full">
+      <.badge
+        :if={@type == "buy"}
+        text={gettext("Buy")}
+        variant="success"
+      />
+      <.badge
+        :if={@type == "sell"}
+        text={gettext("Sell")}
+        variant="error"
+      />
+    </div>
+    """
+  end
+
+  attr :current, :integer, required: true
+  attr :action, :string, required: true
+  attr :href, :string
+  attr :max, :integer, default: 5
+  attr :type, :string, default: "button"
+
+  def paginate(assigns) do
+    ~H"""
+    <div class="join">
+      <button
+        :for={i <- 1..@max}
+        :if={@type == "button"}
+        type="button"
+        class={["join-item btn", @current == i && "btn-primary"]}
+        phx-click={@action}
+        phx-value-page={i}
+      >
+        {i}
+      </button>
+      <button
+        :for={i <- 1..@max}
+        :if={@type == "link"}
+        type="button"
+        class={["join-item btn", @current == i && "btn-primary"]}
+      >
+        <.link href={"#{@href}?page=#{i}"}>{i}</.link>
+      </button>
     </div>
     """
   end

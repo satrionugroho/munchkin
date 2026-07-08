@@ -137,7 +137,7 @@ defmodule Munchkin.Accounts.User do
 
   defp downcase_email(changeset) do
     case get_change(changeset, :email) do
-      email -> put_change(changeset, :email, String.downcase(email))
+      email when is_bitstring(email) -> put_change(changeset, :email, String.downcase(email))
       _ -> changeset
     end
   end

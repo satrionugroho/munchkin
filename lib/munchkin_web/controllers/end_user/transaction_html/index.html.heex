@@ -1,0 +1,55 @@
+<Layouts.flash_group flash={@flash} />
+
+<div class="w-full flex mb-4">
+  <div class="w-3/4"></div>
+  <div class="w-1/4 flex justify-end">
+    <details class="dropdown">
+      <summary class="btn m-1">open or close</summary>
+      <ul class="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+        <li>
+          <Layouts.modal id="buy_transaction_modal" button_title="Add Transaction">
+            <:button_title>
+              <.icon name="hero-plus" />
+              <span>{gettext("Buy Transaction")}</span>
+            </:button_title>
+
+            <div></div>
+          </Layouts.modal>
+        </li>
+        <li>
+          <Layouts.modal id="sell_transaction_modal" button_title="Add Transaction">
+            <:button_title>
+              <.icon name="hero-plus" />
+              <span>{gettext("Sell Transaction")}</span>
+            </:button_title>
+
+            <div></div>
+          </Layouts.modal>
+        </li>
+      </ul>
+    </details>
+  </div>
+</div>
+
+<div class="w-full">
+  <.stats>
+    <:item
+      title={gettext("Number of transactions")}
+      value="0M"
+      description={gettext("Total number of transactions")}
+      background="bg-primary"
+    />
+
+    <:item
+      title={gettext("Current month transactions")}
+      value="2394k"
+      description={gettext("Total of current month transactions")}
+      background="bg-info"
+    />
+  </.stats>
+</div>
+
+<.live_component
+  module={MunchkinWeb.AddTransactionComponent}
+  id="add_transaction_component"
+/>

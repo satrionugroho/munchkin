@@ -15,6 +15,8 @@ defmodule Munchkin.Inventory.AssetTicker do
       primary_key: true,
       foreign_key: :ref_id,
       type: Ecto.UUID
+
+    belongs_to :market, Munchkin.Inventory.Market
   end
 
   def changeset(ticker, attrs \\ %{}) do

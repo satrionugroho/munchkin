@@ -1,0 +1,25 @@
+<div class="w-full">
+  <.title
+    title="Detailed Analysis"
+    description={"Here is detailed analysis for ticker #{@ticker}"}
+  />
+
+  <div
+    class="tradingview-widget-container mt-4"
+    id="tradingview"
+    phx-hook="TradingViewHook"
+    data-symbol={@tv_symbol}
+  >
+    <div class="tradingview-widget-container__widget w-full h-120"></div>
+    <div class="tradingview-widget-copyright hidden">
+      <a
+        href={"https://www.tradingview.com/symbols/#{@tv_ticker}/"}
+        rel="noopener nofollow"
+        target="_blank"
+      >
+        <span class="blue-text">{@tv_ticker} stock chart</span>
+      </a>
+      <span class="trademark"> by TradingView</span>
+    </div>
+  </div>
+</div>

@@ -9,7 +9,7 @@ defmodule Munchkin.Dashboard do
     Munchkin.Cache.get_or_update(key, fn ->
       user_count =
         from(p in Subscription.Plan,
-          where: p.product_id == parent_as(:product).id,
+          where: p.tier == parent_as(:product).id,
           select: count(p.user_id)
         )
 

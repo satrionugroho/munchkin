@@ -167,33 +167,59 @@ defmodule MunchkinWeb.Layouts do
   attr :title, :string
   attr :subtitle, :string
   attr :close_button, :boolean, default: true
-  attr :button_title, :string, required: true
   attr :button_class, :string, default: "btn btn-primary"
   attr :width, :string, default: "w-11/12"
 
+  slot :button_title, required: true
   slot :inner_block
 
   def modal(assigns) do
     ~H"""
     <div id={"#{@id}_container"}>
-      <button class={@button_class} onclick={"#{@id}.showModal()"}>{@button_title}</button>
-      <dialog id={@id} class="modal">
-        <div class={"modal-box #{@width} max-w-5xl"}>
-          <div>
-            <div :if={Map.get(assigns, :title)} class="mb-2">
-              <h1 class="text-lg font-bold">{@title}</h1>
-              <span :if={Map.get(assigns, :subtitle)} class="text-md italic">{@subtitle}</span>
-            </div>
-            <form :if={@close_button} method="dialog" class="absolute right-2 top-2">
-              <button class="btn btn-sm btn-circle btn-ghost">
-                <.icon name="hero-x-mark" />
-              </button>
-            </form>
-          </div>
-          <div class="w-full">{render_slot(@inner_block)}</div>
+      <button class={@button_class} onclick={"#{@id}.showModal()"}>
+        <div :if={@button_title != []}>
+          {render_slot(@button_title)}
         </div>
-      </dialog>
+      </button>
+      <.plain_modal
+        id={@id}
+        title={@title}
+        subtitle={@subtitle}
+        close_button={@close_button}
+        width={@width}
+      >
+        {render_slot(@inner_block)}
+      </.plain_modal>
     </div>
+    """
+  end
+
+  attr :id, :string, required: true
+  attr :title, :string
+  attr :subtitle, :string
+  attr :close_button, :boolean, default: true
+  attr :width, :string, default: "w-11/12"
+
+  slot :inner_block
+
+  def plain_modal(assigns) do
+    ~H"""
+    <dialog id={@id} class="modal">
+      <div class={"modal-box #{@width} max-w-5xl z-10"}>
+        <div>
+          <div :if={Map.get(assigns, :title)} class="mb-2">
+            <h1 class="text-lg font-bold">{@title}</h1>
+            <span :if={Map.get(assigns, :subtitle)} class="text-md italic">{@subtitle}</span>
+          </div>
+          <form :if={@close_button} method="dialog" class="absolute right-2 top-2">
+            <button class="btn btn-sm btn-circle btn-ghost" id={"#{@id}-close"}>
+              <.icon name="hero-x-mark" />
+            </button>
+          </form>
+        </div>
+        <div class="w-full">{render_slot(@inner_block)}</div>
+      </div>
+    </dialog>
     """
   end
 end

@@ -27,7 +27,7 @@ defmodule MunchkinMigrator do
     Enum.map(["en", "id"], fn lang ->
       :code.priv_dir(:munchkin)
       |> Kernel.to_string()
-      |> Kernel.<>("/repo/seeds/product-#{lang}.json")
+      |> Kernel.<>("/repo/data/product-#{lang}.json")
       |> File.read()
       |> case do
         {:ok, file} ->
@@ -79,9 +79,35 @@ defmodule MunchkinMigrator do
     end
   end
 
+  def insert_market! do
+    params = %{
+      name: "Stockbit",
+      details: %{
+        legal_name: "PT Stockbit Sekuritas Digital",
+        address: "RDTX Square 33rd Floor, Jl. Prof. Dr. Satrio No 164 - Jakarta 12930",
+        mobile_phone: "+622150959330",
+        email: "support@stockbit.com"
+      },
+      fee_compositions: %{
+        buy_fee: 15,
+        sell_fee: 15,
+        income_tax: 10,
+        other_fee: %{
+          stamp_fee: %{
+            value: 10000,
+            type: "currency"
+          }
+        }
+      }
+    }
+
+    Munchkin.Inventory.insert_market(params)
+  end
+
   def migrate() do
     Munchkin.Repo.transact(fn ->
-      [should_insert_product?(), should_insert_asset_source?()]
+      # [should_insert_product?(), should_insert_asset_source?(), insert_market!()]
+      [insert_market!()]
       |> Enum.map(&elem(&1, 0))
       |> Enum.map(&Kernel.==(&1, :ok))
       |> Enum.all?()

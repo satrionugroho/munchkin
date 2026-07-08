@@ -4,6 +4,7 @@ defmodule MunchkinWeb.FetchCurrentUser do
   alias Munchkin.Accounts
 
   @user_session_key "_current_admin"
+  @end_user_session_key "_current_user"
 
   def init(opts \\ []), do: opts
 
@@ -14,6 +15,12 @@ defmodule MunchkinWeb.FetchCurrentUser do
 
   def put_admin(conn, _), do: conn
 
+  def put_user(conn, %Accounts.User{email: email} = _user) when not is_nil(email) do
+    hash = Base.url_encode64(email)
+
+    Plug.Conn.put_session(conn, @end_user_session_key, hash)
+  end
+
   def get_admin(conn) do
     case Plug.Conn.get_session(conn, @user_session_key) do
       nil -> {:error, gettext("admin not logged in")}
@@ -21,17 +28,36 @@ defmodule MunchkinWeb.FetchCurrentUser do
     end
   end
 
+  def get_user(conn) do
+    case Plug.Conn.get_session(conn, @end_user_session_key) do
+      nil -> {:error, gettext("user not logged in")}
+      hash -> {:ok, hash}
+    end
+  end
+
   def call(conn, params) do
     case Keyword.get(params, :type) do
-      :cookies -> html_auth(conn)
+      :cookies -> html_auth(conn, params)
       _ -> api_auth(conn)
     end
   end
 
-  defp html_auth(conn) do
+  defp html_auth(conn, params) do
+    type = Keyword.get(params, :user, :normal)
+    validate_signed_in_user(conn, type)
+  end
+
+  defp validate_signed_in_user(conn, :admin) do
     case get_admin(conn) do
-      {:ok, hash} -> validate_hash(conn, hash)
-      _ -> redirected(conn)
+      {:ok, hash} -> validate_hash(conn, hash, :admin)
+      _ -> redirected(conn, :admin)
+    end
+  end
+
+  defp validate_signed_in_user(conn, t) do
+    case get_user(conn) do
+      {:ok, hash} -> validate_hash(conn, hash, t)
+      _ -> redirected(conn, t)
     end
   end
 
@@ -63,10 +89,17 @@ defmodule MunchkinWeb.FetchCurrentUser do
     end)
   end
 
-  defp validate_hash(conn, hash) do
+  defp validate_hash(conn, hash, :admin) do
     case Base.url_decode64(hash) do
       {:ok, email} -> get_admin_data(conn, email)
-      _ -> redirected(conn)
+      _ -> redirected(conn, :admin)
+    end
+  end
+
+  defp validate_hash(conn, hash, t) do
+    case Base.url_decode64(hash) do
+      {:ok, email} -> get_user_data(conn, email)
+      _ -> redirected(conn, t)
     end
   end
 
@@ -91,6 +124,22 @@ defmodule MunchkinWeb.FetchCurrentUser do
     end
   end
 
+  defp get_user_data(conn, email) do
+    get_actual_user(email)
+    |> then(fn
+      {:ok, user} -> Plug.Conn.assign(conn, :current_user, user)
+      _ -> redirected(conn, :normal)
+    end)
+  end
+
+  defp get_actual_user(email) do
+    case Munchkin.Cache.get("uemail:#{email}") do
+      {:ok, nil} -> get_user_from_database(email)
+      {:ok, _admin} = data -> data
+      err -> err
+    end
+  end
+
   defp get_admin_data(conn, email) do
     case Munchkin.Cache.get("email:#{email}") do
       {:ok, nil} -> get_admin_from_database(email)
@@ -98,8 +147,8 @@ defmodule MunchkinWeb.FetchCurrentUser do
       err -> err
     end
     |> then(fn
-      {:ok, admin} -> Plug.Conn.assign(conn, :current_user, admin)
-      _ -> redirected(conn)
+      {:ok, admin} -> Plug.Conn.assign(conn, :current_admin, admin)
+      _ -> redirected(conn, :admin)
     end)
   end
 
@@ -114,10 +163,27 @@ defmodule MunchkinWeb.FetchCurrentUser do
     end
   end
 
-  defp redirected(conn) do
+  defp get_user_from_database(email) do
+    case Accounts.get_user_by_email(email) do
+      %Accounts.User{} = admin ->
+        _ = Munchkin.Cache.put("uemail:#{email}", admin)
+        {:ok, admin}
+
+      _ ->
+        {:error, "Admin not found"}
+    end
+  end
+
+  defp redirected(conn, type) do
+    path =
+      case type do
+        :admin -> "/signin"
+        _ -> "/app/signin"
+      end
+
     conn
     |> Phoenix.Controller.put_flash(:error, gettext("Restricted Area!. Need authenticate."))
-    |> Phoenix.Controller.redirect(to: "/signin")
+    |> Phoenix.Controller.redirect(to: path)
     |> Plug.Conn.halt()
   end
 
@@ -126,8 +192,19 @@ defmodule MunchkinWeb.FetchCurrentUser do
     String.reverse(source)
   end
 
-  def get_current_user(conn) do
+  def get_current_user(%Plug.Conn{} = conn) do
     Map.get(conn.assigns, :current_user)
+  end
+
+  def get_current_user(%{"_current_user" => hash}) do
+    case Base.url_decode64(hash) do
+      {:ok, email} -> get_actual_user(email)
+      _ -> {:error, "cannot find user"}
+    end
+  end
+
+  def get_current_admin(conn) do
+    Map.get(conn.assigns, :current_admin)
   end
 
   def get_current_source(conn) do

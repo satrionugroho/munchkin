@@ -84,3 +84,11 @@ config :phoenix_live_view,
 config :swoosh, :api_client, false
 
 config :munchkin, Munchkin.Mailer, adapter: Swoosh.Adapters.Local
+
+config :munchkin, Munchkin.Engine.Jkse,
+  database_id: "95cc770e-1864-430c-bdcd-bbc71c20c804",
+  instance: {Munchkin.Inventory, :get_source}
+
+config :munchkin, Munchkin.Engine.Factset,
+  database_id: "738eb45b-ae86-47f4-9916-b4d775e4a5b9",
+  instance: {Munchkin.Inventory, :get_source}

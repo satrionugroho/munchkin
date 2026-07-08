@@ -1,0 +1,25 @@
+<div class="w-full">
+  <.title title="Analyze" description="Get your detailed analize for a stocks, ETF, etc." />
+
+  <div class="w-full mt-5">
+    <.form for={@form} method="get" class="w-full" id="form">
+      <input
+        type="hidden"
+        value={Plug.CSRFProtection.get_csrf_token_for("/analyze")}
+        name="_csrf_token"
+      />
+
+      <.input
+        name="target"
+        autocomplete="off"
+        label="Enter your desired ticker"
+        placeholder="BBCA.JK"
+        info="You can add more info in here"
+        field={@form[:ticker]}
+      />
+      <.button type="button" variant="primary" phx-click={JS.dispatch("sunder", to: "#form")}>
+        {gettext("Analyze")}
+      </.button>
+    </.form>
+  </div>
+</div>

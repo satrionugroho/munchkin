@@ -1,15 +1,20 @@
 defmodule Munchkin.Inventory do
-  alias Munchkin.Inventory.Analize
   alias Munchkin.Repo
-  alias Munchkin.Inventory.Fundamental
+
   alias Munchkin.Inventory.Fundamental.Gate
 
   alias Munchkin.Inventory.{
+    Analize,
     Asset,
+    AssetType,
     AssetTicker,
     AssetSource,
+    Fundamental,
+    Market,
     Summary,
-    TradeHistory
+    TradeHistory,
+    Transaction,
+    TransactionStatus
   }
 
   import Ecto.Query, warn: false
@@ -61,6 +66,26 @@ defmodule Munchkin.Inventory do
 
         repo.one(query)
     end
+  end
+
+  def get_multiple_assets(ids, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    query =
+      case Keyword.get(opts, :keyword) do
+        kw when is_bitstring(kw) ->
+          from a in Asset,
+            join: t in AssetTicker,
+            on: t.asset_id == a.id,
+            preload: [:tickers],
+            where: a.id in ^ids,
+            where: ilike(a.name, ^"%#{kw}%") or ilike(t.ticker, ^"%#{kw}%")
+
+        _ ->
+          from a in Asset, preload: [:tickers], where: a.id in ^ids
+      end
+
+    repo.all(query)
   end
 
   def get_index(ticker_or_id, opts \\ []) do
@@ -438,7 +463,21 @@ defmodule Munchkin.Inventory do
 
   def get_fundamental(id, opts \\ []) do
     repo = Keyword.get(opts, :repo, Repo)
-    repo.get(Fundamental, id)
+
+    case Ecto.UUID.cast(id) do
+      {:ok, _} -> repo.get(Fundamental, id)
+      _ -> get_fundamental_by_ticker(id, repo)
+    end
+  end
+
+  defp get_fundamental_by_ticker(id, repo) do
+    query =
+      from f in Fundamental,
+        join: a in AssetTicker,
+        on: f.asset_id == a.asset_id,
+        preload: [:source, :tickers]
+
+    repo.all(query)
   end
 
   def get_fundamental_data(ticker, period, opts \\ []) do
@@ -466,12 +505,14 @@ defmodule Munchkin.Inventory do
     end
   end
 
-  def fundamental_data_standardization(%Fundamental{} = data) do
-    do_get_fundamental_detail(data, [])
+  def fundamental_data_standardization(fun, opts \\ [])
+
+  def fundamental_data_standardization(%Fundamental{} = data, opts) do
+    do_get_fundamental_detail(data, opts)
     |> List.first()
   end
 
-  def fundamental_data_standardization(_), do: {:error, "please parse from fundamental schema"}
+  def fundamental_data_standardization(_, _), do: {:error, "please parse from fundamental schema"}
 
   defp do_get_fundamental_detail(data, opts) when is_list(data) do
     repo = Keyword.get(opts, :repo, Repo)
@@ -915,5 +956,387 @@ defmodule Munchkin.Inventory do
         on_conflict: :replace_all
       )
     )
+  end
+
+  def transform_ticker(maybe_ticker_and_region, opts \\ []) do
+    [ticker, exchange] = split_ticker_and_exchange(maybe_ticker_and_region)
+
+    case Keyword.get(opts, :to) do
+      :factset -> rename_ticker_to_factset(ticker, exchange)
+      :trading_view -> rename_ticker_to_trading_view(ticker, exchange, opts)
+      _ -> "#{ticker}.#{exchange}"
+    end
+  end
+
+  defp change_factset_region(region) do
+    case region do
+      "JK" -> "ID"
+      _ -> region
+    end
+  end
+
+  defp change_trading_view_region(region) do
+    case region do
+      "JK" -> "IDX"
+      _ -> region
+    end
+  end
+
+  defp rename_ticker_to_factset(ticker, region), do: "#{ticker}.#{change_factset_region(region)}"
+
+  defp rename_ticker_to_trading_view(ticker, region, opts) do
+    case Keyword.get(opts, :symbol) do
+      true -> "#{change_trading_view_region(region)}:#{ticker}"
+      _ -> "#{change_trading_view_region(region)}-#{ticker}"
+    end
+  end
+
+  def insert_market(params, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    %Market{}
+    |> Market.changeset(params)
+    |> repo.insert()
+  end
+
+  def get_market(id, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    repo.get(Market, id)
+  end
+
+  def get_available_market(opts \\ []) do
+    Munchkin.Cache.get_or_update_with_ttl(
+      "available_market",
+      fn ->
+        repo = Keyword.get(opts, :repo, Munchkin.Repo)
+        limit = Keyword.get(opts, :limit, 10)
+        offset = Keyword.get(opts, :offset, 0)
+        query = from m in Market, limit: ^limit, offset: ^offset
+
+        repo.all(query)
+        |> then(fn x -> {:ok, x} end)
+      end,
+      :timer.minutes(5)
+    )
+  end
+
+  def search_ticker(ticker, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    query =
+      from a in Asset,
+        join: t in AssetTicker,
+        on: t.asset_id == a.id,
+        where: a.type_id == ^AssetType.stock(),
+        where: ilike(t.ticker, ^"%#{ticker}%") or ilike(a.name, ^"%#{ticker}%"),
+        select: %{
+          id: a.id,
+          name: a.name,
+          ticker: t.ticker,
+          exchange: t.exchange,
+          default_market: t.market_id
+        }
+
+    repo.all(query)
+  end
+
+  def add_transactions(params, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:transaction, Transaction.changeset(%Transaction{}, params))
+    |> Ecto.Multi.run(:updated_trx, fn
+      repo, %{transaction: %{transaction_type: type} = trx} when type.key == :sell ->
+        align_transaction(repo, trx, params)
+
+      _, %{transaction: trx} ->
+        {:ok, trx}
+    end)
+    |> Ecto.Multi.run(:remove_cache, fn _repo, %{transaction: trx} ->
+      Munchkin.Cache.delete("total_trx_#{trx.user_id}")
+      Munchkin.Cache.delete("total_amount_trx_#{trx.user_id}")
+      {:ok, :clear}
+    end)
+    |> repo.transact()
+  end
+
+  defp align_transaction(repo, transaction, %{"sell_method" => "lifo"}) do
+    get_user_per_asset_transaction(transaction.user_id, transaction.asset_id,
+      repo: repo,
+      type: :buy
+    )
+    |> Enum.sort_by(& &1.inserted_at, :desc)
+    |> Enum.reduce(transaction.quantity, &quantity_transaction_subtraction(&1, &2, repo))
+    |> then(fn _ -> {:ok, "updated"} end)
+  end
+
+  defp align_transaction(repo, transaction, %{"sell_method" => "fifo"}) do
+    get_user_per_asset_transaction(transaction.user_id, transaction.asset_id,
+      repo: repo,
+      type: :buy
+    )
+    |> Enum.sort_by(& &1.inserted_at, :asc)
+    |> Enum.reduce(transaction.quantity, &quantity_transaction_subtraction(&1, &2, repo))
+    |> then(fn _ -> {:ok, "updated"} end)
+  end
+
+  defp align_transaction(_repo, _transaction, _) do
+    {:ok, "not updated"}
+  end
+
+  defp quantity_transaction_subtraction(_transaction, 0, _repo), do: 0
+
+  defp quantity_transaction_subtraction(transaction, qty, repo) do
+    IO.inspect("QTY ====")
+    IO.inspect(qty)
+    IO.inspect("TRX ====")
+    IO.inspect(transaction)
+    IO.inspect("END TRX ====")
+
+    transaction.current_quantity
+    |> Kernel.-(qty)
+    |> IO.inspect()
+    |> case do
+      num when num > 0 ->
+        Transaction.subtract_quantity(transaction, num)
+        |> repo.update()
+        |> IO.inspect()
+        |> case do
+          {:ok, _trx} -> num
+          _ -> qty
+        end
+
+      num ->
+        Transaction.subtract_quantity(transaction, transaction.quantity)
+        |> repo.update()
+        |> IO.inspect()
+        |> case do
+          {:ok, _trx} -> abs(num)
+          _ -> qty
+        end
+    end
+  end
+
+  def get_user_transactions(user_or_id, opts \\ [])
+
+  def get_user_transactions(%Munchkin.Accounts.User{} = user, opts),
+    do: get_user_transactions(user.id, opts)
+
+  def get_user_transactions(user_id, opts) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+    limit = Keyword.get(opts, :limit, 20)
+    offset = Keyword.get(opts, :offset, 0)
+
+    query =
+      case Keyword.get(opts, :status) do
+        status when status in ["ongoing", "pending", "executed", "queue"] ->
+          from t in Transaction,
+            where: t.user_id == ^user_id,
+            where: t.status == ^status,
+            limit: ^limit,
+            offset: ^offset,
+            order_by: {:desc, t.inserted_at},
+            preload: [:asset]
+
+        _ ->
+          from t in Transaction,
+            where: t.user_id == ^user_id,
+            limit: ^limit,
+            offset: ^offset,
+            order_by: {:desc, t.inserted_at},
+            preload: [:asset]
+      end
+
+    repo.all(query)
+  end
+
+  def get_total_user_transactions(user_or_id, opts \\ [])
+
+  def get_total_user_transactions(%Munchkin.Accounts.User{} = user, opts),
+    do: get_total_user_transactions(user.id, opts)
+
+  def get_total_user_transactions(user_id, opts) do
+    Munchkin.Cache.get_or_update_with_ttl(
+      "total_trx_#{user_id}",
+      fn ->
+        repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+        query =
+          from t in Transaction,
+            group_by: t.status,
+            where: t.user_id == ^user_id,
+            select: %{status: t.status, total: count(t.id)}
+
+        result = repo.all(query)
+
+        TransactionStatus.all()
+        |> Enum.map(fn f ->
+          Enum.find(result, fn %{status: s} ->
+            s.id == f.id
+          end)
+          |> case do
+            nil -> 0
+            data -> Map.get(data, :total, 0)
+          end
+          |> then(fn x -> {to_string(f.key), x} end)
+        end)
+        |> Enum.into(%{})
+        |> then(fn x -> {:ok, x} end)
+      end,
+      :timer.hours(1)
+    )
+  end
+
+  def get_current_month_amount_user_transactions(user_or_id, opts \\ [])
+
+  def get_current_month_amount_user_transactions(%Munchkin.Accounts.User{} = user, opts),
+    do: get_current_month_amount_user_transactions(user.id, opts)
+
+  def get_current_month_amount_user_transactions(user_id, opts) do
+    Munchkin.Cache.get_or_update_with_ttl(
+      "total_amount_trx_#{user_id}",
+      fn ->
+        now = Date.utc_today()
+        tz = "Etc/UTC"
+        start = DateTime.new!(Date.beginning_of_month(now), ~T[00:00:00], tz)
+        date_end = DateTime.new!(Date.end_of_month(now), ~T[23:59:59], tz)
+
+        repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+        query =
+          from t in Transaction,
+            where: t.user_id == ^user_id,
+            where: t.transaction_type == ^Munchkin.Inventory.TransactionType.buy(),
+            where: t.status == ^Munchkin.Inventory.TransactionStatus.executed(),
+            where: fragment("? BETWEEN ? AND ?", t.settlement_date, ^start, ^date_end),
+            select: sum(t.quantity * t.price)
+
+        repo.one(query)
+        |> then(fn
+          x when is_number(x) -> {:ok, x}
+          _ -> {:error, "cannot get user current amount transactions"}
+        end)
+      end,
+      :timer.hours(1)
+    )
+  end
+
+  def get_user_per_asset_transaction(user_or_id, asset_id, opts \\ [])
+
+  def get_user_per_asset_transaction(%Munchkin.Accounts.User{} = user, asset_id, opts),
+    do: get_user_per_asset_transaction(user.id, asset_id, opts)
+
+  def get_user_per_asset_transaction(user_or_id, %Munchkin.Inventory.Asset{} = asset, opts),
+    do: get_user_per_asset_transaction(user_or_id, asset.id, opts)
+
+  def get_user_per_asset_transaction(user_id, asset_id, opts) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    query =
+      case Keyword.get(opts, :type) do
+        :buy ->
+          from t in Transaction,
+            where: t.user_id == ^user_id and t.asset_id == ^asset_id,
+            where: t.transaction_type == ^Munchkin.Inventory.TransactionType.buy(),
+            order_by: :inserted_at
+
+        :sell ->
+          from t in Transaction,
+            where: t.user_id == ^user_id and t.asset_id == ^asset_id,
+            where: t.transaction_type == ^Munchkin.Inventory.TransactionType.sell(),
+            order_by: :inserted_at
+
+        _ ->
+          from t in Transaction,
+            where: t.user_id == ^user_id and t.asset_id == ^asset_id,
+            order_by: :inserted_at
+      end
+
+    repo.all(query)
+  end
+
+  def set_transaction_settlement(trx, ref \\ nil) do
+    trx
+    |> Transaction.settlement_changeset(%{reference_id: ref})
+    |> Repo.update()
+  end
+
+  def user_portfolio(user_or_id, opts \\ [])
+  def user_portfolio(%Munchkin.Accounts.User{} = user, opts), do: user_portfolio(user.id, opts)
+
+  def user_portfolio(user_id, opts) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    query =
+      from t in Transaction,
+        preload: [:asset],
+        where: t.user_id == ^user_id,
+        where: t.status == ^Munchkin.Inventory.TransactionStatus.executed(),
+        where: t.current_quantity != 0,
+        where: t.transaction_type == ^Munchkin.Inventory.TransactionType.buy()
+
+    repo.all(query)
+    |> get_current_portfolio_price(opts)
+  end
+
+  defp get_current_portfolio_price([], _), do: {:ok, 0}
+
+  defp get_current_portfolio_price(data, opts) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+    assets = Enum.map(data, & &1.asset_id)
+
+    query =
+      from t in TradeHistory,
+        where: t.asset_id in ^assets,
+        order_by: {:desc, t.date},
+        limit: ^length(assets)
+
+    repo.all(query)
+    |> calculate_current_portfolio(data, opts)
+    |> Enum.into(%{})
+    |> then(fn p -> {:ok, p} end)
+  end
+
+  defp calculate_current_portfolio(market_data, transactions, opts) do
+    Enum.group_by(transactions, & &1.asset_id)
+    |> Enum.map(fn {asset_id, trxs} ->
+      current_price = Enum.find(market_data, &Kernel.==(&1.asset_id, asset_id))
+      {asset_id, calculate_one_asset_portfolio(trxs, current_price)}
+    end)
+  end
+
+  defp calculate_one_asset_portfolio(transactions, latest_price) do
+    Enum.reduce(transactions, %{}, fn trx, acc ->
+      curr_qty = Map.get(acc, :current_quantity, Decimal.new(0))
+      curr_avg = Map.get(acc, :average_price, Decimal.new(0))
+
+      new_qty = Decimal.add(curr_qty, trx.quantity)
+
+      new_val =
+        Decimal.mult(curr_qty, curr_avg)
+        |> then(fn last_val ->
+          Decimal.mult(trx.quantity, trx.price)
+          |> Decimal.add(last_val)
+        end)
+
+      new_price = Decimal.div(new_val, new_qty)
+
+      %{
+        quantity: new_qty,
+        asset_value: new_val,
+        average_price: new_price
+      }
+    end)
+    |> then(fn %{quantity: qty, asset_value: asset_value} = res ->
+      current_value = Decimal.mult(qty, latest_price.close)
+
+      Map.put(res, :current_value, current_value)
+      |> Map.put(:estimated_pnl, Decimal.sub(current_value, asset_value))
+    end)
+  end
+
+  def change_transaction(%Transaction{} = trx, attrs \\ %{}) do
+    Transaction.changeset(trx, attrs)
   end
 end
