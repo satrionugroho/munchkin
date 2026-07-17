@@ -1,10 +1,17 @@
 <Layouts.flash_group flash={@flash} />
+<Layouts.plain_modal
+  id="tester"
+  title={gettext("Wanna sell an existing asset?")}
+>
+  <div>TEST</div>
+</Layouts.plain_modal>
+<button id="showmodal" onclick="tester.showModal()" class="hidden">btn</button>
 
 <div class="w-full flex flex-col">
   <div class="my-2 w-full relative">
     <div class="block h-28 bg-base-300">
       <tv-ticker-tape
-        symbols="FOREXCOM:SPXUSD,CMCMARKETS:GOLD,FX_IDC:USDIDR"
+        symbols={@ticker_symbols}
         hide-chart
         line-chart-type="Line"
       >
@@ -19,14 +26,22 @@
         title="Total invested"
         value={@total_invested}
         description={gettext("Cumulative sum of money you have contributed to")}
-        background="bg-primary"
+        background="bg-info"
+      />
+
+      <:item
+        title="Realizations Value"
+        value={@realization_value}
+        action={JS.dispatch("click", to: "#showmodal")}
+        description={gettext("Cumulative sum of money you have realized into")}
+        background="bg-success"
       />
 
       <:item
         title="Unrealized P&L"
         value={@unrealized_pnl}
         description={gettext("Profit or loss on an investment position")}
-        background="bg-info"
+        background="bg-warning"
       />
     </.stats>
   </div>

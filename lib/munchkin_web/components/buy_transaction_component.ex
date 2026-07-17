@@ -17,9 +17,7 @@ defmodule MunchkinWeb.BuyTransactionComponent do
   end
 
   def update(assigns, socket) do
-    assign_new(socket, :current_user, fn ->
-      Map.get(assigns, :user)
-    end)
+    socket
     |> assign(:available_assets, Map.get(assigns, :available_assets))
     |> assign_new(:form, fn ->
       Munchkin.Inventory.change_transaction(%Transaction{})
@@ -34,7 +32,7 @@ defmodule MunchkinWeb.BuyTransactionComponent do
   end
 
   def handle_event("submit", %{"transaction_type" => "buy"} = params, socket) do
-    with current_user <- Map.get(socket.assigns, :current_user),
+    with current_user <- get_current_user(socket.assigns.current_user_session),
          asset <- get_asset(params),
          market <- get_market(params, asset),
          {:ok, _trx} <- insert_buy_transaction(current_user, asset, market, params) do
@@ -126,12 +124,12 @@ defmodule MunchkinWeb.BuyTransactionComponent do
           <div>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">
-                <.label text={gettext("Company Name")} required id="select-ticker" />
+                <.label text={gettext("Company Name")} required id="buy-select-ticker-label" />
                 <.infotip value={gettext("A company you want to buy")} />
               </legend>
               <select
                 phx-hook="ChoicesHook"
-                id="select-ticker"
+                id="buy-select-ticker"
                 name="asset_id"
                 required
                 data-url="/transactions/search-ticker"
@@ -140,8 +138,7 @@ defmodule MunchkinWeb.BuyTransactionComponent do
                 data-no-choice={gettext("Cannot find company with given specification")}
                 data-not-found="Company with those specification is not exists"
                 data-placeholder="Search a company"
-              >
-              </select>
+              ></select>
             </fieldset>
             <.input
               type="select"
@@ -154,6 +151,7 @@ defmodule MunchkinWeb.BuyTransactionComponent do
               prompt={gettext("Select the market")}
               options={@available_market}
               name="market_id"
+              id="buy_market_id"
               value={0}
             />
             <div class="grid grid-cols-2 gap-4">
@@ -163,6 +161,7 @@ defmodule MunchkinWeb.BuyTransactionComponent do
                 required
                 type="datetime-local"
                 name="transaction_date"
+                id="buy_transaction_date"
                 field={@form[:transaction_date]}
               />
               <div>
@@ -173,6 +172,7 @@ defmodule MunchkinWeb.BuyTransactionComponent do
                   }
                   type="datetime-local"
                   phx-hook="TogglerHook"
+                  id="buy_settlement_date"
                   data-target="#reference_no_container"
                   field={@form[:settlement_date]}
                 />
@@ -191,6 +191,7 @@ defmodule MunchkinWeb.BuyTransactionComponent do
                 label={gettext("Price")}
                 type="number"
                 required
+                id="buy_price"
                 info={gettext("The exact price you've traded in")}
                 placeholder={gettext("Enter you traded price")}
                 field={@form[:price]}
@@ -199,6 +200,7 @@ defmodule MunchkinWeb.BuyTransactionComponent do
                 label={gettext("Shares")}
                 required
                 type="number"
+                id="buy_quantity"
                 info={gettext("The exact shares you've traded in ")}
                 placeholder={gettext("Enter you desired shares")}
                 field={@form[:quantity]}
@@ -212,7 +214,7 @@ defmodule MunchkinWeb.BuyTransactionComponent do
               <.button
                 type="button"
                 variant="plain"
-                phx-click={JS.dispatch("click", to: "#buy_transaction_modal-close")}
+                phx-click={JS.dispatch("click", to: "#transaction_modal-close")}
               >
                 {gettext("Back")}
               </.button>

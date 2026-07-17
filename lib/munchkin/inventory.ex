@@ -266,16 +266,26 @@ defmodule Munchkin.Inventory do
     end
   end
 
-  def get_last_trade_history(ticker_or_id, opts \\ []) do
-    repo = Keyword.get(opts, :repo, Repo)
-    type_id = Keyword.get(opts, :type)
+  def get_last_trade_history(ticker_asset_or_id, opts \\ [])
+  def get_last_trade_history(%Asset{} = asset, opts), do: get_last_trade_history(asset.id, opts)
 
+  def get_last_trade_history(asset_id, opts) when is_integer(asset_id) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    query =
+      from t in TradeHistory, where: t.asset_id == ^asset_id, limit: 1, order_by: {:desc, :date}
+
+    repo.one(query)
+  end
+
+  def get_last_trade_history(ticker_or_id, opts) do
     try do
       id = String.to_integer(ticker_or_id)
-      query = from t in TradeHistory, where: t.asset_id == ^id, limit: 1, order_by: {:desc, :date}
-      repo.one(query)
+      get_last_trade_history(id, opts)
     rescue
       ArgumentError ->
+        repo = Keyword.get(opts, :repo, Repo)
+        type_id = Keyword.get(opts, :type)
         [ticker, exchange] = split_ticker_and_exchange(ticker_or_id)
 
         base_query =
@@ -480,28 +490,35 @@ defmodule Munchkin.Inventory do
     repo.all(query)
   end
 
-  def get_fundamental_data(ticker, period, opts \\ []) do
-    case get_fundamental_by_periods(ticker, period, opts) do
-      [_ | _] = f ->
-        Enum.group_by(f, & &1.period)
-        |> Enum.reduce([], fn {_key, data}, acc ->
-          Enum.sort_by(data, & &1.source.priority)
-          |> List.first()
-          |> then(fn k -> [k | acc] end)
-        end)
-        |> do_get_fundamental_detail(opts)
-        |> then(fn res ->
-          case period do
-            [_ | _] -> res
-            _ -> List.first(res)
-          end
-        end)
+  def get_fundamental_data(ticker, period, opts \\ [])
 
-      data ->
-        IO.inspect(data)
+  def get_fundamental_data(ticker, [_ | _] = periods, opts) do
+    Enum.map(periods, &fundamental_data_periods/1)
+    |> :lists.flatten()
+    |> then(fn standardize_p ->
+      get_fundamental_by_periods(ticker, standardize_p, opts)
+      |> do_get_fundamental_detail(opts)
+    end)
+    |> Enum.sort_by(& &1.period)
+  end
 
-        {:error,
-         "fundamental data with with ticker #{inspect(ticker)} and period of #{inspect(period)} is not found"}
+  def get_fundamental_data(ticker, period, opts) when is_number(period) do
+    fundamental_data_periods(period)
+    |> :lists.flatten()
+    |> then(&get_fundamental_data(ticker, &1, opts))
+    |> Enum.sort_by(& &1.period)
+  end
+
+  def get_fundamental_data(ticker, period, opts), do: get_fundamental_data(ticker, [period], opts)
+
+  defp fundamental_data_periods(year) when is_number(year), do: parse_periods(year)
+
+  defp fundamental_data_periods(string_year) when is_bitstring(string_year) do
+    try do
+      year = String.to_integer(string_year)
+      fundamental_data_periods(year)
+    rescue
+      ArgumentError -> [string_year]
     end
   end
 
@@ -1061,24 +1078,62 @@ defmodule Munchkin.Inventory do
     |> repo.transact()
   end
 
-  defp align_transaction(repo, transaction, %{"sell_method" => "lifo"}) do
+  defp align_transaction(repo, %{status: %{key: :executed}} = transaction, %{
+         "sell_method" => "lifo"
+       }) do
+    value = transaction.quantity * transaction.price
+
     get_user_per_asset_transaction(transaction.user_id, transaction.asset_id,
       repo: repo,
       type: :buy
     )
     |> Enum.sort_by(& &1.inserted_at, :desc)
-    |> Enum.reduce(transaction.quantity, &quantity_transaction_subtraction(&1, &2, repo))
-    |> then(fn _ -> {:ok, "updated"} end)
+    |> Enum.reduce(
+      {transaction.quantity, [], value},
+      &quantity_transaction_subtraction(&1, &2, repo)
+    )
+    |> then(fn {_, trxs, value} ->
+      related = [transaction.id | trxs]
+
+      Munchkin.Accounts.add_user_realizations(
+        %{
+          user_id: transaction.user_id,
+          asset_id: transaction.asset_id,
+          related_transactions: related,
+          value: value
+        },
+        repo: repo
+      )
+    end)
   end
 
-  defp align_transaction(repo, transaction, %{"sell_method" => "fifo"}) do
+  defp align_transaction(repo, %{status: %{key: :executed}} = transaction, %{
+         "sell_method" => "fifo"
+       }) do
+    value = transaction.quantity * transaction.price
+
     get_user_per_asset_transaction(transaction.user_id, transaction.asset_id,
       repo: repo,
       type: :buy
     )
     |> Enum.sort_by(& &1.inserted_at, :asc)
-    |> Enum.reduce(transaction.quantity, &quantity_transaction_subtraction(&1, &2, repo))
-    |> then(fn _ -> {:ok, "updated"} end)
+    |> Enum.reduce(
+      {transaction.quantity, [], value},
+      &quantity_transaction_subtraction(&1, &2, repo)
+    )
+    |> then(fn {_, trxs, value} ->
+      related = [transaction.id | trxs]
+
+      Munchkin.Accounts.add_user_realizations(
+        %{
+          user_id: transaction.user_id,
+          asset_id: transaction.asset_id,
+          related_transactions: related,
+          value: value
+        },
+        repo: repo
+      )
+    end)
   end
 
   defp align_transaction(_repo, _transaction, _) do
@@ -1087,33 +1142,32 @@ defmodule Munchkin.Inventory do
 
   defp quantity_transaction_subtraction(_transaction, 0, _repo), do: 0
 
-  defp quantity_transaction_subtraction(transaction, qty, repo) do
-    IO.inspect("QTY ====")
-    IO.inspect(qty)
-    IO.inspect("TRX ====")
-    IO.inspect(transaction)
-    IO.inspect("END TRX ====")
-
+  defp quantity_transaction_subtraction(transaction, {qty, acc, pnl}, repo) do
     transaction.current_quantity
     |> Kernel.-(qty)
-    |> IO.inspect()
     |> case do
       num when num > 0 ->
         Transaction.subtract_quantity(transaction, num)
         |> repo.update()
-        |> IO.inspect()
         |> case do
-          {:ok, _trx} -> num
-          _ -> qty
+          {:ok, trx} ->
+            min = trx.quantity * trx.price
+            {num, [trx.id | acc], pnl - min}
+
+          _ ->
+            {qty, acc, pnl}
         end
 
       num ->
         Transaction.subtract_quantity(transaction, transaction.quantity)
         |> repo.update()
-        |> IO.inspect()
         |> case do
-          {:ok, _trx} -> abs(num)
-          _ -> qty
+          {:ok, trx} ->
+            min = trx.quantity * trx.price
+            {abs(num), [trx.id | acc], pnl - min}
+
+          _ ->
+            {qty, acc, pnl}
         end
     end
   end
@@ -1147,6 +1201,26 @@ defmodule Munchkin.Inventory do
             order_by: {:desc, t.inserted_at},
             preload: [:asset]
       end
+
+    repo.all(query)
+  end
+
+  def get_user_specific_asset_transactions(user_or_id, asset_or_id, opts \\ [])
+
+  def get_user_specific_asset_transactions(%Munchkin.Accounts.User{} = user, asset_or_id, opts),
+    do: get_user_specific_asset_transactions(user.id, asset_or_id, opts)
+
+  def get_user_specific_asset_transactions(user, %Asset{} = asset, opts),
+    do: get_user_specific_asset_transactions(user, asset.id, opts)
+
+  def get_user_specific_asset_transactions(user_id, asset_id, opts) do
+    repo = Keyword.get(opts, :queue, Munchkin.Repo)
+
+    query =
+      from t in Transaction,
+        where: t.user_id == ^user_id and t.asset_id == ^asset_id,
+        where: t.status == :executed and t.transaction_type == :buy,
+        preload: [asset: :tickers]
 
     repo.all(query)
   end
@@ -1256,10 +1330,22 @@ defmodule Munchkin.Inventory do
     repo.all(query)
   end
 
-  def set_transaction_settlement(trx, ref \\ nil) do
-    trx
-    |> Transaction.settlement_changeset(%{reference_id: ref})
-    |> Repo.update()
+  def set_transaction_settlement(trx, params) do
+    ref = Map.get(params, "reference_id")
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(
+      :transaction,
+      Transaction.settlement_changeset(trx, %{reference_id: ref})
+    )
+    |> Ecto.Multi.run(:updated_trx, fn
+      repo, %{transaction: %{transaction_type: type} = trx} when type.key == :sell ->
+        align_transaction(repo, trx, params)
+
+      _, %{transaction: trx} ->
+        {:ok, trx}
+    end)
+    |> Repo.transact()
   end
 
   def user_portfolio(user_or_id, opts \\ [])
@@ -1308,10 +1394,10 @@ defmodule Munchkin.Inventory do
 
   defp calculate_one_asset_portfolio(transactions, latest_price) do
     Enum.reduce(transactions, %{}, fn trx, acc ->
-      curr_qty = Map.get(acc, :current_quantity, Decimal.new(0))
+      curr_qty = Map.get(acc, :quantity, Decimal.new(0))
       curr_avg = Map.get(acc, :average_price, Decimal.new(0))
 
-      new_qty = Decimal.add(curr_qty, trx.quantity)
+      new_qty = Decimal.add(curr_qty, trx.current_quantity)
 
       new_val =
         Decimal.mult(curr_qty, curr_avg)

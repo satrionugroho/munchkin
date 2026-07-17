@@ -2,20 +2,23 @@
 
 <div class="w-full">
   <Layouts.plain_modal
-    id="sell_transaction_modal"
+    :if={@modal != ""}
+    open={true}
+    close_action="close-modal"
+    id="transaction_modal"
     title={gettext("Wanna sell an existing asset?")}
   >
     <.live_component
+      :if={@modal == "sell"}
       module={MunchkinWeb.SellTransactionComponent}
-      current_user={@current_user}
+      current_user_session={@current_user_session}
       id="sell_transaction_component"
     />
-  </Layouts.plain_modal>
 
-  <Layouts.plain_modal id="buy_transaction_modal" title={gettext("Get a new asset")}>
     <.live_component
+      :if={@modal == "buy"}
       module={MunchkinWeb.BuyTransactionComponent}
-      user={@current_user}
+      current_user_session={@current_user_session}
       id="buy_transaction_component"
     />
   </Layouts.plain_modal>
@@ -35,16 +38,16 @@
         id="create-transaction"
       >
         <li>
-          <a onclick="buy_transaction_modal.showModal()">
+          <.link phx-click="open-modal" phx-value-id="buy">
             <.icon name="hero-document-plus" />
             <span>{gettext("Buy")}</span>
-          </a>
+          </.link>
         </li>
         <li>
-          <a onclick="sell_transaction_modal.showModal()">
+          <.link phx-click="open-modal" phx-value-id="sell">
             <.icon name="hero-document-minus" />
             <span>{gettext("Sell")}</span>
-          </a>
+          </.link>
         </li>
       </ul>
     </div>
@@ -54,19 +57,15 @@
     <.stats>
       <:item
         title={gettext("Number of transactions")}
-        value={Munchkin.Cldr.Number.to_string!(@total_transaction, format: :short)}
+        value={number_format(@total_transaction)}
         description={gettext("Total number of transactions")}
+        action="yuhuu"
         background="bg-primary"
       />
 
       <:item
         title={gettext("Current month transactions")}
-        value={
-          Munchkin.Cldr.Number.to_string!(@current_month_transaction,
-            currency: "IDR",
-            format: :short
-          )
-        }
+        value={currency_format(@current_month_transaction)}
         description={gettext("Total amount of current month transactions")}
         background="bg-info"
       />
@@ -110,36 +109,41 @@
 
   <div class="w-full mt-4">
     <div class="w-full">
-      <.table id="transactions_list" rows={@transactions}>
-        <:col :let={trx} label="ID">
-          <div class="flex">
-            <span class="mr-2">
-              <.transaction_type_badge type={trx.transaction_type.label} />
-            </span>
-            <span class="mr-2">
-              <.transaction_status_badge status={trx.status.label} />
-            </span>
-            <span>
-              {concatenate(trx.id)}
-            </span>
-            <button
-              type="button"
-              class="cursor-pointer ml-2 text-primary"
-              phx-hook="ModalOpenerHook"
-              id={"trx_id_#{trx.id}"}
-              data-target="detail_transaction"
-              data-data={json_data(trx)}
-            >
-              <.icon name="hero-identification" />
-            </button>
-          </div>
-        </:col>
-        <:col :let={trx} label="Asset Name">{trx.asset.name}</:col>
-        <:col :let={trx} label="Price">{trx.price}</:col>
-        <:col :let={trx} label="Qty">
-          {gettext("%{qty} shares (%{lot} LOT)", qty: trx.quantity, lot: ceil(trx.quantity / 100))}
-        </:col>
-      </.table>
+      <.async_result :let={transactions} assign={@transactions}>
+        <:loading>{gettext("Loading the user transactions...")}</:loading>
+        <:failed :let={_failuer}>
+          {gettext("There was an error loading the transactions")}
+        </:failed>
+        <.table id="transactions_list" rows={transactions}>
+          <:col :let={trx} label="ID">
+            <div class="flex">
+              <span class="mr-2">
+                <.transaction_type_badge type={trx.transaction_type.label} />
+              </span>
+              <span>{concatenate(trx.id)}</span>
+              <button
+                type="button"
+                class="cursor-pointer ml-2 text-primary"
+                phx-hook="ModalOpenerHook"
+                id={"trx_id_#{trx.id}"}
+                data-target="detail_transaction"
+                data-data={json_data(trx)}
+              >
+                <.icon name="hero-identification" />
+              </button>
+            </div>
+          </:col>
+          <:col :let={trx} label="Asset Name">{trx.asset.name}</:col>
+          <:col :let={trx} label="Price">{currency_format(trx.price, type: :standard)}</:col>
+          <:col :let={trx} label="Qty">
+            {gettext("%{qty} shares (%{lot} LOT)",
+              qty: trx.quantity,
+              lot: ceil(trx.quantity / 100)
+            )}
+          </:col>
+        </.table>
+      </.async_result>
+
       <div :if={@paginated?} class="w-full flex justify-between mt-4">
         <span>
           {gettext("Showing %{first}-%{last} of %{total} records",

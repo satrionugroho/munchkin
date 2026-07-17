@@ -58,10 +58,13 @@ defmodule MunchkinWeb.Router do
     pipe_through :authenticated_user
 
     get "/", HomeController, :index
-    resources "/analyze", AnalyzeController, only: [:index, :show]
-    resources "/portfolio", PortfolioController, only: [:index, :show]
 
+    live "/analyze", AnalyzeLive
+    live "/analyze/:ticker", AnalyzeLive
     live "/transactions", TransactionLive
+    live "/portfolio", PortfolioLive
+
+    get "/transactions/find-ticker", TransactionController, :find
     get "/transactions/search-ticker", TransactionController, :search
     resources "/transactions", TransactionController, only: [:show]
 

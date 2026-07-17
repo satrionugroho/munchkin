@@ -127,7 +127,7 @@ defmodule MunchkinWeb.CoreComponents do
   attr :text, :string
 
   def tooltip(assigns) do
-    assigns = assign_new(assigns, :text, gettext("Hover Me"))
+    assigns = assign_new(assigns, :text, fn -> gettext("Hover Me") end)
 
     ~H"""
     <div :if={Map.get(assigns, :value)} class="tooltip" data-tip={@value}>
@@ -431,14 +431,18 @@ defmodule MunchkinWeb.CoreComponents do
   """
   slot :item, required: true do
     attr :title, :string, required: true
+    attr :header_class, :string
   end
 
   def list(assigns) do
     ~H"""
     <ul class="list">
-      <li :for={item <- @item} class="p-3 border-t first:border-t-0 border-base-content/20">
+      <li
+        :for={item <- @item}
+        class="p-3 border-t first:border-t-0 border-base-content/20"
+      >
         <div class="list-col-grow">
-          <div class="font-bold">{item.title}</div>
+          <div class={["font-bold", Map.get(item, :header_class)]}>{item.title}</div>
           <div>{render_slot(item)}</div>
         </div>
       </li>
@@ -574,6 +578,7 @@ defmodule MunchkinWeb.CoreComponents do
     attr :icon, :string
     attr :description, :string
     attr :link, :string
+    attr :action, :string
   end
 
   def stats(assigns) do
@@ -592,22 +597,87 @@ defmodule MunchkinWeb.CoreComponents do
         :for={item <- @item}
         class={[
           "flex-auto rounded-sm px-2 py-1 flex items-center min-w-64",
+          Map.get(item, :action, "") != "" && "cursor-pointer",
+          Map.get(item, :link, "") != "" && "cursor-pointer",
           Map.get(item, :background, "")
         ]}
       >
-        <div class="flex flex-col flex-auto px-4">
-          <div class={["text-sm text-gray-200", Map.get(item, :class, "")]}>
-            <.icon :if={Map.get(item, :icon)} name={item.icon} />
-          </div>
-          <div class="stat-title mb-2 capitalize">{item.title}</div>
-          <div class={["text-4xl font-bold", Map.get(item, :class, "text-white")]}>{item.value}</div>
-          <div class="text-sm text-gray-300 mt-2">{item.description}</div>
+        <.stat_item_with_action
+          :if={Map.get(item, :action)}
+          action={Map.get(item, :action)}
+          title={Map.get(item, :title)}
+          class={Map.get(item, :class)}
+          value={Map.get(item, :value)}
+          icon={Map.get(item, :icon)}
+          description={Map.get(item, :description)}
+          link={Map.get(item, :link)}
+        />
+        <.stat_item
+          :if={is_nil(Map.get(item, :action))}
+          title={Map.get(item, :title)}
+          class={Map.get(item, :class)}
+          value={Map.get(item, :value)}
+          icon={Map.get(item, :icon)}
+          description={Map.get(item, :description)}
+          link={Map.get(item, :link)}
+        />
+      </div>
+    </div>
+    """
+  end
+
+  attr :class, :string
+  attr :title, :string
+  attr :value, :string, required: true
+  attr :link, :string
+  attr :description, :string
+  attr :icon, :string
+  attr :action, :string, required: true
+
+  defp stat_item_with_action(assigns) do
+    ~H"""
+    <div class="w-full flex flex-row items-center" phx-click={@action}>
+      <div class="flex flex-col flex-auto px-4">
+        <div class={["text-sm text-gray-200", @class]}>
+          <.icon :if={@icon} name={@icon} />
         </div>
-        <div :if={Map.get(item, :link)}>
-          <.link href={item.link}>
-            <.icon name="hero-chevron-right" class="size-5" />
-          </.link>
+        <div class="stat-title mb-2 capitalize">{@title}</div>
+        <div class={["text-4xl font-bold", Map.get(assigns, :class, "text-white")]}>
+          {@value}
         </div>
+        <div class="text-sm text-gray-300 mt-2">{@description}</div>
+      </div>
+      <div>
+        <.icon name="hero-chevron-right" class="size-5" />
+      </div>
+    </div>
+    """
+  end
+
+  attr :class, :string
+  attr :title, :string
+  attr :value, :string, required: true
+  attr :link, :string
+  attr :description, :string
+  attr :icon, :string
+
+  defp stat_item(assigns) do
+    ~H"""
+    <div class="w-full flex flex-row items-center">
+      <div class="flex flex-col flex-auto px-4">
+        <div class={["text-sm text-gray-200", @class]}>
+          <.icon :if={@icon} name={@icon} />
+        </div>
+        <div class="stat-title mb-2 capitalize">{@title}</div>
+        <div class={["text-4xl font-bold", Map.get(assigns, :class, "text-white")]}>
+          {@value}
+        </div>
+        <div class="text-sm text-gray-300 mt-2">{@description}</div>
+      </div>
+      <div :if={Map.get(assigns, :link)}>
+        <.link href={@link}>
+          <.icon name="hero-chevron-right" class="size-5" />
+        </.link>
       </div>
     </div>
     """
@@ -625,10 +695,11 @@ defmodule MunchkinWeb.CoreComponents do
     """
   end
 
-  attr :text, :string, required: true
+  attr :text, :string
   attr :size, :string, values: ~w(xs sm md lg xl)
   attr :type, :string, values: ~w(soft outline dash normal)
-  attr :variant, :string, values: ~w(primary info error warning plain)
+  attr :variant, :string, values: ~w(primary info error warning plain success)
+  slot :inner_block
 
   def badge(assigns) do
     assigns = badge_assigns(assigns)
@@ -636,7 +707,10 @@ defmodule MunchkinWeb.CoreComponents do
     ~H"""
     <div class={["badge", @size, @type, @variant]}>
       <.icon :if={Map.get(assigns, :icon)} name={@icon} />
-      <span>{@text}</span>
+      <span :if={Map.get(assigns, :text)}>{@text}</span>
+      <div :if={@inner_block != []} class="w-full">
+        {render_slot(@inner_block)}
+      </div>
     </div>
     """
   end
@@ -804,5 +878,162 @@ defmodule MunchkinWeb.CoreComponents do
       </button>
     </div>
     """
+  end
+
+  attr :value, :float, required: true
+  attr :type, :atom, default: :long
+
+  def pnl_block(assigns) do
+    assigns =
+      assign(
+        assigns,
+        :format,
+        Munchkin.Cldr.Number.to_string!(assigns.value,
+          format: assigns.type
+        )
+      )
+
+    ~H"""
+    <div class="flex ml-2">
+      <div :if={@value > 0} class="text-success">
+        <span>(</span>
+        <.icon name="hero-plus" />
+        <span>{@format}</span>
+        <span>)</span>
+      </div>
+
+      <div :if={@value < 0} class="text-danger">
+        <span>(</span>
+        <.icon name="hero-minus" />
+        <span>{@format}</span>
+        <span>)</span>
+      </div>
+    </div>
+    """
+  end
+
+  attr :message, :string, required: true
+  attr :description, :string
+  attr :style, :string, values: ~w(dot outline soft normal)
+  attr :variant, :string, values: ~w(primary info error warning)
+  attr :icon, :string
+
+  def alert(assigns) do
+    variants = %{
+      "primary" => "alert-primary",
+      "info" => "alert-info",
+      "error" => "alert-error",
+      "warning" => "alert-warning",
+      nil => ""
+    }
+
+    styles = %{
+      "dot" => "alert-dash",
+      "outline" => "alert-outline",
+      "soft" => "alert-soft",
+      nil => ""
+    }
+
+    assigns =
+      assign_new(assigns, :class, fn ->
+        ["alert", Map.fetch!(variants, assigns[:variant]), Map.fetch!(styles, assigns[:style])]
+      end)
+
+    ~H"""
+    <div role="alert" class={@class}>
+      <.icon :if={Map.get(assigns, :icon)} name={@icon} />
+      <div>
+        <h3 class="font-bold">{@message}</h3>
+        <span :if={Map.get(assigns, :description)}>{@description}</span>
+      </div>
+    </div>
+    """
+  end
+
+  attr :data, :list, required: true
+  attr :type, :atom, required: true
+  attr :timeframe, :string, default: "yearly"
+  attr :format, :atom, values: [:short, :standard], default: :standard
+
+  slot :row, required: true do
+    attr :key, :atom
+  end
+
+  def fundamental_table(assigns) do
+    assigns =
+      assign_new(assigns, :columns, fn ->
+        get_fundamental_range(assigns.data, assigns.timeframe)
+      end)
+
+    ~H"""
+    <div class="flex w-full mt-4">
+      <div class="flex flex-col w-1/5">
+        <div class="h-12">&nbsp;</div>
+        <div :for={r <- @row} class="w-[160px] h-12 font-bold">{render_slot(r)}</div>
+      </div>
+      <div class="flex flex-col overflow-x-scroll w-full max-w-[2160px]">
+        <div class={["flex h-12 items-center", (@format == :standard && "w-[2160px]") || "w-full"]}>
+          <span
+            :for={r <- @columns}
+            class={[
+              (@format == :standard && "w-[210px]") || "w-[130px]",
+              "ml-2 font-bold text-center"
+            ]}
+          >
+            {r}
+          </span>
+        </div>
+        <div
+          :for={f <- @row}
+          class={["flex h-12 items-center", (@format == :standard && "w-[2160px]") || "w-full"]}
+        >
+          <div
+            :for={r <- @columns}
+            class={[
+              "ml-2",
+              (@format == :standard && "w-[210px] text-left") || "w-[130px] text-center"
+            ]}
+          >
+            <span>{get_fundamental_item(@data, @type, r, f.key, @format)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  defp get_fundamental_item(data, type, period, item, format) do
+    Enum.find(data, &Kernel.==(&1.period, period))
+    |> Map.get(type, %{})
+    |> Map.get(item)
+    |> case do
+      num when is_number(num) -> Munchkin.Cldr.Number.to_string!(num, format: format)
+      _ -> Munchkin.Cldr.Number.to_string!(0, format: :short)
+    end
+  end
+
+  defp get_fundamental_period(data), do: data.period
+
+  defp get_fundamental_range(data, "quarterly") do
+    data
+    |> Enum.filter(&String.contains?(&1.period, "Q"))
+    |> Enum.reduce([], fn d, acc ->
+      case String.contains?(d.period, "Q") do
+        true -> [d.period | acc]
+        _ -> acc
+      end
+    end)
+    |> Enum.sort(:desc)
+  end
+
+  defp get_fundamental_range(data, _) do
+    data
+    |> Enum.reduce([], fn d, acc ->
+      case String.contains?(d.period, "FY") do
+        true -> [d.period | acc]
+        _ -> acc
+      end
+    end)
+    |> Enum.sort(:desc)
   end
 end

@@ -1,0 +1,159 @@
+<Layouts.flash_group flash={@flash} />
+
+<div class="w-full flex flex-col">
+  <div class="my-2 w-full relative">
+    <div class="block h-28 bg-base-300">
+      <tv-ticker-tape
+        symbols={@ticker_symbols}
+        hide-chart
+        line-chart-type="Line"
+      >
+      </tv-ticker-tape>
+    </div>
+    <div class="h-6 bg-base-300 absolute left-0 right-0 w-full z-10 bottom-0"></div>
+  </div>
+
+  <.async_result
+    :let={stats}
+    assign={@stats}
+  >
+    <:loading>{gettext("Loading the statistics...")}</:loading>
+    <:failed :let={_failuer}>
+      {gettext("There was an error loading the portfolio statistics")}
+    </:failed>
+    <.stats>
+      <:item
+        title={gettext("Total invested")}
+        value={stats.total_invested}
+        description={gettext("Cumulative sum of money you have contributed to")}
+        background="bg-info"
+      />
+
+      <:item
+        title={gettext("Realizations Value")}
+        value={stats.realization}
+        action={JS.dispatch("click", to: "#showmodal")}
+        description={gettext("Cumulative sum of money you have realized into")}
+        background="bg-success"
+      />
+
+      <:item
+        title={gettext("Unrealized P&L")}
+        value={stats.unrealized_pnl}
+        description={gettext("Profit or loss on an investment position")}
+        background="bg-warning"
+      />
+    </.stats>
+  </.async_result>
+
+  <.async_result :let={data} assign={@portfolio}>
+    <:loading>{gettext("Loading your portfolio...")}</:loading>
+    <:failed :let={_failuer}>
+      {gettext("There was an error loading the portfolio")}
+    </:failed>
+
+    <.table id="transactions_list" rows={data}>
+      <:col :let={d} label={gettext("Asset Name")}>
+        <.link phx-click="open_detail" phx-value-id={d.asset_id} class="link">
+          {d.asset_name}
+        </.link>
+      </:col>
+      <:col :let={d} label={gettext("Average Price")}>{d.average_price}</:col>
+      <:col :let={d} label={gettext("Qty")}>
+        {gettext("%{qty} shares (%{lot} LOT)",
+          qty: d.quantity,
+          lot: ceil(d.quantity / 100)
+        )}
+      </:col>
+      <:col :let={d} label={gettext("Current Value")}>
+        <div class="flex">
+          <span>{d.current_value}</span>
+          <.pnl_block value={d.estimated_pnl} type={:short} />
+        </div>
+      </:col>
+    </.table>
+  </.async_result>
+</div>
+
+<div :if={@modal_show} id="modal-detail">
+  <Layouts.plain_modal
+    id="detail"
+    title={gettext("Correlated transaction in current portfolio")}
+    close_action="close_detail"
+    open={@modal_show}
+  >
+    <div class="w-full">
+      <.list>
+        <:item title={gettext("Asset Name")}>
+          <div class="flex w-full">
+            <div class="w-1/2">
+              {@detail.asset.name} ({@detail.asset.id})
+            </div>
+            <div class="w-1/2">
+              <.badge variant="primary" size="xl">
+                <div class="text-xs flex">
+                  <div class="font-bold">
+                    <span>{gettext("Latest close")}</span>
+                    <span>({@latest_close.date})</span>
+                    <span>:</span>
+                  </div>
+                  <div class="text-md font-bold ml-2">{@latest_close.close}</div>
+                </div>
+              </.badge>
+            </div>
+          </div>
+        </:item>
+        <:item title={gettext("Related Tickers")}>
+          <div class="flex w-full">
+            <.badge :for={t <- @detail.asset.tickers}>
+              <span>{t.ticker}</span>
+              <span>-</span>
+              <span>{t.exchange}</span>
+            </.badge>
+          </div>
+        </:item>
+        <:item title={gettext("Asset Type")}>{@detail.asset.type_id.label}</:item>
+        <:item title={gettext("Address")}>{@detail.asset.address}</:item>
+        <:item title={gettext("Industry")}>
+          <.badge variant="info" text={titleize(@detail.asset.industry)} />
+          <span>({titleize(@detail.asset.subindustry)})</span>
+        </:item>
+        <:item title={gettext("Sector")}>
+          <.badge variant="warning" text={titleize(@detail.asset.sector)} />
+          ({titleize(@detail.asset.subsector)})
+        </:item>
+        <:item title={gettext("Contact")}>{@detail.asset.email}</:item>
+      </.list>
+
+      <div class="mt-4">
+        <h2 class="font-bold text-xl">
+          {gettext("Transaction List")}
+        </h2>
+        <.table id="related_transactions_list" rows={@detail.transactions}>
+          <:col :let={trx} label="ID">
+            <div class="flex"><span>{concatenate(trx.id, end: 7)}</span></div>
+          </:col>
+          <:col :let={trx} label="Price">{trx.price}</:col>
+          <:col :let={trx} label="Qty">
+            {gettext("%{qty} shares (%{lot} LOT)",
+              qty: trx.quantity,
+              lot: ceil(trx.quantity / 100)
+            )}
+          </:col>
+          <:col
+            :let={trx}
+            phx-hook="Format"
+            data-format="date"
+            label={gettext("Transaction Date")}
+          >
+            {intl_date(trx.transaction_date)}
+          </:col>
+          <:col :let={trx} label={gettext("Settlement Date")}>
+            {intl_date(trx.settlement_date)}
+          </:col>
+          <:col :let={trx} label={gettext("Inserted At")}>{intl_date(trx.inserted_at)}</:col>
+        </.table>
+      </div>
+    </div>
+  </Layouts.plain_modal>
+</div>

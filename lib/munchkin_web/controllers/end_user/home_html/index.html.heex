@@ -4,7 +4,7 @@
   <div class="my-2 w-full relative">
     <div class="block h-28 bg-base-300">
       <tv-ticker-tape
-        symbols="FOREXCOM:SPXUSD,CMCMARKETS:GOLD,FX_IDC:USDIDR"
+        symbols={@ticker_symbols}
         hide-chart
         line-chart-type="Line"
       >
@@ -13,14 +13,14 @@
     <div class="h-6 bg-base-300 absolute left-0 right-0 w-full z-10 bottom-0"></div>
   </div>
 
-  <div class="">
+  <div class="w-full">
     <.stats>
       <:item
         title="Total portfolio"
         value="0M"
         description="No portfolio"
         background="bg-primary"
-        link="/portfolio"
+        action={JS.patch("/portfolio")}
       />
 
       <:item

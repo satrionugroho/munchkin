@@ -21,6 +21,13 @@ defmodule MunchkinWeb.EndUser.TransactionController do
     end
   end
 
+  def find(conn, %{"q" => q}) do
+    with raw_data <- Munchkin.Inventory.search_ticker(q),
+         data <- parse_found_data(raw_data) do
+      json(conn, data)
+    end
+  end
+
   def get_asset_data(portfolio, query) do
     Map.keys(portfolio)
     |> Munchkin.Inventory.get_multiple_assets(keyword: query)
@@ -29,6 +36,15 @@ defmodule MunchkinWeb.EndUser.TransactionController do
       %{name: asset.name, ticker: ticker.ticker, exchange: ticker.exchange, id: asset.id}
     end)
   end
+
+  defp parse_found_data(data) when length(data) > 0 do
+    %{
+      status: 200,
+      data: Enum.map(data, &standardize_found_data/1)
+    }
+  end
+
+  defp parse_found_data(_data), do: parse_data(nil)
 
   defp parse_data(data) when length(data) > 0 do
     %{
@@ -48,6 +64,13 @@ defmodule MunchkinWeb.EndUser.TransactionController do
     %{
       label: "#{Map.get(data, :name)} (#{Map.get(data, :ticker)}-#{Map.get(data, :exchange)})",
       value: Map.get(data, :id)
+    }
+  end
+
+  defp standardize_found_data(data) do
+    %{
+      label: "#{Map.get(data, :name)} (#{Map.get(data, :ticker)}-#{Map.get(data, :exchange)})",
+      value: "#{Map.get(data, :ticker)}.#{Map.get(data, :exchange)}"
     }
   end
 end

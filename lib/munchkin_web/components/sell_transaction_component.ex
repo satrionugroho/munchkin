@@ -12,10 +12,11 @@ defmodule MunchkinWeb.SellTransactionComponent do
           available_assets: [],
           quantity: 0,
           price: 0,
-          errors: %{}
+          errors: %{},
+          current_user_session: "",
+          portfolio: []
         )
         |> assign_market()
-        |> assign_portfolio()
 
       _ ->
         assign(socket,
@@ -32,9 +33,8 @@ defmodule MunchkinWeb.SellTransactionComponent do
   end
 
   def update(assigns, socket) do
-    assign_new(socket, :current_user, fn ->
-      Map.get(assigns, :current_user)
-    end)
+    socket
+    |> assign(assigns)
     |> assign_new(:form, fn ->
       Munchkin.Inventory.change_transaction(%Transaction{})
       |> to_form()
@@ -331,7 +331,7 @@ defmodule MunchkinWeb.SellTransactionComponent do
               <.button
                 type="button"
                 variant="plain"
-                phx-click={JS.dispatch("click", to: "#sell_transaction_modal-close")}
+                phx-click={JS.dispatch("click", to: "#transaction_modal-close")}
               >
                 {gettext("Back")}
               </.button>

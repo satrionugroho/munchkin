@@ -17,6 +17,7 @@ defmodule Munchkin.Application do
       # Start to serve requests, typically the last entry
       MunchkinWeb.Endpoint,
       Munchkin.Scheduler,
+      {DynamicSupervisor, name: Munchkin.DynamicSupervisor, strategy: :one_for_one},
       Munchkin.DelayedJob,
       Munchkin.Cache,
       Munchkin.Engine,

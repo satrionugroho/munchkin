@@ -198,28 +198,51 @@ defmodule MunchkinWeb.Layouts do
   attr :title, :string
   attr :subtitle, :string
   attr :close_button, :boolean, default: true
+  attr :close_action, :string, default: ""
+  attr :open, :boolean, default: false
   attr :width, :string, default: "w-11/12"
 
   slot :inner_block
 
   def plain_modal(assigns) do
     ~H"""
-    <dialog id={@id} class="modal">
+    <dialog id={@id} open={@open} class="modal">
       <div class={"modal-box #{@width} max-w-5xl z-10"}>
         <div>
           <div :if={Map.get(assigns, :title)} class="mb-2">
             <h1 class="text-lg font-bold">{@title}</h1>
             <span :if={Map.get(assigns, :subtitle)} class="text-md italic">{@subtitle}</span>
           </div>
-          <form :if={@close_button} method="dialog" class="absolute right-2 top-2">
-            <button class="btn btn-sm btn-circle btn-ghost" id={"#{@id}-close"}>
-              <.icon name="hero-x-mark" />
-            </button>
-          </form>
+          <.modal_close id={@id} show={@close_button} action={@close_action} />
         </div>
         <div class="w-full">{render_slot(@inner_block)}</div>
       </div>
     </dialog>
+    """
+  end
+
+  attr :show, :boolean, default: true
+  attr :id, :string, required: true
+  attr :action, :string
+
+  defp modal_close(assigns) do
+    ~H"""
+    <form :if={@show && @action == ""} method="dialog" class="absolute right-2 top-2">
+      <button class="btn btn-sm btn-circle btn-ghost" id={"#{@id}-close"}>
+        <.icon name="hero-x-mark" />
+      </button>
+    </form>
+
+    <form
+      :if={@show && @action != ""}
+      method="dialog"
+      phx-submit={@action}
+      class="absolute right-2 top-2"
+    >
+      <button class="btn btn-sm btn-circle btn-ghost" id={"#{@id}-close"}>
+        <.icon name="hero-x-mark" />
+      </button>
+    </form>
     """
   end
 end

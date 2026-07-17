@@ -59,7 +59,17 @@ defmodule MunchkinWeb do
       use Gettext, backend: MunchkinWeb.Gettext
 
       import MunchkinWeb.LiveHelper,
-        only: [assign_user: 2, ok: 1, halt: 1, get_current_user: 1, noreply: 1, reply: 2]
+        only: [
+          assign_user: 2,
+          ok: 1,
+          halt: 1,
+          get_current_user: 1,
+          noreply: 1,
+          reply: 2,
+          assign_user_id: 2
+        ]
+
+      import MunchkinWeb.StringFormatterHelper, only: :functions
 
       unquote(html_helpers())
     end
@@ -70,7 +80,17 @@ defmodule MunchkinWeb do
       use Phoenix.LiveComponent
 
       import MunchkinWeb.LiveHelper,
-        only: [assign_user: 2, ok: 1, halt: 1, get_current_user: 1, noreply: 1, reply: 2]
+        only: [
+          assign_user: 2,
+          ok: 1,
+          halt: 1,
+          get_current_user: 1,
+          noreply: 1,
+          reply: 2,
+          assign_user_id: 2
+        ]
+
+      import MunchkinWeb.StringFormatterHelper, only: :functions
 
       unquote(html_helpers())
     end

@@ -4,6 +4,7 @@ defmodule Munchkin.Accounts do
   """
 
   import Ecto.Query, warn: false
+  alias Munchkin.Accounts.Realization
   alias Munchkin.Repo
 
   alias Munchkin.Accounts.{Admin, Integration, PartialQuery, User, UserToken}
@@ -734,4 +735,33 @@ defmodule Munchkin.Accounts do
     |> Integration.changeset(attrs)
     |> Repo.insert()
   end
+
+  def add_user_realizations(attrs \\ %{}, opts \\ []) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    %Realization{}
+    |> Realization.changeset(attrs)
+    |> repo.insert()
+  end
+
+  def get_user_realizations(user_or_id, opts \\ [])
+  def get_user_realizations(%User{} = user, opts), do: get_user_realizations(user.id, opts)
+
+  def get_user_realizations(user_id, opts) do
+    repo = Keyword.get(opts, :repo, Munchkin.Repo)
+
+    query = from q in Realization, where: q.user_id == ^user_id
+    data = repo.all(query)
+
+    case Keyword.get(opts, :summary) do
+      true -> calculate_realization_summary(data)
+      _ -> data
+    end
+  end
+
+  defp calculate_realization_summary([_ | _] = data) do
+    Enum.reduce(data, 0, &Decimal.add(&1.value, &2))
+  end
+
+  defp calculate_realization_summary(_), do: 0
 end

@@ -24,7 +24,11 @@ defmodule Munchkin.Accounts.User do
     has_many :subscriptions, Munchkin.Subscription.Plan
     has_many :integrations, Munchkin.Accounts.Integration
 
+    has_many :realization, Munchkin.Accounts.Realization
+
     has_one :tier, through: [:subscriptions, :product]
+
+    embeds_one :personalization, Munchkin.Accounts.UserPersonalization, on_replace: :update
 
     timestamps(type: :utc_datetime)
   end
@@ -34,6 +38,10 @@ defmodule Munchkin.Accounts.User do
     user
     |> cast(attrs, [:firstname, :lastname, :email, :password, :email_source])
     |> validate_required([:firstname, :lastname, :email, :email_source])
+    |> cast_embed(:personalization,
+      required: true,
+      with: &Munchkin.Accounts.UserPersonalization.changeset/2
+    )
     |> should_mark_email_valid?()
     |> should_cast_password?()
     |> downcase_email()
@@ -74,10 +82,17 @@ defmodule Munchkin.Accounts.User do
         add_password_error(changeset)
 
       _ ->
-        changeset
-        |> validate_required([:password])
-        |> cast_password()
+        case get_field(changeset, :password_hash) do
+          nil -> must_have_password(changeset)
+          _ -> changeset
+        end
     end
+  end
+
+  defp must_have_password(changeset) do
+    changeset
+    |> validate_required([:password])
+    |> cast_password()
   end
 
   defp add_password_error(changeset) do

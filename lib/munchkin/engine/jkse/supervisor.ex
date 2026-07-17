@@ -9,7 +9,8 @@ defmodule Munchkin.Engine.Jkse.Supervisor do
   def init(_arg) do
     children = [
       Munchkin.Engine.Jkse.Session,
-      Munchkin.Engine.Jkse.Instance
+      Munchkin.Engine.Jkse.Instance,
+      Munchkin.Engine.Jkse.SimpleCache
     ]
 
     pid =

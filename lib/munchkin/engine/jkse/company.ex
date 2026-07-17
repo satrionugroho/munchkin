@@ -1,6 +1,8 @@
 defmodule Munchkin.Engine.Jkse.Company do
   use Munchkin.Engine.Jkse.Engine
 
+  alias Munchkin.Engine.Jkse.SimpleCache
+
   def profile(ticker) when is_bitstring(ticker) do
     path = get_url(:company_profile, %{"KodeEmiten" => ticker})
 
@@ -20,6 +22,18 @@ defmodule Munchkin.Engine.Jkse.Company do
     |> case do
       {:ok, %{"result" => result}} -> {:ok, parse_esg(result)}
       err -> err
+    end
+  end
+
+  def corporate_action(ticker \\ nil) do
+    path = get_url(:corporate_action)
+
+    SimpleCache.get_or_update(:corporate_action, fn ->
+      fetch(path, [])
+    end)
+    |> case do
+      {:ok, %{"data" => data}} -> parse_corporate_action_data(data, ticker)
+      _ -> {:error, "cannot get corporate action"}
     end
   end
 
@@ -55,6 +69,41 @@ defmodule Munchkin.Engine.Jkse.Company do
       ],
       key
     )
+  end
+
+  defp parse_corporate_action_data(data, ticker) when ticker in [nil, ""] do
+    Enum.map(data, &translate_corporate_action/1)
+    |> Enum.sort_by(& &1["date"], {:desc, Date})
+    |> then(fn d -> {:ok, d} end)
+  end
+
+  defp parse_corporate_action_data(data, ticker) do
+    Enum.filter(data, fn %{"KodeEmiten" => t} ->
+      String.downcase(t)
+      |> String.equivalent?(String.downcase(ticker))
+    end)
+    |> Enum.map(&translate_corporate_action/1)
+    |> Enum.sort_by(& &1["date"], {:desc, Date})
+    |> then(fn d -> {:ok, d} end)
+  end
+
+  defp translate_corporate_action(data) do
+    Enum.reduce(data, %{}, fn
+      {k, value}, acc when k == "TanggalPencatatan" ->
+        key = Map.get(corporate_action_translation(), k)
+        val = Munchkin.Engine.Jkse.Utils.string_to_date(value)
+        Map.put(acc, key, val)
+
+      {k, value}, acc when k == "JenisTindakan" ->
+        key = Map.get(corporate_action_translation(), k)
+        val = Map.get(corporate_action_list(), value)
+
+        Map.put(acc, key, val)
+
+      {k, value}, acc ->
+        key = Map.get(corporate_action_translation(), k)
+        Map.put(acc, key, value)
+    end)
   end
 
   defp translate(key) do
@@ -119,5 +168,22 @@ defmodule Munchkin.Engine.Jkse.Company do
       "LastUpdate" => "last_update",
       "TickerCode" => "ticker"
     }
+  end
+
+  defp corporate_action_translation() do
+    %{
+      "JenisTindakan" => "action",
+      "JumlahSaham" => "quantity",
+      "JumlahSahamSetelahTindakan" => "become_quantity",
+      "KodeEmiten" => "ticker",
+      "TanggalPencatatan" => "date",
+      "id" => "id"
+    }
+  end
+
+  defp corporate_action_list() do
+    Munchkin.Engine.Jkse.Utils.corporate_actions_translation()
+    |> Enum.map(fn %{label: label, key: key} -> {key, label} end)
+    |> Enum.into(%{})
   end
 end

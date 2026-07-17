@@ -19,6 +19,33 @@ defmodule Munchkin.Engine.Jkse.Utils do
     end
   end
 
+  def corporate_actions_translation() do
+    [
+      %{key: "delist", id: -1, label: "Delisting"},
+      %{key: "waran", id: 1, label: "Warant"},
+      %{key: "stockSplit", id: 2, label: "Stock Split"},
+      %{key: "hmetd", id: 3, label: "Right Issue"},
+      %{key: "ipo", id: 4, label: "Initial Public Offerring"},
+      %{key: "tanpaHmetd", id: 5, label: "Private Placement"},
+      %{key: "Dividen Saham", id: 6, label: "Dividend"},
+      %{key: "sahamBonus", id: 7, label: "Stock Bonus"},
+      %{key: "gabungUsaha", id: 8, label: "Joint Venture"},
+      %{key: "kurangModal", id: 9, label: ""},
+      %{key: "partialDelisting", id: 10, label: "Partial Delisting"},
+      %{key: "obligasiWajibKonversi", id: 11, label: "Mandatory Convertible Bond"},
+      %{key: "partialRelisting", id: 12, label: "Partial Relisting"},
+      %{key: "esopMsop", id: 13, label: "ESOP/MSOP"},
+      %{key: "KonversiSaham", id: 14, label: "Stock Conversion"},
+      %{key: "CompanyListing", id: 15, label: "Company Listing"},
+      %{key: "BuybackSaham", id: 16, label: "Buyback Stock"},
+      %{key: "MSOP", id: 17, label: "MSOP"},
+      %{key: "PrivatePlacement", id: 18, label: "Private Placement (+)"},
+      %{key: "ESOP", id: 19, label: "ESOP"},
+      %{key: "reverseStock", id: 20, label: "Reverse Stock"},
+      %{key: "TransaksiMaterial", id: 21, label: "Material Transaction"}
+    ]
+  end
+
   defp parse_year(num), do: safe_parse_integer(num, Date.utc_today().year)
   defp parse_day(num), do: safe_parse_integer(num, Date.utc_today().day)
 

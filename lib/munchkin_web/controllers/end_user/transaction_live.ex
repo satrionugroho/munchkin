@@ -1,19 +1,21 @@
 defmodule MunchkinWeb.EndUser.TransactionLive do
+  alias Phoenix.LiveView.AsyncResult
   use MunchkinWeb, :live_view
 
   def mount(_, session, socket) do
-    assign_user(session, socket)
+    assign_user_id(session, socket)
     |> assign(
       current_page: 1,
       each_page: 20,
       tab: "executed",
-      transactions: [],
       total: 100,
       total_detailed: %{},
       total_transaction: 0,
       current_month_transaction: 0,
-      paginated?: false
+      paginated?: false,
+      modal: ""
     )
+    |> get_transactions_async()
     |> ok()
   end
 
@@ -24,7 +26,6 @@ defmodule MunchkinWeb.EndUser.TransactionLive do
         socket
         |> get_stats()
         |> assign(current_page: 1, each_page: 20, tab: "executed", total: 100, paginated?: false)
-        |> get_transactions()
 
       _ ->
         socket
@@ -52,7 +53,7 @@ defmodule MunchkinWeb.EndUser.TransactionLive do
 
   def handle_event("paginate", %{"page" => page}, socket) do
     assign(socket, :current_page, String.to_integer(page))
-    |> get_transactions()
+    |> get_transactions_async()
     |> noreply()
   end
 
@@ -60,13 +61,23 @@ defmodule MunchkinWeb.EndUser.TransactionLive do
     active_tab = String.downcase(tab)
 
     assign(socket, :tab, active_tab)
-    |> get_transactions()
+    |> get_transactions_async()
+    |> noreply()
+  end
+
+  def handle_event("open-modal", %{"id" => modal_id}, socket) do
+    assign(socket, :modal, modal_id)
+    |> noreply()
+  end
+
+  def handle_event("close-modal", _, socket) do
+    assign(socket, :modal, "")
     |> noreply()
   end
 
   defp do_update_transaction(socket, trx, ref) do
     trx
-    |> Munchkin.Inventory.set_transaction_settlement(ref)
+    |> Munchkin.Inventory.set_transaction_settlement(%{"reference_id" => ref})
     |> case do
       {:ok, _trx} -> put_flash(socket, :info, gettext("Transaction was updated sucessfully"))
       _ -> put_flash(socket, :error, gettext("An error occurred when updating the transactions"))
@@ -75,21 +86,39 @@ defmodule MunchkinWeb.EndUser.TransactionLive do
     |> then(fn s -> {:noreply, s} end)
   end
 
-  defp get_transactions(socket) do
+  defp get_transactions_async(socket) do
+    current_user = get_current_user(socket)
     type = socket.assigns.tab
     limit = socket.assigns.each_page
     page = socket.assigns.current_page
+    tab = socket.assigns.tab
+    total_detailed = socket.assigns.total_detailed
 
-    get_current_user(socket)
-    |> Munchkin.Inventory.get_user_transactions(
-      status: type,
+    assign_async(
+      socket,
+      :transactions,
+      fn ->
+        get_user_transaction(current_user,
+          type: type,
+          limit: limit,
+          page: page,
+          tab: tab,
+          total_detailed: total_detailed
+        )
+      end
+    )
+  end
+
+  defp get_user_transaction(user, opts) do
+    page = Keyword.get(opts, :page)
+    limit = Keyword.get(opts, :limit)
+
+    Munchkin.Inventory.get_user_transactions(user,
+      status: Keyword.get(opts, :type),
       limit: limit,
       offset: (page - 1) * limit
     )
-    |> then(fn trx ->
-      total_each = Map.get(socket.assigns.total_detailed, socket.assigns.tab)
-      assign(socket, transactions: trx, total: total_each)
-    end)
+    |> then(fn trx -> {:ok, %{transactions: trx}} end)
   end
 
   defp get_stats(socket) do
@@ -123,14 +152,6 @@ defmodule MunchkinWeb.EndUser.TransactionLive do
       {:ok, total} -> assign(socket, :current_month_transaction, total)
       _ -> assign(socket, :current_month_transaction, 0)
     end)
-  end
-
-  def concatenate(string, opts \\ []) do
-    start = Keyword.get(opts, :start, 0)
-    final = Keyword.get(opts, :end, 8)
-
-    String.slice(string, start, final)
-    |> Kernel.<>("...")
   end
 
   def json_data(trx) do

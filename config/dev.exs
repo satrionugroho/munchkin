@@ -92,3 +92,7 @@ config :munchkin, Munchkin.Engine.Jkse,
 config :munchkin, Munchkin.Engine.Factset,
   database_id: "738eb45b-ae86-47f4-9916-b4d775e4a5b9",
   instance: {Munchkin.Inventory, :get_source}
+
+# config :live_debugger,
+#   ip: {:local, "/tmp/live_debugger.sock"},
+#   port: 0

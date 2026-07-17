@@ -80,6 +80,8 @@ config :munchkin, Munchkin, name: "app"
 
 config :munchkin, Munchkin.Integrations.Payment, engine: Munchkin.ThirdParty.XenditMock
 
+config :swoosh, :api_client, Swoosh.ApiClient.Req
+
 config :pythonx, :uv_init,
   pyproject_toml: """
   [project]

@@ -46,11 +46,11 @@ defmodule Munchkin.MixProject do
     [
       {:phoenix, "~> 1.8.0"},
       {:phoenix_ecto, "~> 4.5"},
-      {:ecto_sql, "~> 3.13"},
-      {:postgrex, ">= 0.0.0"},
+      {:ecto_sql, "~> 3.14"},
+      {:postgrex, ">= 0.22.3"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 1.1.17"},
+      {:phoenix_live_view, "~> 1.2.7"},
       {:lazy_html, ">= 0.1.0"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
@@ -62,8 +62,8 @@ defmodule Munchkin.MixProject do
        app: false,
        compile: false,
        depth: 1},
-      {:swoosh, "~> 1.19"},
-      {:req, "~> 0.5"},
+      {:swoosh, "~> 1.26.3"},
+      {:req, "~> 0.6.2"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.26"},
@@ -79,7 +79,7 @@ defmodule Munchkin.MixProject do
       {:pythonx, "~> 0.4.0"},
       {:xlsxir, "~> 1.6.4"},
       {:nimble_csv, "~> 1.3.0"},
-      {:explorer, "~> 0.11.1"},
+      {:explorer, "~> 0.12"},
       {:langchain, "~> 0.5.2"},
       {:nx, "~> 0.9"},
       {:scholar, "~> 0.4.1"},
@@ -88,7 +88,9 @@ defmodule Munchkin.MixProject do
       {:tzdata, "~> 1.1"},
       {:quantum, "~> 3.0"},
       {:ex_cldr, "~> 2.47"},
-      {:ex_cldr_numbers, "~> 2.38"}
+      {:ex_cldr_numbers, "~> 2.38"},
+      {:ex_cldr_dates_times, "~> 2.0"},
+      {:live_debugger, "~> 1.0.1", only: :dev}
     ]
   end
 
